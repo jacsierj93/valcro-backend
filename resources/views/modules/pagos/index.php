@@ -289,7 +289,7 @@
             <md-content class="cntLayerHolder" layout="column" flex>
 
 
-                <form layout="row">
+                <form id="formPagoCuota" name="formPagoCuota" layout="row" ng-class="{'focused':isShow}">
 
                     <div active-left></div>
 

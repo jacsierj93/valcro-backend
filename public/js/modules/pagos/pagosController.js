@@ -15,7 +15,8 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.toolBar = {"add": true, "edit": false, "filter": false}; ///botonera
         $scope.provData = {"id": '', "nombre": '', "pagos": [], "deudas": [], "deudas2": []};
 
-
+        $scope.isShow = true;
+        
         /**
          * funcion que resetea el valor de los objetos segun la opcion colocada
          */
