@@ -3596,7 +3596,7 @@ MyApp.controller('OrderminiAddKitchenBoxCtrl',['$scope','$timeout','$mdSidenav',
     };
 }]);
 
-MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form', 'setGetOrder', function($scope, $timeout,$mdSidenav,Order, formSrv,$model){
+MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Order','form', 'setGetOrder','masters', function($scope, $timeout,$mdSidenav,Order, formSrv,$model,masters){
 
     $scope.defaultUrl =  {type:$scope.$parent.formMode.mod, mod:"SaveProductItem"};
     $scope.block= false;
@@ -3604,6 +3604,7 @@ MyApp.controller('OrderminiAddProductCtrl',['$scope','$timeout','$mdSidenav','Or
     $scope.isOpen = false;
     $scope.select ={};
     $scope.event =undefined;
+    $scope.unidCompra = masters.query("getUnitsCompras");
     $scope.$parent.OrderminiAddProductCtrl= function (data, url) {
         if($scope.allowEdit()){
             $scope.url = url;

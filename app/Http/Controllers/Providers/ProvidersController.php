@@ -69,29 +69,31 @@ class ProvidersController extends BaseController
 
     public function getProv(request $prv)
     {
-        $data = Provider::find($prv->id);
+        $data = Provider::selectRaw("id,razon_social, siglas,tipo_id,tipo_envio_id, contrapedido, reserved")->find($prv->id);
 
         $data->contraped = ($data->contraped == 1);
         $data->limCred =$data->limitCredit()->max("limite");
         $data->nomValc = $data->nombres_valcro()->select("id","nombre as name","fav")->get();
         foreach($data->nomValc as $nom){
-            $nom->departments = $nom->departamento()->get();
+            $nom->departments = $nom->departamento()->selectRaw('tbl_departamento.id,tbl_departamento.nombre')->get();
         };
-        $data->tiemposP = $data->prodTime()->get();
+        $data->tiemposP = $data->prodTime()->selectRaw('id,prov_id,min_dias,max_dias,linea_id')->get();
         foreach ($data->tiemposP as $time){
             $time->lines;
         }
-        $data->tiemposT = $data->transTime()->get();
+        $data->tiemposT = $data->transTime()->selectRaw('id,prov_id,min_dias,max_dias,id_pais')->get();
         foreach ($data->tiemposT as $time){
             $time->country;
         }
-        $data->direcciones=$data->address()->get();
+        $data->direcciones=$data->address()->selectRaw('id,prov_id,direccion,pais_id,tipo_dir,telefono, codigo_postal, aprov, user_aprov, coment_aprov')->get();
         foreach ($data->direcciones as $dir){
             $dir->country;
             $dir->tipo;
             $dir->ports = $dir->ports()->lists("puerto_id");
         }
-        $data->contacts = $data->contacts()->get();
+        $data->contacts = $data->contacts()
+            ->selectRaw('tbl_contacto.id,nombre,pais_id,agente,responsabilidades, direccion, aprov, user_aprov, coment_aprov')
+            ->get();
         foreach($data->contacts as $contact){
             $contact->languages=$contact->idiomas()->lists("languaje_id");
             $contact->country;
@@ -105,13 +107,13 @@ class ProvidersController extends BaseController
             $rep = $contact->campos()->where("prov_id",$data->id)->where("campo","notas")->first();
             $contact->notas=($rep)?$rep->valor:"";
         }
-        $data->banks = $data->bankAccount()->get();
+        $data->banks = $data->bankAccount()->selectRaw('id,prov_id,banco,cuenta,swift, beneficiario, dir_banco, dir_beneficiario, ciudad_id, aprov, user_aprov, coment_aprov')->get();
         foreach ($data->banks as $acc){
             $acc["ciudad"]=$acc->ciudad()->first();
             $acc["estado"] = $acc["ciudad"]->state()->first();
             $acc["pais"] = $acc["estado"]->country()->first();
         }
-        $data->monedas = $data->getProviderCoin()->get();
+        $data->monedas = $data->getProviderCoin()->selectRaw('nombre,simbolo,codigo')->get();
         $data->limites = $data->limitCredit()->get();
         foreach ($data->limites as $lim){
             $lim->moneda = Monedas::find($lim->moneda_id);
@@ -268,6 +270,15 @@ class ProvidersController extends BaseController
 
     }
 
+    public function aprovProvDir(request $req){
+        $result = array("success" => "aprovacion/desaprovacion guardada con exito", "action" => "aprov","id"=>"$req->id");
+        $addr = Address::find($req->id);
+        $addr->aprov = $req->stat;
+        $addr->coment_aprov = $req->coment;
+        $addr->save();
+        return $result;
+    }
+
     public function saveValcroName(request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
@@ -371,7 +382,7 @@ class ProvidersController extends BaseController
 
         $result['mails'] = $this->contactEmail($req->emailCont,$contact->id,$req->prov_id);
         $result['phones'] = $this->contactPhone($req->contTelf,$contact->id,$req->prov_id);
-        $result['cargos'] = $this->contactCargos($req->cargo,$contact->id,$req->prov_id);
+        //$result['cargos'] = $this->contactCargos($req->cargo,$contact->id,$req->prov_id);
         $this->contactCampos("direccion",$req->dirOff,$contact->id,$req->prov_id);
         $this->contactCampos("responsabilidad",$req->responsability,$contact->id,$req->prov_id);
         $this->contactCampos("notas",$req->notes,$contact->id,$req->prov_id);

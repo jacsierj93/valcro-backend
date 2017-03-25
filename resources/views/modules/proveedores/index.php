@@ -203,7 +203,7 @@
                                 Produccion:
                             </div>
                             <md-content flex>
-                                <div class="row resumBlock" layout="row" layout-align="start center" style="overflow: hidden; text-overflow: ellipsis;" ng-repeat="tiempo in prov.tiemposP">
+                                <div class="row resumBlock" ng-class="{'aprov':tiempo.aprov==1, 'deny':tiempo.aprov==0, 'wait':!tiempo.aprov}" layout="row" layout-align="start center" style="overflow: hidden; text-overflow: ellipsis;" ng-repeat="tiempo in prov.tiemposP">
                                     de: <b>{{tiempo.min_dias}}</b> a <b>{{tiempo.max_dias }}</b> para <b>{{tiempo.lines.linea}}</b>
                                 </div>
                             </md-content>
@@ -227,20 +227,23 @@
                                 </div>
                             </div>
                             <md-content flex>
-                                <div ng-repeat="direccion in prov.direcciones" class="resumBlock" layout="column">
-                                    <div class="row" layout="row">
-                                        <div flex style="overflow: hidden; text-overflow: ellipsis;" class="resumEm">
-                                            {{direccion.tipo.descripcion}}
-                                        </div>
-                                        <div flex="initial">
-                                            (venezuela)
+                                <div ng-repeat="direccion in prov.direcciones" ng-click="openAprov(direccion,'address')" class="resumBlock" layout="column">
+                                    <div ng-class="{'aprov':tiempo.aprov==1, 'deny':tiempo.aprov==0, 'wait':!tiempo.aprov}">
+                                        <div class="row" layout="row">
+                                            <div flex style="overflow: hidden; text-overflow: ellipsis;" class="resumEm">
+                                                {{direccion.tipo.descripcion}}
+                                            </div>
+                                            <div flex="initial">
+                                                (venezuela)
+                                            </div>
+
                                         </div>
 
+                                        <div class="row" style="overflow: hidden;">
+                                            {{direccion.direccion}}
+                                        </div>
                                     </div>
 
-                                    <div class="row" style="overflow: hidden;">
-                                        {{direccion.direccion}}
-                                    </div>
                                 </div>
                             </md-content>
                         </div>
@@ -2377,6 +2380,52 @@
             <div class="showNext"   style="width: 16px;" ng-mouseover="showNext(true,'END')">
 
             </div>
+        </md-sidenav>
+
+
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="aprovLayr" id="aprovLayr" click-out="closePopUp('aprovLayr',$event)">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+                <input type="hidden" md-autofocus>
+                <div ng-controller="aprovLayrCtrlr">
+                    <form name="aprovLayrForm" layout="column" class="focused">
+
+                            <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
+                                <div>
+                                    Aprobaciones de {{formu}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <md-input-container class="md-block" flex>
+                                    <label>fecha</label>
+                                    <input disable="true">
+                                </md-input-container>
+                            </div>
+                            <div class="row">
+                                <lmb-collection
+                                        class="rad-contain"
+                                        layout="row"
+                                        lmb-type="items"
+                                        lmb-model="aprov.stat"
+                                        lmb-display="name"
+                                        lmb-itens="[{name:'Aprobacion',id:1},{name:'Rechazar',id:0}]"
+                                        lmb-label="'Aprobacion'"
+                                        lmb-key="id"
+                                >
+
+                                </lmb-collection>
+                            </div>
+                            <div flex>
+                                <md-input-container class="md-block" flex>
+                                    <label>comentarios adicionales</label>
+                                    <textarea skip-tab decimal autocomplete="off" ng-disabled="$parent.enabled" ng-model="aprov.coment" ></textarea>
+
+                                </md-input-container>
+                            </div>
+
+
+                    </form>
+                </div>
+            </md-content>
         </md-sidenav>
 
         <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">

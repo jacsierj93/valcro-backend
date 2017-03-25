@@ -527,15 +527,26 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };
 });
-MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterLists) {
+MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterLists,common,aprovService) {
     $scope.provider = setGetProv.getProv();
-    $scope.prov = {tiemposP:[],tiemposT:[],direcciones:[]};
+    $scope.prov = {tiemposP: [], tiemposT: [], direcciones: []};
     $scope.pais = masterLists.getCountries();
-
-    $scope.$watch('provider.id',function(nvo){
+    $scope.common = common.getCommon();
+    $scope.$watch('provider.id', function (nvo) {
         $scope.prov = setGetProv.getFullProv();
-        console.log($scope.prov)
     })
+
+    var  cfgAprov = aprovService.getCfg();
+
+    $scope.openAprov = function(elem,url){
+        $scope.$parent.openPopUp("aprovLayr",{
+            before:function(){
+                cfgAprov.url = url;
+                cfgAprov.id = elem.id;
+                return true;
+            }
+        })
+    }
 
 
 });
@@ -1876,14 +1887,18 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
 
     /*seteado de Cargos para el contacto (tipo departamento nombre valcro*/
     $scope.setCargo = function(elem,e){
+        console.log(elem,e)
         if(e.keyCode==32 || e.type=="click"){
+            console.log("entrooo");
             var cargo = elem.id;
             var k = $scope.cnt.cargo.indexOf(cargo);
             if(k!=-1){
                 $scope.cnt.cargo.splice(k,1);
             }else{
+                console.log($scope.cnt.cargo,cargo)
                 $scope.cnt.cargo.push(""+cargo);
             }
+            console.log($scope.cnt.cargo)
             $scope.provContactosForm.$setDirty();
         }
 
@@ -1940,19 +1955,17 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         //if((jQuery(event.target).parents("#contactBook").length==0) && (jQuery(event.target).parents("#lyrAlert").length==0)){
         if(!elem){
             saveContact(function(){
-                //console.log("ENTROOOOOOOOOOOO")
                 $scope.provContactosForm.$setUntouched();
                 $scope.provContactosForm.$setPristine();
                 contact = {};
                 setGetContac.setContact(false);
                 $scope.ctrl.searchCountry = "";
-
                 angular.element("#contTelf").find("input").val("");
                 if($scope.$parent.expand==$scope.id){
+
                     $scope.isShowMore = elem;
                     $scope.$parent.expand = false;
                 }
-                //$timeout(function(){$scope.setting = false;},500)
             });
 
 
@@ -3646,6 +3659,27 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
     //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
 });
 
+MyApp.controller('aprovLayrCtrlr', function ($scope,aprovService,providers,setGetProv,$filter){
+    var cfg = aprovService.getCfg();
+    $scope.$watchGroup("cfg",function(n){
+        console.log(n)
+    })
+
+
+});
+MyApp.service("aprovService",function($timeout,providers,setGetProv,setNotif,$filter,App){
+    var aprvCfg = {
+        url : "",
+        id : false
+    }
+
+    return {
+        getCfg : function() {
+            return aprvCfg;
+        }
+
+    }
+})
 MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter,App){
     var foreign = {
         currentOrig : {},
@@ -3749,6 +3783,7 @@ MyApp.service("saveForm",function($timeout,providers,setGetProv,setNotif,$filter
         }
     }
 });
+
 
 
 

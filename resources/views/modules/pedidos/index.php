@@ -3832,6 +3832,18 @@
                             <md-tooltip >Cantidad a agregar</md-tooltip>
                         </div>
 
+                        <div layout="row" class="row" >
+                            <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
+                                <div layout="column" layout-align="center center">Asignado </div>
+                            </div>
+
+                            <md-input-container class="md-block rms" flex >
+                                <input  skip-tab required id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"   >
+                            </md-input-container>
+
+                            <md-tooltip >Cantidad a agregar</md-tooltip>
+                        </div>
+
                         <div layout="row"  class="row" >
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
                                 <div layout="column" layout-align="center center">Costo unitario </div>
