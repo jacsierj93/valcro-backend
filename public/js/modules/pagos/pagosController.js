@@ -8,6 +8,23 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             $scope.layer = nvo[0];
         });
 
+        $scope.validForm = function(){
+            //return true;
+           var x = $scope.fmrAbonos.$valid;
+           if(!x){
+               $scope.NotifAction("alert",'debe terminar los campos de formulario',[],{autohidden:2000});
+           }
+           return x;
+        }
+
+        $scope.gotoPage = function(){
+            $scope.LayersAction({open:{name:"lyr6pag"}});
+        }
+
+        $scope.showErr = function(){
+            alert("prueba");
+        }
+
         // Variables generales -------------
         var historia = [15];
         $scope.index = 0;

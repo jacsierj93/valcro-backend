@@ -777,11 +777,11 @@
                     -->
 
             </md-content>
+            <show-next on-next="gotoPage" valid="validForm" on-error="showErr" ></show-next>
+           <!-- <div style="width: 16px;" ng-mouseover="showNext(true,'lyr6pag')">
 
-            <div style="width: 16px;" ng-mouseover="showNext(true,'lyr6pag')">
 
-
-            </div>
+            </div>-->
         </md-sidenav>
 
 

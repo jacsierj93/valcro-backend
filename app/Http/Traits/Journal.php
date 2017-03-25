@@ -57,7 +57,7 @@ trait Journal
         });
 
         static::updated(function ($model) {
-
+            dd($model);
             self::audit($model,"upd");
         });
 

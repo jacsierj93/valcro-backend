@@ -809,8 +809,9 @@ MyApp.directive('showNext', function() {
         scope:{
             nextFn:"=?onNext",
             nextValid:"=?valid"
+
         },
-        controller:function($scope,$mdSidenav,nxtService,Layers){
+        controller:function($scope,$mdSidenav,nxtService,$timeout,Layers){
             $scope.cfg = nxtService.getCfg();
             if(!("onNext" in  $scope)){
                 $scope.onNext = ($scope.$parent)
