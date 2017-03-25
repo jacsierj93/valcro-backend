@@ -426,6 +426,69 @@ class OrderController extends BaseController
         $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " BETWEEN 61 and  90 ") . ") as review90 ";
         $rawn .= " , (" . $this->generateProviderQuery("ult_revision", " > 90 ") . ") as review100 ";
 
+            /*$qry = "SELECT
+            id,
+            razon_social,
+            contrapedido,
+            (SELECT
+              SUM(monto)
+            FROM tbl_proveedor AS proveedor
+              INNER JOIN tbl_compra_orden
+                ON proveedor.id = tbl_compra_orden.prov_id
+            WHERE tbl_compra_orden.prov_id = tbl_proveedor.id AND tbl_compra_orden.deleted_at IS NULL) AS deuda,
+            (SELECT
+              COUNT(id)
+            FROM tbl_compra_orden
+            WHERE prov_id = tbl_proveedor.id AND tbl_compra_orden.deleted_at IS NULL
+            AND final_id IS NULL AND fecha_sustitucion IS NULL AND fecha_aprob_compra != NULL
+            AND fecha_aprob_gerencia != NULL AND estado_id != 3) AS contraPedidos,
+            emisiones.emit0,
+            emisiones.emit7,
+            emisiones.emit30,
+            emisiones.emit60,
+            emisiones.emit90,
+            emisiones.emit100,
+            revisiones.review0,
+            revisiones.review7,
+            revisiones.review30,
+            revisiones.review60,
+            revisiones.review90,
+            revisiones.review100
+          FROM tbl_proveedor
+            LEFT JOIN (SELECT
+              SUM(vce.emit0) AS emit0,
+              SUM(vce.emit7) AS emit7,
+              SUM(vce.emit30) AS emit30,
+              SUM(vce.emit60) AS emit60,
+              SUM(vce.emit90) AS emit90,
+              SUM(vce.emit100) AS emit100,
+              vce.prov_id
+            FROM view_compras_emisiones AS vce
+            GROUP BY vce.prov_id) AS emisiones
+              ON emisiones.prov_id = tbl_proveedor.id
+            LEFT JOIN (SELECT
+              SUM(vcr.review0) AS review0,
+              SUM(vcr.review7) AS review7,
+              SUM(vcr.review30) AS review30,
+              SUM(vcr.review60) AS review60,
+              SUM(vcr.review90) AS review90,
+              SUM(vcr.review100) AS review100,
+              vcr.prov_id
+            FROM view_compras_revisiones AS vcr
+            GROUP BY vcr.prov_id) AS revisiones
+              ON revisiones.prov_id = tbl_proveedor.id
+          GROUP BY tbl_proveedor.id";
+        $provs = DB::select($qry);
+        
+        foreach ($provs as $key => $val) {
+            foreach ($val as $k => $v) {
+                if(gettype($k)== "integer"){
+                    unset($provs[$key][$k]);
+                }
+            };
+        };*/
+        
+        
         $provs = Provider::selectRaw($rawn)
             ->with('getProviderCoin','getPaymentCondition','contacts')
             ->get();
@@ -696,7 +759,16 @@ class OrderController extends BaseController
           */
             $data[] = $aux;
         }
+        //print_r($data);
 
+        /*$data = DB::select("SELECT * FROM view_compras_docs AS docs WHERE docs.prov_id = ".$req->id);
+        foreach ($data as $key => $val) {
+            foreach ($val as $k => $v) {
+                if(gettype($k)== "integer"){
+                    unset($data[$key][$k]);
+                }
+            };
+        };*/
         return $data;
 
     }
