@@ -423,19 +423,35 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
 
         };
+        
+        $scope.ctrl.searchCoin= undefined;
+
+        $scope.validFormPago = function(){
+            //return true;
+           var x = $scope.fmrAbonos.$valid;
+           console.log($scope.fmrAbonos);
+           if(!x){
+               $scope.NotifAction("alert",'debe terminar los campos de formulario',[],{autohidden:2000});
+           }
+           return x;
+        }
+
+        $scope.showErrFormPago = function(){
+            alert("prueba");
+        }
 
 
         /////formulario de registro de pago
         $scope.saveFormPago = function () {
-            $http.post('payments/savePay', $scope.pago).success(function (data, status, headers, config) {
+            console.log($scope.pago);
+            /*$http.post('payments/savePay', $scope.pago).success(function (data, status, headers, config) {
 
                         console.log(data);
-
                         //  $scope.NotifAction("alert","por favor escriba un monto",[{"name":"aceptar","action":null,"default":5}],{"autohidden":5})
 
                     }).error(function (data, status, header, config) {
                 console.log("Error:enviando datos del pago...");
-            });
+            });*/
         };
 
 

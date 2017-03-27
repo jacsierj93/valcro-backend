@@ -319,11 +319,10 @@
                                    md-hide-icons="all"
                                    md-open-on-focus
                                    required >
-                                       
                                </md-datepicker>
                             </md-input-container>
                             
-<!--                            <div layout="column" flex>
+                            <!--<div layout="column" flex>
                                 <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
                             </div>-->
 
@@ -332,7 +331,7 @@
                                 <input  type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
                             </md-input-container>
 
-<!--                            <md-input-container class="md-block" flex="10">
+                            <!--<md-input-container class="md-block" flex="10">
                                 <label>Moneda</label>
                                 <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
                                            required md-no-ink>
@@ -342,52 +341,68 @@
                                 </md-select>
                             </md-input-container>-->
 
-
-
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
                                 <md-autocomplete 
-                                                     flex
-                                                     id="moneda_pago"
-                                                     
-                                                     info="moneda de este factor"
-                                                     skip-tab
-                                                     required
-                                                     md-require-match="true"
-                                                     md-selected-item="ctrl.searchCoin"
-                                                     md-search-text="ctrl.searchCoin"
-                                                     md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
-                                                     md-item-text="moneda.nombre"
-                                                     md-no-asterisk
-                                                    
-                                                     md-min-length="0">
-                                        <input >
+                                            flex
+                                            skip-tab
+                                            required
+                                            md-no-asterisk
+                                            md-select-on-match
+                                            md-autoselect = "true"
+                                            md-min-length="0"
+                                            md-no-cache="true"
+                                            md-min-length="0"
+                                            id="moneda_pago"
+                                            info="moneda de este factor"
+                                            model="pago.moneda_id"
+                                            md-require-match="true"
+                                            md-selected-item="ctrl.searchCoin"
+                                            md-search-text="ctrl.searchCoin"
+                                            md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
+                                            md-item-text="moneda.nombre"
+                                            md-selected-item-change="showErrFormPago()">
                                         <md-item-template>
-                                            <span>{{item.nombre}}</span>
+                                            <span>{{moneda.nombre}}</span>
                                         </md-item-template>
                                     </md-autocomplete>
                             </md-input-container>
 
-
-
-
-
-
-
-
                             <md-input-container class="md-block" flex="10">
                                 <label>Tasa</label>
-                                <input ng-model="pago.tasa" ng-readonly="true" required/>
+                                <input ng-model="pago.tasa" ng-readonly="true" />
 
                             </md-input-container>
 
-                            <md-input-container class="md-block" flex="20">
+                            <!--<md-input-container class="md-block" flex="20">
                                 <label>Tipo Pago</label>
                                 <md-select info="prueba" ng-model="pago.tipo_id" required md-no-ink>
                                     <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
                                         {{tipoPago.nombre}}
                                     </md-option>
                                 </md-select>
+                            </md-input-container>-->
+
+                            <md-input-container class="md-block" flex>
+                                <label>Tipo Pago</label>
+                                <md-autocomplete 
+                                            flex
+                                            id="tipo_pago"
+                                            info="Seleccione el tipo de transccion"
+                                            skip-tab
+                                            required
+                                            model="pago.tipo_id"
+                                            md-require-match="true"
+                                            md-selected-item="ctrl.searchTipPago"
+                                            md-search-text="ctrl.searchTipPago"
+                                            md-items="tipoPago in tipoPagos | stringKey : ctrl.searchTipPago: 'nombre'"
+                                            md-item-text="tipoPago.nombre"
+                                            md-no-asterisk
+                                            md-min-length="0">
+                                        <md-item-template>
+                                            <span>{{tipoPago.nombre}}</span>
+                                        </md-item-template>
+                                    </md-autocomplete>
                             </md-input-container>
 
                             <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>
@@ -467,10 +482,7 @@
 
             </md-content>
 
-            <div style="width: 16px;" ng-mouseover="showNext(true,'END')">
-
-
-            </div>
+            <show-next on-next="saveFormPago" valid="validFormPago" on-error="showErrFormPago"></show-next>
         </md-sidenav>
 
 
