@@ -46,7 +46,7 @@ MyApp.service("popUpService",function($mdSidenav){
 
         }
     }
-})
+}) //GLOBAL
 MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,mastersCrit,$filter){
     var providers = masterSrv.getProvs();
     var listProv = productos.query({type:'provsProds'});
@@ -158,6 +158,69 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
 
     }
 });
+
+MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
+    $scope.nxtAction = null;
+    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old) {
+        $scope.index = nvo[1];
+        $scope.layerIndex = nvo[0];
+        $scope.layer = nvo[0];
+    });
+
+    $scope.openForm = function(id){
+        $scope.LayersAction({open:{name:"prodLayer3"},before:function(){
+            productsServices.setProd(id);
+        }});
+    };
+
+    $scope.prevLayer = function(){
+        if($scope.index==1 && productsServices.showChange()){
+            setNotif.addNotif("alert","ha realizado cambios en el producto, desea salir",[
+                {
+                    name:"Si",
+                    action:function(){
+                        $scope.LayersAction({close:true,before:function(){
+                            productsServices.setProvprod(false);
+                        }});
+                    },
+                    default:defaultTime
+                },
+                {
+                    name:"No",
+                    action:function(){
+
+                    }
+                }
+            ]);
+        }else{
+            $scope.LayersAction({close:true});
+        }
+
+    };
+
+
+    // Acciones de la capa resumen -------------------------
+    $scope.goToResumen = function(id){
+        $scope.LayersAction({open:{name:"prodLayer6"}});
+    };
+
+    $scope.goToEnd = function(){
+        $scope.LayersAction({close:{all:true,before:function(){
+            //critForm.setLine(false);
+        },
+            after:function(){
+                setNotif.addNotif("ok", "El producto se ha finalizado correctamente", [
+                ],{autohidden:2000});
+            }}});
+    };
+    // -------------------------------------------------------
+
+
+    $scope.prod = productsServices.getToSavedProd();
+
+    $scope.items = []
+
+}]);
 
 MyApp.controller('listProdController',['$scope', 'setNotif','productos','productsServices',function ($scope, setNotif,productos,productsServices) {
     $scope.listProvs = {
@@ -338,68 +401,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 }]);
 
 
-MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
-    $scope.nxtAction = null;
-    $scope.$watchGroup(['module.layer','module.index'],function(nvo,old) {
-        $scope.index = nvo[1];
-        $scope.layerIndex = nvo[0];
-        $scope.layer = nvo[0];
-    });
 
-    $scope.openForm = function(id){
-        $scope.LayersAction({open:{name:"prodLayer3"},before:function(){
-            productsServices.setProd(id);
-        }});
-    };
-
-    $scope.prevLayer = function(){
-        if($scope.index==1 && productsServices.showChange()){
-            setNotif.addNotif("alert","ha realizado cambios en el producto, desea salir",[
-                {
-                    name:"Si",
-                    action:function(){
-                        $scope.LayersAction({close:true,before:function(){
-                            productsServices.setProvprod(false);
-                        }});
-                    },
-                    default:defaultTime
-                },
-                {
-                    name:"No",
-                    action:function(){
-
-                    }
-                }
-            ]);
-        }else{
-            $scope.LayersAction({close:true});
-        }
-
-    };
-    
-    
-    // Acciones de la capa resumen -------------------------
-    $scope.goToResumen = function(id){
-		$scope.LayersAction({open:{name:"prodLayer6"}});
-    };
-	
-	$scope.goToEnd = function(){
-        $scope.LayersAction({close:{all:true,before:function(){
-            //critForm.setLine(false);
-        },
-        after:function(){
-            setNotif.addNotif("ok", "El producto se ha finalizado correctamente", [
-            ],{autohidden:2000});
-        }}});
-	};
-    // -------------------------------------------------------
-    
-    
-    $scope.prod = productsServices.getToSavedProd();
-
-    $scope.items = []
-
-}]);
 MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService','App','generic',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService,App,generic) {
     $scope.prod = {
         id:false,
@@ -800,6 +802,44 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
 
 }]);
 
+MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout', function ($scope, setNotif,productos,productsServices,$timeout) {
+    $scope.prod = productsServices.getProd();
+
+    $scope.crit = productsServices.getCriteria();
+    console.log($scope.crit.criteria)
+
+	$scope.prodCrir = 
+	[{
+		"campo" : "Serie",
+		"valor" : "Algo"
+	},{
+		"campo" : "Codigo",
+		"valor" : "Algo"
+	},{
+		"campo" : "Ancho",
+		"valor" : "111"
+	},{
+		"campo" : "Profundidad",
+		"valor" : "111"
+	},{
+		"campo" : "Unidas",
+		"valor" : "Pieza"
+	},{
+		"campo" : "Caracteristicas",
+		"valor" : "Mesedora"
+	},{
+		"campo" : "Voltaje",
+		"valor" : "220V"
+	},{
+		"campo" : "Acabdo",
+		"valor" : "Pulido"
+	},{
+		"campo" : "Acabado Base",
+		"valor" : "Cromo"
+	}];
+
+}]);
+
 
 MyApp.directive('showNext', function() {
 
@@ -839,7 +879,7 @@ MyApp.directive('showNext', function() {
         },
         template: '<div class="showNext" style="width: 16px;" ng-mouseover="show()"> </div>'
     };
-});
+});//GLOBAL
 
 MyApp.directive('nextRow', function() {
 
@@ -859,10 +899,10 @@ MyApp.directive('nextRow', function() {
             }
         },
         template: '<md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url(\'images/btn_backBackground.png\');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="hideNext()">'+
-                    '<img src="images/btn_nextArrow.png" ng-click="nxtAction(\$event)"/>'+
-                    '</md-sidenav>'
+        '<img src="images/btn_nextArrow.png" ng-click="nxtAction(\$event)"/>'+
+        '</md-sidenav>'
     };
-});
+});//GLOBAL
 
 MyApp.service("nxtService",function(){
     var cfg = {
@@ -875,7 +915,7 @@ MyApp.service("nxtService",function(){
             return cfg;
         }
     }
-})
+});//GLOBAL
 
 
 
@@ -917,97 +957,58 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
 
         }
     };
-})
+})//GLOBAL
     .directive('autoClose',function(popUpService,$mdSidenav,$compile,$interval){
-    return {
-        terminal: true, //this setting is important, see explanation below
-        priority: 1000, //this setting is important, see explanation below
+        return {
+            terminal: true, //this setting is important, see explanation below
+            priority: 1000, //this setting is important, see explanation below
 
-        link:function(scope,object,attr){
-            scope.fn = scope.$eval(attr.autoClose);
-            scope.sideNav = object.parents("md-sidenav").first().attr("md-component-id");
+            link:function(scope,object,attr){
+                scope.fn = scope.$eval(attr.autoClose);
+                scope.sideNav = object.parents("md-sidenav").first().attr("md-component-id");
 
-            scope.closer = function(){
-                $mdSidenav(scope.sideNav).close().then(function(){
-                    popUpService.remove(idx);
-                    if(scope.fn.after){
-                        scope.fn.after();
-                    }
-                });
-            };
-            scope.close = function(){
-
-                idx = popUpService.exist(scope.sideNav);
-                if(idx != -1){
-                    if(scope.fn.before){
-                        pre= scope.fn.before();
-                    }else{
-                        pre = true;
-                    }
-
-
-                    if(!pre){
-                        return false;
-                    }
-                    else if(typeof(pre) == "object" && 'wait' in pre){
-                        var x = $interval(function(){
-                            if(pre.wait===true){
-                                $interval.cancel(x);
-                                scope.closer();
-                            }else if(pre.wait===false){
-                                $interval.cancel(x);
-                                return false;
-                            }
-                        },1000)
-                    }else{
-                        scope.closer();
-                    }
-
+                scope.closer = function(){
+                    $mdSidenav(scope.sideNav).close().then(function(){
+                        popUpService.remove(idx);
+                        if(scope.fn.after){
+                            scope.fn.after();
+                        }
+                    });
                 };
-            };
+                scope.close = function(){
 
-            object.attr("click-out","close()")
-            object.removeAttr("auto-close");
-            $compile(object)(scope);
-        },
-    }
-});
+                    idx = popUpService.exist(scope.sideNav);
+                    if(idx != -1){
+                        if(scope.fn.before){
+                            pre= scope.fn.before();
+                        }else{
+                            pre = true;
+                        }
 
 
-MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout', function ($scope, setNotif,productos,productsServices,$timeout) {
-    $scope.prod = productsServices.getProd();
+                        if(!pre){
+                            return false;
+                        }
+                        else if(typeof(pre) == "object" && 'wait' in pre){
+                            var x = $interval(function(){
+                                if(pre.wait===true){
+                                    $interval.cancel(x);
+                                    scope.closer();
+                                }else if(pre.wait===false){
+                                    $interval.cancel(x);
+                                    return false;
+                                }
+                            },1000)
+                        }else{
+                            scope.closer();
+                        }
 
-    $scope.crit = productsServices.getCriteria();
-    console.log($scope.crit.criteria)
+                    };
+                };
 
-	$scope.prodCrir = 
-	[{
-		"campo" : "Serie",
-		"valor" : "Algo"
-	},{
-		"campo" : "Codigo",
-		"valor" : "Algo"
-	},{
-		"campo" : "Ancho",
-		"valor" : "111"
-	},{
-		"campo" : "Profundidad",
-		"valor" : "111"
-	},{
-		"campo" : "Unidas",
-		"valor" : "Pieza"
-	},{
-		"campo" : "Caracteristicas",
-		"valor" : "Mesedora"
-	},{
-		"campo" : "Voltaje",
-		"valor" : "220V"
-	},{
-		"campo" : "Acabdo",
-		"valor" : "Pulido"
-	},{
-		"campo" : "Acabado Base",
-		"valor" : "Cromo"
-	}];
-
-}]);
+                object.attr("click-out","close()")
+                object.removeAttr("auto-close");
+                $compile(object)(scope);
+            },
+        }
+    });//GLOBAL

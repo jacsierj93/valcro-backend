@@ -21,10 +21,6 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             $scope.LayersAction({open:{name:"lyr6pag"}});
         }
 
-        $scope.showErr = function(){
-            alert("prueba");
-        }
-
         // Variables generales -------------
         var historia = [15];
         $scope.index = 0;
