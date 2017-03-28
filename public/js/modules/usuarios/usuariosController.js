@@ -180,7 +180,7 @@ MyApp.controller('mainUsersController', ['$scope', 'setNotif', '$http', '$mdSide
         var self = this;
         // Reseteo del formulario --------------------------------------------------------------------------
         $scope.resetFormUsuario = function(){
-            // Reset Varibles que contiene datos del producto seleccionado ---------------------------------
+            // Reset Variables que contiene datos del producto seleccionado ---------------------------------
             $scope.userSelected = angular.copy($scope.camposForm);
             $scope.useBase = angular.copy($scope.camposForm);
             // Reset Selectores ----------------------------------------------------------------------------
