@@ -289,7 +289,7 @@
             <md-content class="cntLayerHolder" layout="column" flex>
 
 
-                <form id="formPagoCuota" name="formPagoCuota" layout="row" ng-class="{'focused':isShow}">
+                <form id="formPagoCuota" global name="formPagoCuota" layout="row" ng-class="{'focused':isShow}">
 
                     <div active-left></div>
 
@@ -344,28 +344,25 @@
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
                                 <md-autocomplete 
-                                            flex
-                                            skip-tab
-                                            required
-                                            md-no-asterisk
-                                            md-select-on-match
-                                            md-autoselect = "true"
-                                            md-min-length="0"
-                                            md-no-cache="true"
-                                            md-min-length="0"
-                                            id="moneda_pago"
-                                            info="moneda de este factor"
-                                            model="pago.moneda_id"
-                                            md-require-match="true"
-                                            md-selected-item="ctrl.searchCoin"
-                                            md-search-text="ctrl.searchCoin"
-                                            md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
-                                            md-item-text="moneda.nombre"
-                                            md-selected-item-change="showErrFormPago()">
-                                        <md-item-template>
-                                            <span>{{moneda.nombre}}</span>
-                                        </md-item-template>
-                                    </md-autocomplete>
+                                    flex
+                                    skip-tab
+                                    required
+                                    md-no-asterisk
+                                    md-autoselect = "true"
+                                    md-min-length="0"
+                                    id="moneda_pago"
+                                    md-no-cache="ctrl.noCache"
+                                    info="Indique la moneda con la que se efectuo la transaccion."
+                                    model="pago.moneda_id"
+                                    md-require-match="true"
+                                    md-selected-item="ctrl.selCoin"
+                                    md-search-text="ctrl.searchCoin"
+                                    md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
+                                    md-item-text="moneda.nombre">
+                                    <md-item-template>
+                                        <span>{{moneda.nombre}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="10">
@@ -386,23 +383,25 @@
                             <md-input-container class="md-block" flex>
                                 <label>Tipo Pago</label>
                                 <md-autocomplete 
-                                            flex
-                                            id="tipo_pago"
-                                            info="Seleccione el tipo de transccion"
-                                            skip-tab
-                                            required
-                                            model="pago.tipo_id"
-                                            md-require-match="true"
-                                            md-selected-item="ctrl.searchTipPago"
-                                            md-search-text="ctrl.searchTipPago"
-                                            md-items="tipoPago in tipoPagos | stringKey : ctrl.searchTipPago: 'nombre'"
-                                            md-item-text="tipoPago.nombre"
-                                            md-no-asterisk
-                                            md-min-length="0">
-                                        <md-item-template>
-                                            <span>{{tipoPago.nombre}}</span>
-                                        </md-item-template>
-                                    </md-autocomplete>
+                                    flex
+                                    skip-tab
+                                    required
+                                    md-no-asterisk
+                                    md-autoselect = "true"
+                                    md-min-length="0"
+                                    id="tipo_pago"
+                                    md-no-cache="ctrl.noCache"
+                                    info="Seleccione el tipo de transccion."
+                                    model="pago.tipo_id"
+                                    md-require-match="true"
+                                    md-selected-item="ctrl.selTipPago"
+                                    md-search-text="ctrl.searchTipPago"
+                                    md-items="tipoPago in tipoPagos | stringKey : ctrl.searchTipPago: 'nombre'"
+                                    md-item-text="tipoPago.nombre">
+                                    <md-item-template>
+                                        <span>{{tipoPago.nombre}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
                             </md-input-container>
 
                             <md-button style="height: 20px;" md-no-ink flex="10">Adjuntar</md-button>

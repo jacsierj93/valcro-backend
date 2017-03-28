@@ -33,6 +33,17 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.provData = {"id": '', "nombre": '', "pagos": [], "deudas": [], "deudas2": []};
 
         $scope.isShow = true;
+
+        $scope.pago = {
+            "id": null,
+            "nro_doc": null,
+            "fecha": null,
+            "monto": 0,
+            "moneda_id": 3,
+            "tasa": null,
+            "tipo_id": null
+        };
+        
         
         /**
          * funcion que resetea el valor de los objetos segun la opcion colocada
@@ -212,6 +223,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.getCoins = function () {
             $http.get('master/getCoins').success(function (response) {
                 $scope.monedas = response;
+                console.log($scope.monedas);
                 console.log("lista de monedas");
             });
         };
@@ -424,7 +436,8 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
         };
         
-        $scope.ctrl.searchCoin= undefined;
+        $scope.ctrl = {};
+        $scope.ctrl.searchCoin = undefined;
 
         $scope.validFormPago = function(){
             //return true;
@@ -434,11 +447,11 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
                $scope.NotifAction("alert",'debe terminar los campos de formulario',[],{autohidden:2000});
            }
            return x;
-        }
+        };
 
         $scope.showErrFormPago = function(){
             alert("prueba");
-        }
+        };
 
 
         /////formulario de registro de pago
