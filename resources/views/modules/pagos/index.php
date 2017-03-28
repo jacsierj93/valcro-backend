@@ -308,38 +308,37 @@
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Nro. Documento</label>
-                                <input skip-tab ng-model="pago.nro_doc" required/>
+                                <input
+                                    skip-tab
+                                    ng-model="pago.nro_doc"
+                                    required/>
                             </md-input-container>
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Fecha</label>
-                               <md-datepicker
-                                   skip-tab
-                                   ng-model="pago.fecha"
-                                   md-hide-icons="all"
-                                   md-open-on-focus
-                                   required >
-                               </md-datepicker>
+                                <md-datepicker
+                                    flex
+                                    skip-tab
+                                    md-no-asterisk
+                                    ng-model="pago.fecha"
+                                    md-hide-icons="calendar"
+                                    required>
+                                </md-datepicker>
                             </md-input-container>
-                            
-                            <!--<div layout="column" flex>
-                                <md-datepicker ng-model="pago.fecha" required md-placeholder="fecha"></md-datepicker>
-                            </div>-->
 
                             <md-input-container class="md-block" flex="15">
                                 <label>Monto</label>
-                                <input  type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-change="calculateDeuda2(abonos2,pago)" ng-model="pago.monto" required/>
+                                <input
+                                    skip-tab
+                                    type="text"
+                                    awnum num-sep=","
+                                    num-int="8"
+                                    num-fract="4"
+                                    num-thousand="true"
+                                    ng-change="calculateDeuda2(abonos2,pago)"
+                                    ng-model="pago.monto"
+                                    required/>
                             </md-input-container>
-
-                            <!--<md-input-container class="md-block" flex="10">
-                                <label>Moneda</label>
-                                <md-select ng-model="pago.moneda_id" ng-change="getTasaByCoinId(pago.moneda_id,'pago')"
-                                           required md-no-ink>
-                                    <md-option ng-repeat="moneda in monedas" value="{{moneda.id}}">
-                                        {{moneda.nombre}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>-->
 
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
@@ -367,18 +366,13 @@
 
                             <md-input-container class="md-block" flex="10">
                                 <label>Tasa</label>
-                                <input ng-model="pago.tasa" ng-readonly="true" />
-
+                                <input
+                                    flex
+                                    skip-tab
+                                    required
+                                    ng-model="pago.tasa"
+                                    ng-readonly="false" />
                             </md-input-container>
-
-                            <!--<md-input-container class="md-block" flex="20">
-                                <label>Tipo Pago</label>
-                                <md-select info="prueba" ng-model="pago.tipo_id" required md-no-ink>
-                                    <md-option ng-repeat="tipoPago in tipoPagos" value="{{tipoPago.id}}">
-                                        {{tipoPago.nombre}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>-->
 
                             <md-input-container class="md-block" flex>
                                 <label>Tipo Pago</label>
@@ -440,7 +434,16 @@
                                     <div flex="10" class="cellGrid"> {{abono.monto | currency : "$" : 2}}</div>
                                     <div flex="10" class="cellGrid"> {{abono.saldo | currency : "$" : 2}}</div>
                                     <div flex="10" class="cellGrid">
-                                        <input type="text" awnum num-sep="," num-int=8 num-fract=4 num-thousand='true' ng-model="abono.montoUsado" ng-change="calculateDeuda2(abonos2,pago)" ng-disabled="!abono.asignado" ng-value="abono.saldo" />
+                                        <input
+                                            type="text"
+                                            awnum num-sep=","
+                                            num-int="8"
+                                            num-fract="4"
+                                            num-thousand="true"
+                                            ng-model="abono.montoUsado"
+                                            ng-change="calculateDeuda2(abonos2,pago)"
+                                            ng-disabled="!abono.asignado"
+                                            ng-value="abono.saldo" />
                                     </div>
                                 </div>
 

@@ -35,7 +35,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             "nro_doc": null,
             "fecha": null,
             "monto": 0,
-            "moneda_id": 3,
+            "moneda_id": null,
             "tasa": null,
             "tipo_id": null
         };
@@ -65,7 +65,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
                     'saldo2': 0.0 ///backup
                 };
                 $scope.payData = {"id": '', "provname": '', "provid": '', "factura": ''};
-                $scope.pago = {"monto": ''};
+                //$scope.pago = {"monto": ''};
                 $scope.abonos = [];
                 $scope.abonos2 = [];
                 $scope.abono = {"monto": '', "monto_rec": 0.0, "monto_recp": 0.0};
@@ -437,8 +437,8 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
         $scope.validFormPago = function(){
             //return true;
-           var x = $scope.fmrAbonos.$valid;
-           console.log($scope.fmrAbonos);
+           var x = $scope.formPagoCuota.$valid;
+           console.log($scope.formPagoCuota);
            if(!x){
                $scope.NotifAction("alert",'debe terminar los campos de formulario',[],{autohidden:2000});
            }
