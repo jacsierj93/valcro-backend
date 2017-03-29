@@ -352,6 +352,7 @@
                                     md-no-cache
                                     info="Indique la moneda con la que se efectuo la transaccion."
                                     model="pago.moneda_id"
+
                                     md-require-match="true"
                                     md-selected-item="ctrl.selCoin"
                                     md-search-text="ctrl.searchCoin"
