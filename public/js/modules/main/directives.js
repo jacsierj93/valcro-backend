@@ -661,6 +661,7 @@ MyApp.service('clickCommitSrv', function() {
     }
 });
 
+
 MyApp.service('formPreviewSrv',function(){
     var commons = {
         crit:[],
@@ -781,19 +782,7 @@ MyApp.directive('critModel', function(formPreviewSrv) {
 
     };
 });
-/*
 
-MyApp.directive('critModel', function(formPreviewSrv) {
-    return {
-        link: function(scope, elem, attr){
-            scope[attr.critModel] = formPreviewSrv.getCrits();
-            console.log("linked")
-        }
-
-    };
-});
-
-*/
 
 
 

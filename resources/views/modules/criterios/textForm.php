@@ -11,7 +11,6 @@
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
            autocomplete="off"
-           name="razon_social"
            ng-required="{{field.options.Requerido[0].pivot.value || false}}"
            min-length="{{field.options.Minimo[0].pivot.value || 0}}"
            max-lenght="{{field.options.Max[0].pivot.value || 9999}}"
@@ -38,7 +37,6 @@
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
            autocomplete="off"
-           name="razon_social"
            ng-required="{{field.options.Requerido[0].pivot.value || false}}"
            number
            min="{{field.options.Minimo[0].pivot.value || 0}}"
@@ -62,7 +60,6 @@
                      model="crit[field.id].value"
                      flex
                      skip-tab
-                     id="langCont"
                      ng-required="{{field.options.Requerido[0].pivot.value || ''}}"
                      info="{{field.options.Info[0].pivot.value || ''}}"
                      md-search-text="ctrl[field.id].searchSel"
@@ -72,7 +69,6 @@
                      md-item-text="item.elem.nombre"
                      md-no-asterisk
                      md-min-length="0"
-                
                      id="{{field.id}}">
 
         <md-item-template>
@@ -90,6 +86,7 @@
                 lmb-itens="field.options.Opcion"
                 lmb-label="field.options.placeholder[0].pivot.value || field.field.descripcion"
                 lmb-key="elem.id"
+                id="{{field.id}}"
                 ng-attr-multiple="field.options.multi[0].pivot.value==1"
                 data="{{formFilters[field.id]}}"
                 filter-by="filterSearch: formFilters[field.id] : 'elem.id' "

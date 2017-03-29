@@ -7,6 +7,8 @@ MyApp.factory('productos', ['$resource',function ($resource) {
         });
     }
 ]);
+
+//GLOBAL
 MyApp.service("popUpService",function($mdSidenav){
     var actives = [];
 
@@ -46,7 +48,8 @@ MyApp.service("popUpService",function($mdSidenav){
 
         }
     }
-}) //GLOBAL
+})
+
 MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,mastersCrit,$filter){
     var providers = masterSrv.getProvs();
     var listProv = productos.query({type:'provsProds'});
@@ -101,10 +104,6 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             prov.siglas = item.siglas|| "";
             prov.tipo_id = item.tipo_id|| false;
             prodToSave.prov = item.id || false;
-            //console.log(item)
-            //if(!item){
-
-            //}
         },
         getProv:function(){
             return prov;
@@ -330,7 +329,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.prodCrit = [];
     $scope.criteria = [];
     $scope.dataCrit = [];
-    $scope.criterioShared = productsServices.getCriteria()
+    $scope.criterioShared = productsServices.getCriteria();
     $scope.$watch("prod.prov",function(n,o){
         $timeout(function(){
             if(typeof(n)== "undefined"){
@@ -916,8 +915,6 @@ MyApp.service("nxtService",function(){
         }
     }
 });//GLOBAL
-
-
 
 
 MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {

@@ -342,7 +342,8 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
-                                <md-autocomplete 
+                                <md-autocomplete
+
                                     flex
                                     skip-tab
                                     required
@@ -353,6 +354,7 @@
                                     md-no-cache="ctrl.noCache"
                                     info="Indique la moneda con la que se efectuo la transaccion."
                                     model="pago.moneda_id"
+
                                     md-require-match="true"
                                     md-selected-item="ctrl.selCoin"
                                     md-search-text="ctrl.searchCoin"

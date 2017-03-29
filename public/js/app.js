@@ -1,4 +1,4 @@
-var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode','treeControl','dynamicNumber'];
+var dependency = ['ngMaterial', 'ngRoute','ngResource','ngMessages','vlcClickOut','ngSanitize','ngFileUpload','io-barcode','treeControl'/*,'dynamicNumber'*/];
 var urls = [
     {
         secc: 'Inicio',
@@ -689,14 +689,17 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
 
             }*/
             if(element.is("md-autocomplete") &&  attrs.model){
+                var aliasTxt =attrs.mdItems.split(/ in /i)[0];
                 var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
                 var ngmodel = attrs.model;
                 var local = false;
-                var keyVal = attrs.key || "item.id";
+                var keyVal = attrs.key || aliasTxt+".id";
 
-                var text = attrs.mdItemText.split(".")[1];
+                //var text = attrs.mdItemText.split(".")[0];
 
                 model.scope.itemChange = function(cambio){
+                    console.log(aliasTxt);
+                    //console.log(cambio);
                     if(typeof(cambio)=="undefined"){
                         return false;
                     }
@@ -715,7 +718,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                         local = false;
                         return false;
                     }
-                    var aux = (newVall)? $filter("filterSearch")(src, [newVall],keyVal.replace("item.","")) : [];
+                    var aux = (newVall)? $filter("filterSearch")(src, [newVall],keyVal.replace(aliasTxt+".","")) : [];
 
                     if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
                             model.scope.selectedItem = (aux.length>0)?aux[0] : null;
@@ -930,9 +933,9 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
             time:"=?timeMsg",
             week:"=?weekMsg",
             month:"=?monthMsg",
+            mdMinLength:"=?mdMinLength",
             minImp:"=?minImpMsg",
             maxImp:"=?maxImpMsg",
-            mdMinLength:"=?mdMinLength",
             duplicate:"=?duplicateMsg"
 
         },
