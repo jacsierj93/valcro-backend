@@ -19,6 +19,7 @@ $app->get('payments/getProv/{id}','Payments\PaymentController@getProvById'); ///
 $app->get('payments/provider/getBankAccounts','Payments\PaymentController@getProvBankAccounts'); ///lista de cuentas bancarias del proveedor
 $app->post('payments/savePay', 'Payments\PaymentController@paySaveOrUpdate'); ///guarda un documento de abono
 
+$app->get('payments/getCoins', 'Payments\PaymentController@listCoins'); /// Lista de monedas
 
 $app->get('payments/typeDocsList', 'Payments\DocumentController@getDocumentTypes'); ///tipos de documentos
 $app->get('payments/payDocsList', 'Payments\DocumentController@getDocumentPayTypes'); ///tipos de documentos de pago

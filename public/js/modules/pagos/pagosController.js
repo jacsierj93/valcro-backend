@@ -1,4 +1,24 @@
-MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', function ($scope, $mdSidenav, $http, Upload) {
+MyApp.factory('pays', ['$resource',function ($resource) {
+        return $resource('payments/:type/:id', {}, {
+            query: {method: 'GET', cancellable:true, params: {type: "",id:""}, isArray: true},
+            filt: {method: 'POST', cancellable:true, params: {type: "",id:""}, isArray: true},
+            get:   {method: 'POST', params: {type: ""}, isArray: false},
+            put:   {method: 'POST', params: {type: ""}, isArray: false}
+        });
+    }
+]);
+
+MyApp.factory('master', ['$resource',function ($resource) {
+        return $resource('master/:type/:id', {}, {
+            query: {method: 'GET', cancellable:true, params: {type: "",id:""}, isArray: true},
+            filt: {method: 'POST', cancellable:true, params: {type: "",id:""}, isArray: true},
+            get:   {method: 'POST', params: {type: ""}, isArray: false},
+            put:   {method: 'POST', params: {type: ""}, isArray: false}
+        });
+    }
+]);
+
+MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', 'pays', 'master', function ($scope, $mdSidenav, $http, Upload, pays, master) {
 
         // funcion para apertura de layer --------
         $scope.nxtAction = null;
@@ -37,7 +57,8 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             "monto": 0,
             "moneda_id": null,
             "tasa": null,
-            "tipo_id": null
+            "tipo_id": null,
+            "docs":[]
         };
         
         
@@ -216,8 +237,9 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.monedaSel = "";
 
         /////lista monedas
+        //$scope.monedas = master.query({type:'getCoins'});
         $scope.getCoins = function () {
-            $http.get('master/getCoins').success(function (response) {
+            $http.get('payments/getCoins').success(function (response) {
                 $scope.monedas = response;
                 console.log($scope.monedas);
                 console.log("lista de monedas");
@@ -228,12 +250,13 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
         $scope.tipoPagoSel = "";
 
         /////lista de formas de pago
-        $scope.getPayTypes = function () {
+        $scope.tipoPagos = pays.query({type:'typeList'});
+        /*$scope.getPayTypes = function () {
             $http.get('payments/typeList').success(function (response) {
                 $scope.tipoPagos = response;
                 console.log("tipos de pago");
             });
-        };
+        };*/
 
 
         /////lista de tipos de documento de pago
@@ -336,7 +359,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
             });
 
             $scope.getCoins();
-            $scope.getPayTypes();
+            //$scope.getPayTypes;
             $scope.getAbonosNew();
 
         };
@@ -452,7 +475,16 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', funct
 
         /////formulario de registro de pago
         $scope.saveFormPago = function () {
+
+            
+            for (var d = 0, len = $scope.abonos2.length; d < len; d += 1) {
+                if ($scope.abonos2[d].asignado == true) {
+                    $scope.pago.docs.push($scope.abonos2[d]);
+                }
+            }
+            
             console.log($scope.pago);
+            
             /*$http.post('payments/savePay', $scope.pago).success(function (data, status, headers, config) {
 
                         console.log(data);
