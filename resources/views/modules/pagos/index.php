@@ -343,6 +343,10 @@
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
                                 <md-autocomplete
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/development
                                     flex
                                     skip-tab
                                     required
