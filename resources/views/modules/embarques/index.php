@@ -3385,7 +3385,7 @@
                                     <div class="rms" flex> {{$parent.shipment.nro_hbl.emision | date :'dd/MM/yyyy' }}</div>
                                 </div>
                             </div>
-                            <div layout="column" layout-align="center center" style="width: 65%%"
+                            <div layout="column" layout-align="center center" style="width: 65%"
                                  ng-show="keyCount(model.nro_hbl) == 0;"
                             >
                                 <span style="margin:4px; font-size: 12px; color:#ccc;"> NO SE REALIZARON MODIFICACIONES EN ESTOS CAMPOS</span>

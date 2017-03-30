@@ -650,7 +650,7 @@
                             <div layout="row" flex>
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
-                                    <div style="height: 160px: border-bottom:1px solid #ccc">
+                                    <div style="height: 160px; border-bottom:1px solid #ccc">
 
                                             <div class="titulo_formulario row" layout="row" layout-align="start start" >
                                                 <div>

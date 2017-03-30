@@ -45,6 +45,7 @@ class ProductController  extends BaseController
             ->with(array("getType"=>function($q){
                 return $q->selectRaw("id,descripcion");
             }))
+            ->with('isAprov')
             ->with(array("prodCrit"=>function($q){
                 //dd($q->selectRaw("crit_id,value"));
                 return $q->selectRaw("crit_id,value");
@@ -54,7 +55,7 @@ class ProductController  extends BaseController
                     return $query->selectRaw("id,linea");
                 }));
             }))
-
+            
             ->where("prov_id",$prov)
             ->distinct("id")
             ->get();
@@ -67,7 +68,7 @@ class ProductController  extends BaseController
             }
 
         }
-
+        //dd($all);
         return json_encode($all);
     }
 

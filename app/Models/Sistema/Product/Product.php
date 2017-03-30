@@ -10,13 +10,14 @@ namespace App\Models\Sistema\Product;
 use App\Models\Sistema\SysCustom\customBaseModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\Journal;
-
+use App\Http\Traits\Approvable;
 
 
 class Product extends customBaseModel
 {
     use SoftDeletes;
     use Journal;
+    use Approvable;
     protected $table = "tbl_producto";
 
     public function getType(){
