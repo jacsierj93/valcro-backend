@@ -236,7 +236,26 @@ class PaymentController extends BaseController
 
     }
 
-
+    public function listCoins(){
+            $qry = "SELECT
+                id,
+                nombre,
+                simbolo,
+                codigo,
+                precio_usd
+              FROM tbl_moneda
+              WHERE deleted_at IS NULL";
+            $result = DB::select($qry);
+            foreach ($result as $key => $val) {
+                foreach ($val as $k => $v) {
+                    if(gettype($k)== "integer"){
+                        unset($result[$key][$k]);
+                    }
+                }
+            }
+            return $result;
+    }
+    
     /**trae los pagos de un proveedor
      * @param Request $req
      */

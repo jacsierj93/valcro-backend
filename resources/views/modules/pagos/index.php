@@ -343,25 +343,28 @@
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
                                 <md-autocomplete
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/development
                                     flex
                                     skip-tab
                                     required
                                     md-no-asterisk
-                                    md-autoselect = "true"
                                     md-min-length="0"
                                     id="moneda_pago"
-                                    md-no-cache="ctrl.noCache"
+                                    md-no-cache
                                     info="Indique la moneda con la que se efectuo la transaccion."
                                     model="pago.moneda_id"
 
                                     md-require-match="true"
                                     md-selected-item="ctrl.selCoin"
                                     md-search-text="ctrl.searchCoin"
-                                    md-items="moneda in monedas | stringKey : ctrl.searchCoin: 'nombre'"
-                                    md-item-text="moneda.nombre">
+                                    key="monedas.id"
+                                    md-items="item in monedas | stringKey : ctrl.searchCoin: 'nombre'"
+                                    md-item-text="item.nombre">
                                     <md-item-template>
-                                        <span>{{moneda.nombre}}</span>
+                                        <span>{{item.nombre}}</span>
                                     </md-item-template>
                                 </md-autocomplete>
                             </md-input-container>
@@ -386,7 +389,7 @@
                                     md-autoselect = "true"
                                     md-min-length="0"
                                     id="tipo_pago"
-                                    md-no-cache="ctrl.noCache"
+                                    md-no-cache
                                     info="Seleccione el tipo de transccion."
                                     model="pago.tipo_id"
                                     md-require-match="true"
