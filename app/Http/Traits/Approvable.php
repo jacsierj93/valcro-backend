@@ -15,20 +15,17 @@ trait Approvable
     private static function setPending($model,$act){
         $modelName = class_basename(get_class($model));
         $usr = Session::get("DATAUSER");
-        $set = array(
-            'user_id'=>$usr['id'],
-            'estatus'=>'pendiente',
-            'approvable_type'=>$modelName,
-            'approvable_id'=>$model->attributes[$model->primaryKey],
-            'accion'=>$act
-        );
-        
-        Approval::insert($set);
+        $set = new Approval();
+        $set->user_id = $usr['id'];
+        $set->estatus = 'pendiente';
+        $set->accion = $act;
+        $set->save();
+        $model->isAprov()->save($set);
     }
     
     public function isAprov(){
         //dd($this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','tabla','campo_id')->toSql());
-        return $this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable');
+        return $this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','procedencia','aprov_id');//->latest();//->selectRaw('user_id,estatus,comentario,accion,fecha');
     }
     
      public static function bootApprovable(){

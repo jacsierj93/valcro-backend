@@ -52,6 +52,12 @@ class Product extends customBaseModel
             ->withTimestamps()
             ->whereNull("tbl_prod_rela.deleted_at");
     }
+    
+//    public function isAprov(){
+//        //dd($this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','tabla','campo_id')->toSql());
+//        return $this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable');
+//    }
+    
 
     
 }

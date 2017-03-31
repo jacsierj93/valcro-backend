@@ -45,7 +45,6 @@ class ProductController  extends BaseController
             ->with(array("getType"=>function($q){
                 return $q->selectRaw("id,descripcion");
             }))
-            ->with('isAprov')
             ->with(array("prodCrit"=>function($q){
                 //dd($q->selectRaw("crit_id,value"));
                 return $q->selectRaw("crit_id,value");
@@ -55,12 +54,15 @@ class ProductController  extends BaseController
                     return $query->selectRaw("id,linea");
                 }));
             }))
-            
+            ->with(array("isAprov"=>function($q){
+                return $q->latest();
+            }))
             ->where("prov_id",$prov)
             ->distinct("id")
             ->get();
         //dd($all);
         foreach ($all as  $prod){
+            //$prod["aprv"]=$prod->isAprov()->get();
             foreach($prod->prodCrit as $crit){
                if(strpos($crit['value'],'>>' )){
                    $crit['value'] = explode(">>",$crit['value']);

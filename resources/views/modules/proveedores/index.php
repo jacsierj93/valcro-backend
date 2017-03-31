@@ -568,7 +568,7 @@
                                                      md-search-text="ctrl.searchCountry"
                                                      md-items="item in paises | stringKey : ctrl.searchCountry: 'short_name'"
                                                      md-item-text="item.short_name"
-
+                                                     ng-disabled="$parent.enabled"
                                                      md-no-asterisk
                                                      md-input-minlength="0"
                                                      md-min-length=0>
