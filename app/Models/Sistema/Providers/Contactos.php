@@ -6,10 +6,14 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Http\Traits\Journal;
+use App\Http\Traits\Approvable;
 class Contactos extends  Model
 {
 
     use SoftDeletes;
+    use Approvable;
+    use Journal;
     protected $table = 'tbl_contacto';
 
     ////foreing key

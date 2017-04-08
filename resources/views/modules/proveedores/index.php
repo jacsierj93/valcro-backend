@@ -1,4 +1,4 @@
-<!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
+ <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl" global>
 
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
@@ -228,7 +228,7 @@
                             </div>
                             <md-content flex>
                                 <div ng-repeat="direccion in prov.direcciones" ng-click="openAprov(direccion,'address')" class="resumBlock" layout="column">
-                                    <div ng-class="{'aprov':tiempo.aprov==1, 'deny':tiempo.aprov==0, 'wait':!tiempo.aprov}">
+                                    <div approvable="direccion">
                                         <div class="row" layout="row">
                                             <div flex style="overflow: hidden; text-overflow: ellipsis;" class="resumEm">
                                                 {{direccion.tipo.descripcion}}
@@ -255,21 +255,24 @@
                             </div>
                             <md-content>
                                 <div ng-repeat="contact in prov.contacts"  class="resumBlock" layout="column">
-                                    <div class="row" flex layout="row" layout-align="start center">
-                                        <div class="resumEm" style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.nombre}} </div>
-                                        <div flex="grown">
-                                            ({{contact.country.short_name}})
+                                    <div ng-class="{'aprov':contact.is_aprov[0].estatus=='aprovado', 'deny':contact.is_aprov[0].estatus=='rechazado', 'wait':contact.is_aprov[0].estatus=='pendiente'}">
+                                        <div class="row" flex layout="row" layout-align="start center">
+                                            <div class="resumEm" style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.nombre}} </div>
+                                            <div flex="grown">
+                                                ({{contact.country.short_name}})
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row" flex>
-                                        {{contact.emails[0].valor}}
-                                    </div>
-                                    <div class="row" flex layout="row">
-                                       <!-- <div style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.country.short_name}}</div>-->
-                                        <div flex>
-                                            {{contact.phones[0].valor}}
+                                        <div class="row" flex>
+                                            {{contact.emails[0].valor}}
                                         </div>
+                                        <div class="row" flex layout="row">
+                                           <!-- <div style=" overflow: hidden; text-overflow: ellipsis" flex>{{contact.country.short_name}}</div>-->
+                                            <div flex>
+                                                {{contact.phones[0].valor}}
+                                            </div>
+                                        </div>
+                                        
                                     </div>
                                 </div>
                             </md-content>
@@ -2383,11 +2386,11 @@
         </md-sidenav>
 
 
-        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="aprovLayr" id="aprovLayr" click-out="closePopUp('aprovLayr',$event)">
-            <md-content class="cntLayerHolder" layout="column" layout-padding flex >
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="aprovLayr" id="aprovLayr">
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex  ng-controller="aprovLayrCtrlr">
                 <input type="hidden" md-autofocus>
-                <div ng-controller="aprovLayrCtrlr">
-                    <form name="aprovLayrForm" layout="column" class="focused">
+                <div>
+                    <form name="aprovLayrForm" layout="column" class="focused" auto-close="{before:trysave,after:null}">
 
                             <div class="titulo_formulario" layout="column" layout-align="start start" style="heigth:39px;">
                                 <div>
@@ -2396,18 +2399,36 @@
                             </div>
                             <div class="row">
                                 <md-input-container class="md-block" flex>
-                                    <label>fecha</label>
-                                    <input disable="true">
+                                    <label>fecha de modificacion</label>
+                                    <input disabled="true">
                                 </md-input-container>
                             </div>
+                            <div class="row" layout="column">
+                                <div flex>
+                                    Accion:
+                                </div>
+                                <div flex>
+                                    {{cfg.cfg.accion}}
+                                </div>
+                            </div>
+                          
+                            <div class="row" layout="column">
+                                <div flex>
+                                    usuario:
+                                </div>
+                                <div flex>
+                                    {{cfg.cfg.user.apellido}}, {{cfg.cfg.user.nombre}}
+                                </div>
+                            </div>
+                          
                             <div class="row">
                                 <lmb-collection
                                         class="rad-contain"
                                         layout="row"
                                         lmb-type="items"
                                         lmb-model="aprov.stat"
-                                        lmb-display="name"
-                                        lmb-itens="[{name:'Aprobacion',id:1},{name:'Rechazar',id:0}]"
+                                        lmb-display="text"
+                                        lmb-itens="estatus"
                                         lmb-label="'Aprobacion'"
                                         lmb-key="id"
                                 >
@@ -2417,17 +2438,17 @@
                             <div flex>
                                 <md-input-container class="md-block" flex>
                                     <label>comentarios adicionales</label>
-                                    <textarea skip-tab decimal autocomplete="off" ng-disabled="$parent.enabled" ng-model="aprov.coment" ></textarea>
+                                    <textarea skip-tab autocomplete="off" ng-model="aprov.coment" ></textarea>
 
                                 </md-input-container>
                             </div>
-
+                            
 
                     </form>
                 </div>
             </md-content>
+            <show-next on-next="saveProd" valid="isValid"></show-next>
         </md-sidenav>
-
         <md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url('images/btn_backBackground.png');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="showNext(false)">
             <?= HTML::image("images/btn_nextArrow.png","",array('ng-click'=>"nextLayer(nextLyr,\$event)")) ?>
         </md-sidenav>

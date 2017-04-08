@@ -11,13 +11,18 @@ use App\Quotation;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Http\Traits\Journal;
+use App\Http\Traits\Approvable;
 
 
 class ProviderAddress extends Model
 {
     use SoftDeletes;
+    use Journal;
+    use Approvable;
+    protected $with = array("isAprov");
     protected $table = 'tbl_prov_direccion';
-
+    
     public function providers()
     {
         return $this->belongsTo('App\Models\Sistema\Providers\Provider', 'prov_id');

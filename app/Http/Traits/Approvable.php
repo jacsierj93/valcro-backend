@@ -11,25 +11,30 @@ use Session;
 use App\Models\Sistema\SysCustom\Approval;
 trait Approvable
 {
+    //protected $with = array("isAprov");
     /*funcion que setea como pendiente automaticamente al registrarse un cambio*/
     private static function setPending($model,$act){
-        $modelName = class_basename(get_class($model));
+        $model->isAprov()->delete();
         $usr = Session::get("DATAUSER");
         $set = new Approval();
         $set->user_id = $usr['id'];
         $set->estatus = 'pendiente';
         $set->accion = $act;
+        $set->tabla = $model->table;
         $set->save();
         $model->isAprov()->save($set);
     }
     
+    
     public function isAprov(){
-        //dd($this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','tabla','campo_id')->toSql());
-        return $this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','procedencia','aprov_id');//->latest();//->selectRaw('user_id,estatus,comentario,accion,fecha');
+        return $this->MorphMany('App\Models\Sistema\SysCustom\Approval','approvable','procedencia','aprov_id')->with("user");
+                
     }
     
+    
+   
+    
      public static function bootApprovable(){
-
         static::created(function ($model) {
             self::setPending($model,"creado");
         });

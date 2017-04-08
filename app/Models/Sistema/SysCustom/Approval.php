@@ -18,9 +18,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Approval extends Model{
     use SoftDeletes;
-    protected $table="tbl_aprovaciones";
+    
+    protected $table="tbl_aprobaciones";
    public function approvable()
     {
         return $this->morphTo();
+    }
+   public function user()
+    {
+        return $this->hasOne("App\Models\Sistema\User",'id','user_id');
     }
 }

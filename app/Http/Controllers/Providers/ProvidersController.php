@@ -70,7 +70,7 @@ class ProvidersController extends BaseController
     public function getProv(request $prv)
     {
         $data = Provider::selectRaw("id,razon_social, siglas,tipo_id,tipo_envio_id, contrapedido, reserved")->find($prv->id);
-
+        
         $data->contraped = ($data->contraped == 1);
         $data->limCred =$data->limitCredit()->max("limite");
         $data->nomValc = $data->nombres_valcro()->select("id","nombre as name","fav")->get();
@@ -85,18 +85,21 @@ class ProvidersController extends BaseController
         foreach ($data->tiemposT as $time){
             $time->country;
         }
-        $data->direcciones=$data->address()->selectRaw('id,prov_id,direccion,pais_id,tipo_dir,telefono, codigo_postal, aprov, user_aprov, coment_aprov')->get();
-        foreach ($data->direcciones as $dir){
-            $dir->country;
-            $dir->tipo;
-            $dir->ports = $dir->ports()->lists("puerto_id");
-        }
+        $data->direcciones=$data->address()->selectRaw('id,prov_id,direccion,pais_id,tipo_dir,telefono, codigo_postal, aprov, user_aprov, coment_aprov')
+                ->with("country")
+                ->with("tipo")
+                ->with(array("ports"=>function($q){
+                    return $q->lists("puerto_id");
+                }))
+                
+                ->get();
+      
         $data->contacts = $data->contacts()
             ->selectRaw('tbl_contacto.id,nombre,pais_id,agente,responsabilidades, direccion, aprov, user_aprov, coment_aprov')
+                ->with("country")
             ->get();
         foreach($data->contacts as $contact){
             $contact->languages=$contact->idiomas()->lists("languaje_id");
-            $contact->country;
             $contact->emails=$contact->campos()->where("prov_id",$data->id)->where("campo","email")->get();
             $contact->phones=$contact->campos()->where("prov_id",$data->id)->where("campo","telefono")->get();
             $contact->cargos=$contact->campos()->where("prov_id",$data->id)->where("campo","cargos")->lists("valor");
@@ -107,7 +110,10 @@ class ProvidersController extends BaseController
             $rep = $contact->campos()->where("prov_id",$data->id)->where("campo","notas")->first();
             $contact->notas=($rep)?$rep->valor:"";
         }
-        $data->banks = $data->bankAccount()->selectRaw('id,prov_id,banco,cuenta,swift, beneficiario, dir_banco, dir_beneficiario, ciudad_id, aprov, user_aprov, coment_aprov')->get();
+        $data->banks = $data->bankAccount()->selectRaw('id,prov_id,banco,cuenta,swift, beneficiario, dir_banco, dir_beneficiario, ciudad_id, aprov, user_aprov, coment_aprov')
+                
+                ->get();
+        
         foreach ($data->banks as $acc){
             $acc["ciudad"]=$acc->ciudad()->first();
             $acc["estado"] = $acc["ciudad"]->state()->first();

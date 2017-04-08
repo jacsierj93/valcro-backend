@@ -54,8 +54,9 @@ class ProductController  extends BaseController
                     return $query->selectRaw("id,linea");
                 }));
             }))
+            //->with('isAprov')
             ->with(array("isAprov"=>function($q){
-                return $q->latest();
+                return $q->first();
             }))
             ->where("prov_id",$prov)
             ->distinct("id")

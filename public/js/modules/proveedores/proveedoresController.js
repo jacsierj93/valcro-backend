@@ -527,7 +527,7 @@ MyApp.controller('AppCtrl', function ($scope,$mdSidenav,$http,setGetProv,masters
 
     };
 });
-MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterLists,common,aprovService) {
+MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterLists,common,aprovService,popUpService) {
     $scope.provider = setGetProv.getProv();
     $scope.prov = {tiemposP: [], tiemposT: [], direcciones: []};
     $scope.pais = masterLists.getCountries();
@@ -536,16 +536,19 @@ MyApp.controller('resumenProv', function ($scope,setGetProv,providers,masterList
         $scope.prov = setGetProv.getFullProv();
     })
 
-    var  cfgAprov = aprovService.getCfg();
+    //var  cfgAprov = aprovService.getCfg();
 
     $scope.openAprov = function(elem,url){
-        $scope.$parent.openPopUp("aprovLayr",{
-            before:function(){
-                cfgAprov.url = url;
-                cfgAprov.id = elem.id;
-                return true;
+        popUpService.popUpOpen({
+            'aprovLayr':{
+                before:function(){
+                    aprovService.setCfg(elem.is_aprov[0])
+                    return true;
+                },
+                after:null
             }
         })
+        console.log(elem,url)
     }
 
 
@@ -2112,12 +2115,18 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
     $scope.$watch('ctrl.pais.id', function(nvo) {
         //$scope.bnk.pais = nvo;
         $scope.states = (nvo)?masters.query({ type:"getStates",id:nvo||0}):[];
-        $scope.ctrl.state = undefined;
+        if($scope.ctrl){
+            $scope.ctrl.state = undefined;
+        }
+        
     });
     $scope.$watch('ctrl.state.id', function(nvo) {
         //$scope.bnk.est = nvo;
         $scope.cities = (nvo)?masters.query({ type:"getCities",id:nvo||0}):[];
-        $scope.ctrl.city = undefined;
+        if($scope.ctrl){
+            $scope.ctrl.city = undefined;
+        }
+        
     });
     var account = {};
     var saveBank = function(onSuccess,elem){
@@ -3659,23 +3668,66 @@ MyApp.controller('resumenProvFinal', function ($scope,providers,setGetProv,$filt
     //$scope.finalProv = $scope.dataProv.dataProv[parseInt($scope.prov.id)];
 });
 
-MyApp.controller('aprovLayrCtrlr', function ($scope,aprovService,providers,setGetProv,$filter){
-    var cfg = aprovService.getCfg();
-    $scope.$watchGroup("cfg",function(n){
-        console.log(n)
+MyApp.controller('aprovLayrCtrlr', function ($scope,aprovService,providers,setGetProv,$filter,masters,setNotif){
+    
+    $scope.aprov = {};
+    $scope.aprov.stat = null;
+    $scope.estatus = [
+        {id:"aprobado",text:"Aprobar"},
+        {id:"rechazado",text:"Rechazar"},
+    ]
+    $scope.cfg = aprovService.getCfg();
+    
+    $scope.$watchGroup("cfg",function(n,o){
+        console.log(n);
+        //$scope.aprov.stat = (n.cfg.cfg.estatus != "pendiente")?n.cfg.cfg.estatus:undefined;
+        //$scope.aprov.coment = "";
+       
     })
+    $scope.trysave = function(){
+        if($scope.aprov.stat){
+            var toSave = {
+                stat:$scope.aprov.stat,
+                coment:$scope.aprov.coment,
+                target:$scope.cfg.cfg.procedencia,
+                id:$scope.cfg.id
+            }
+            masters.post({type:"aprov"},toSave,function(data){
+                setNotif.addNotif("ok", $scope.aprov.stat, [
+                ],{autohidden:3000});
+                $scope.cfg.cfg.estatus = $scope.aprov.stat;
+                $scope.aprov.stat = null;
+                $scope.aprov.coment = "";
+            })
+            return true;
+        }else{
+            setNotif.addNotif("error", "porfavor indique si acepta o rechaza este campo", [
+                {
+                    name:"comprendo",
+                    action:function(){}
+                }
+            ]);
+            return false;
+        }
+        
+    }
 
 
 });
 MyApp.service("aprovService",function($timeout,providers,setGetProv,setNotif,$filter,App){
     var aprvCfg = {
-        url : "",
-        id : false
-    }
+        cfg : null,
+        id:false
+    };
 
     return {
         getCfg : function() {
             return aprvCfg;
+        },
+        setCfg:function(targ){
+            aprvCfg.cfg = targ;
+            aprvCfg.id = targ.aprov_id;
+            
         }
 
     }

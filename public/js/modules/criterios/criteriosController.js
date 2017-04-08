@@ -997,6 +997,7 @@ MyApp.directive('lmbCollection', function() {
     return {
         replace: true,
         transclude: true,
+        require: '?ngModel',
         scope: {
             itens: '=lmbItens',
             model: '=lmbModel',
@@ -1054,6 +1055,7 @@ MyApp.directive('lmbCollection', function() {
 
         },
         link:function(scope,elem,attr,model){
+            
             scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
             attr.$observe('disabled', function (newValue) {

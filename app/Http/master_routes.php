@@ -37,3 +37,5 @@ $app->get("master/mailModule/resend",'Masters\FilesController@resendMailModulo')
 
 $app->get("master/getUnits",'Masters\MasterController@getUnits'); ///obtener listado de unidades
 $app->get("master/getUnitsCompras",'Masters\MasterController@getUnitCompra'); ///obtener listado de unidades
+
+$app->post("master/aprov",'Api\ApprovalController@approv'); ///obtener listado de unidades

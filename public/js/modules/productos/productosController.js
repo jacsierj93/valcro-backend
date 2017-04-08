@@ -322,7 +322,7 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
     }
 }]);
 
-MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','productsServices','masterSrv',function ($scope,$timeout, setNotif,productos,productsServices,masterSrv) {
+MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','productsServices','masterSrv',function ($scope,$timeout, setNotif,productos,productsServices,masterSrv)  {
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();
@@ -870,6 +870,7 @@ MyApp.directive('showNext', function() {
                 }
             });
             $scope.show = function(){
+                console.log(typeof($scope.nextFn),$scope.nextFn);
                 if($scope.nextValid()){
                     $scope.cfg.show = true;
                     $scope.cfg.fn = $scope.nextFn;
@@ -887,10 +888,18 @@ MyApp.directive('nextRow', function() {
         scope:{
 
         },
-        controller:function($scope,$mdSidenav,nxtService){
+        controller:function($scope,$mdSidenav,nxtService,Layers){
+            $scope.LayersAction = Layers.setAccion;
+            
             $scope.cfg = nxtService.getCfg();
             $scope.nxtAction = function(e){
-                $scope.cfg.fn();
+                console.log(typeof($scope.cfg.fn),$scope.cfg.fn);
+                if(typeof($scope.cfg.fn) === "string"){
+                    $scope.LayersAction({open:{name:$scope.cfg.fn}});
+                }else{
+                    $scope.cfg.fn();
+                }
+                
                 $scope.hideNext();
             };
             $scope.hideNext = function(){

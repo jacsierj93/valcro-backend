@@ -498,6 +498,18 @@ MyApp.directive('contenteditable', function() {
     };
 });
 
+MyApp.directive('approvable', function ($compile,$timeout) {
+    return {
+        priority: 1010,
+        terminal:true,
+        link: function (scope, element, attrs) {
+             element.attr("ng-class","{'aprov':"+attrs.approvable+".is_aprov[0].estatus=='aprobado', 'deny':"+attrs.approvable+".is_aprov[0].estatus=='rechazado', 'wait':"+attrs.approvable+".is_aprov[0].estatus=='pendiente'}");
+            element.removeAttr("approvable");
+            $compile(element[0])(scope);
+        }
+    }
+});
+
 MyApp.directive('skipTab', function ($compile,$timeout) {
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
