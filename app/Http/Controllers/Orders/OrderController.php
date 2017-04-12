@@ -1307,6 +1307,7 @@ class OrderController extends BaseController
 
         $model->doc_origen_id = $req->has('doc_origen_id') ? $req->doc_origen_id : null;
         $model->costo_unitario = $req->has('costo_unitario') ? $req->costo_unitario : null;
+        $model->unidad_compra_id = $req->has('uni_producto') ? $req->uni_producto : null;
         $model->producto_id = $req->producto_id;
         $model->descripcion = $req->descripcion;
         $model->uid = $req->has('uid') ? $req->uid : uniqid('', true);

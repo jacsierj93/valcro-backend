@@ -760,12 +760,16 @@ MyApp.directive('formPreview', function() {
 MyApp.service('masterSrv',function(masters){
     var providers = masters.query({type:'allProviders'});
     var lines = masters.query({ type:"prodLines"});
+    var buyUnit = masters.query({ type:"getUnitsCompras"});
     return {
         getProvs:function(){
             return providers
         },
         getLines:function(){
             return lines;
+        },
+        getBuyUnits:function(){
+            return buyUnit;
         },
         getFilters:function(){
             return commons.formFilters;

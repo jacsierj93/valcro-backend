@@ -168,11 +168,9 @@ class ProvidersController extends BaseController
             $cond['items'] = $cond->getItems()->get();
             if($cond->linea_id){
                 $cond->line;
-            }else{
+            }else{ 
                 $cond->line = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
             }
-            //= $cond->linea;//($cond->linea)?$cond->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo") ;
-            //if($cond['line']==null){$cond['line']=array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");};
         }
         $data->listPrice = $data->listPrice()->get();
         foreach ($data->listPrice as $list) {

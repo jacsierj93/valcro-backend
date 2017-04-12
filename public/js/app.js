@@ -503,7 +503,8 @@ MyApp.directive('approvable', function ($compile,$timeout) {
         priority: 1010,
         terminal:true,
         link: function (scope, element, attrs) {
-             element.attr("ng-class","{'aprov':"+attrs.approvable+".is_aprov[0].estatus=='aprobado', 'deny':"+attrs.approvable+".is_aprov[0].estatus=='rechazado', 'wait':"+attrs.approvable+".is_aprov[0].estatus=='pendiente'}");
+            element.attr("ng-class","{'aprov':"+attrs.approvable+".is_aprov[0].estatus=='aprobado', 'deny':"+attrs.approvable+".is_aprov[0].estatus=='rechazado', 'wait':"+attrs.approvable+".is_aprov[0].estatus=='pendiente'}");
+            element.attr("ng-click","openAprov("+attrs.approvable+")");
             element.removeAttr("approvable");
             $compile(element[0])(scope);
         }

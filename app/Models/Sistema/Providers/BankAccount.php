@@ -9,12 +9,16 @@
 namespace App\Models\Sistema\Providers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Http\Traits\Journal;
+use App\Http\Traits\Approvable;
 
 
 class BankAccount extends Model
 {
     use SoftDeletes;
+    use Journal;
+    use Approvable;
+    protected $with = array("isAprov");
     protected $table = "tbl_cuenta_bancaria";
     protected $touches = ['provider'];
 

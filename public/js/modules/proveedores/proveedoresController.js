@@ -3675,30 +3675,39 @@ MyApp.controller('aprovLayrCtrlr', function ($scope,aprovService,providers,setGe
     $scope.estatus = [
         {id:"aprobado",text:"Aprobar"},
         {id:"rechazado",text:"Rechazar"},
-    ]
-    $scope.cfg = aprovService.getCfg();
+    ];
+    $scope.config = aprovService.getCfg();
+    var current = null;
     
-    $scope.$watchGroup("cfg",function(n,o){
-        console.log(n);
-        //$scope.aprov.stat = (n.cfg.cfg.estatus != "pendiente")?n.cfg.cfg.estatus:undefined;
-        //$scope.aprov.coment = "";
+    $scope.$watch("config.id",function(n,o){
+        
+        if(n){
+            current = $scope.config.cfg.estatus;
+            $scope.aprov.stat = ($scope.config.cfg.estatus !== "pendiente")?$scope.config.cfg.estatus:undefined;
+            $scope.aprov.coment = "";
+        }
+       
        
     })
     $scope.trysave = function(){
+        if(($scope.aprov.stat!== "pendiente") && ($scope.aprov.stat === current)){
+            return true;
+        }
+        
         if($scope.aprov.stat){
             var toSave = {
                 stat:$scope.aprov.stat,
                 coment:$scope.aprov.coment,
-                target:$scope.cfg.cfg.procedencia,
-                id:$scope.cfg.id
-            }
+                target:$scope.config.cfg.procedencia,
+                id:$scope.config.id
+            };
             masters.post({type:"aprov"},toSave,function(data){
                 setNotif.addNotif("ok", $scope.aprov.stat, [
                 ],{autohidden:3000});
-                $scope.cfg.cfg.estatus = $scope.aprov.stat;
+                $scope.config.cfg.estatus = $scope.aprov.stat;
                 $scope.aprov.stat = null;
                 $scope.aprov.coment = "";
-            })
+            });
             return true;
         }else{
             setNotif.addNotif("error", "porfavor indique si acepta o rechaza este campo", [
@@ -3725,6 +3734,7 @@ MyApp.service("aprovService",function($timeout,providers,setGetProv,setNotif,$fi
             return aprvCfg;
         },
         setCfg:function(targ){
+            
             aprvCfg.cfg = targ;
             aprvCfg.id = targ.aprov_id;
             

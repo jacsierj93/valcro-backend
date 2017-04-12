@@ -3834,11 +3834,29 @@
 
                         <div layout="row" class="row" >
                             <div layout="row" flex="50" style="color: rgb(84, 180, 234);">
-                                <div layout="column" layout-align="center center">Asignado </div>
+                                <div layout="column" layout-align="center center">Unidad de compra </div>
                             </div>
 
-                            <md-input-container class="md-block rms" flex >
-                                <input  skip-tab required id="input" type="text" ng-model="select.saldo" range minVal="0.1" maxVal="{{select.cantidad}}"   >
+                            <md-input-container class="md-block rms" flex   >
+                                <label>Unidad</label>
+                                <md-autocomplete 
+                                    md-selected-item="unitSel"
+                                    info="unidad de producto"
+                                    required
+                                    skip-tab
+                                    md-search-text="unitText"
+                                    model="select.uni_producto"
+                                    md-items="item in unidCompra | stringKey : unitText : 'descripcion' "
+                                    md-item-text="item.descripcion"
+                                    md-no-asterisk
+                                    md-min-length="0"
+                                    md-require-match="true"
+                                    md-no-cache="true"
+                                >
+                                    <md-item-template>
+                                        <span>{{item.descripcion}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
                             </md-input-container>
 
                             <md-tooltip >Cantidad a agregar</md-tooltip>
