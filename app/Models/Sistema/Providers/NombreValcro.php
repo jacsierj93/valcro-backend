@@ -20,7 +20,11 @@ class NombreValcro extends Model
 
     public function departamento()
     {
-        return $this->belongsToMany('App\Models\Sistema\Providers\Departament','tbl_nom_valcro_departameno','nomVal_id','depa_id')->withPivot("fav");
+        return $this->belongsToMany('App\Models\Sistema\Providers\Departament','tbl_nom_valcro_departameno','nomVal_id','depa_id')
+                ->withPivot("fav")
+                ->withTimestamps()
+                ->whereNull("tbl_nom_valcro_departameno.deleted_at");
+
     }
     public function providers()
     {

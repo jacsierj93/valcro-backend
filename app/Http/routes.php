@@ -13,10 +13,8 @@
 
 
 
-$app->get('/hola', function () use ($app) {
-    return "hola";
-});
-
+$app->get('home','Masters\MasterController@mainIndex');
+$app->get('providers','Providers\ProvidersController@index');
 
 $app->get('/date', function () use ($app) {
     return date("Y-m-d H:i:s");

@@ -21,6 +21,7 @@ MyApp.directive('vldhtmlPreview', function() {
             'lang' : "=?lang",
             'contacts': "=?contacts",
             'asuntos': "=?asuntos",
+            'asunto': "=?asunto",
             'funciones' : "=?funciones",
             'state' : "=?state"
         },
@@ -130,6 +131,7 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
             angular.forEach($scope.origenes[id].subjets, function (v, k) {
                 $scope.asuntos.push(v);
             });
+            $scope.asunto =  $scope.asuntos[0];
             setNotif.addNotif("info", "Se ha actualizado la lista de asuntos disponibles, por favor revisala y recuerda siempre se debe escribir el asunto en el idioma selecionado",[], {autohidden:5000})
             $scope.select= id;
         }
@@ -199,6 +201,7 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
     $scope.$watchCollection(
         "langs",
         function( newValue, oldValue ) {
+            //console.log(newValue);
             if(newValue){
                 var prf =undefined;
                 var mayor =  -1;
@@ -215,7 +218,8 @@ MyApp.controller('vldChtmlPreview',['$scope','$timeout','$sce','setNotif',functi
 
                 });
                 $scope.prf  = prf;
-                }
+                $scope.selectLang(prf);
+            }
         }
     );
 }]) ;

@@ -36,23 +36,28 @@ use Illuminate\Database\Eloquent\Collection;
 class MasterController extends BaseController
 {
 
-	public function __construct()
-	{
-		$this->middleware('auth');
-	}
+    public function __construct()
+    {
+            $this->middleware('auth');
+    }
+    
+    public function mainIndex(){
+        return view("home",array("countries"=>$this->getCountries()));
+        
+    }
 
-	public function getCountries()
-	{
-		$paises = Country::all();
-		foreach($paises as $pais){
-			$pais->areaCode;
-		}
-		return json_encode($paises);
-	}
+    public function getCountries()
+    {
+            $paises = Country::all();
+            foreach($paises as $pais){
+                    $pais->areaCode;
+            }
+            return json_encode($paises);
+    }
 
-	public function getUserData(Request $req){
-	    $model =User::selectRaw('nombre, email')->where('id',$req->session()->get('DATAUSER')['id'])->first();
-            return $model;
+    public function getUserData(Request $req){
+        $model =User::selectRaw('nombre, email')->where('id',$req->session()->get('DATAUSER')['id'])->first();
+        return $model;
     }
     public function getSystemMail(){
 	   return ['nombre'=>'sistema','email'=>'sistemaValcro@valcro.co'];

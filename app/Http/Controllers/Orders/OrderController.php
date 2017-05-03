@@ -2471,7 +2471,7 @@ class OrderController extends BaseController
         $result["action"]="new";
         $model = new Order();
 
-        if ($req->has('id')) {
+        if ($req->has('id') && $req->id) {
             $model = $model->findOrFail($req->id);
             $result["action"]="edit";
         }

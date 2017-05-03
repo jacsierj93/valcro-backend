@@ -679,7 +679,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
 
         if( newVal[1] == "unclosetDoc" || newVal[1] == "priorityDocs" ){
             $timeout(function(){
-                $scope.document ={};
+                $scope.document ={id:false};
                 $scope.provSelec ={};
                 $scope.ctrl.searchProveedor= undefined;
                 setGetOrder.clear();
@@ -693,8 +693,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
         }
         if(newVal[1] == "listPedido" || newVal[1] == "menuAgr" ){
             $timeout(function(){
-                $scope.document ={};
-                $scope.document ={};
+                $scope.document ={id:false};
                 $scope.Docsession ={};
                 $scope.Docsession.global='new';
                 setGetOrder.clear();
@@ -1176,7 +1175,8 @@ MyApp.controller('OrderlistDocImportCtrl',['$scope','$timeout','DateParse','Orde
     };
 
     $scope.open = function (doc){
-        Order.get({mod:"Compare",type:$scope.$parent.formMode.mod, id:$scope.$parent.document.id, compare:doc.id}, {},function(response){
+        console.log($scope.$parent)
+        Order.get({mod:"Compare",type:$scope.$parent.formMode.mod, id:$scope.$parent.document.id || false, compare:doc.id}, {},function(response){
             var errors = response.error;
             var globalData = response;
             var send = {doc_parent_id:doc.id,doc_parent_origen_id:$scope.$parent.formMode.value - 1 , id : $scope.document.id, items:[], prov_id:$scope.$parent.provSelec.id};
@@ -1480,6 +1480,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
             }
 
             Order.postMod({type:$scope.formMode.mod, mod:"Save"},$scope.$parent.document, function(response){
+                console.log("pruebaaa");
                 setGetOrder.setOrder({id:response.id,tipo:$scope.formMode.value});
                 setGetOrder.setState('select');
             });
@@ -1672,9 +1673,9 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         }
     });
 
-    $scope.$watch('$parent.document.titulo',function (newVal ) {
+    /*$scope.$watch('$parent.document.titulo',function (newVal ) {
 
-    });
+    });*/
 
     $scope.$watch('clikBind.state', function (newVal) {
         if(newVal){
@@ -1700,6 +1701,7 @@ MyApp.controller('OrderDetalleDocCtrl',['$scope','$timeout','DateParse','Order',
         if(!newVal[1] &&  $scope.formMode.mod && $scope.provSelec.id){
             $scope.document.prov_id = angular.copy($scope.provSelec.id);
             Order.postMod({type:$scope.$parent.formMode.mod, mod:"Save"},$scope.document, function(response){
+                $scope.$parent.document.id= response.id;
                 $scope.FormHeadDocument.$setPristine();
                 $scope.$parent.document.uid= response.uid;
             });
@@ -2871,6 +2873,8 @@ MyApp.controller('OrderSendMail',['$scope','$mdSidenav','$timeout','$sce', 'App'
         Order.getMod({type:$scope.formMode.mod, mod:(data.action == 'sendPrv') ? "ProviderTemplates":'InternalTemplates',id:$scope.document.id},{}, function(response){
             $scope.correos = response.correos;
             $scope.origenes = response.templates;
+            
+            $scope.model.subject = "solicitud #"+$scope.document.id+": "+$scope.document.titulo+" ";
             $scope.model.tipo = response.tipo;
             if(response.to){
                 angular.forEach(response.to, function (v) {

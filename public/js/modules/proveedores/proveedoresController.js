@@ -605,7 +605,11 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
         return valid;
     };
 
-    setGetProv.setList( $scope.todos = providers.query({type:"provList"}));
+    
+    $scope.setList = function(data){
+        //console.log(data);
+        setGetProv.setList( $scope.todos = data);
+    }
     $scope.$parent.list = $scope.todos
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){

@@ -8,7 +8,8 @@ var urls = [
     }, {
         secc: 'Proveedores',
         key:'proveedores',
-        url: 'modules/proveedores/index',
+        //url: 'modules/proveedores/index',
+        url: 'providers',
         selct: 'btnPie'
     }, {
         secc: 'Embarques',
@@ -512,52 +513,53 @@ MyApp.directive('approvable', function ($compile,$timeout) {
 });
 
 MyApp.directive('skipTab', function ($compile,$timeout) {
+    //var genericList = angular.element("[step]:not([disabled]):visible");
     var skip = function(jqObject,scope){
         var elem = (typeof jqObject == "string")?angular.element("#"+jqObject):jqObject;
-        var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
+        //var list = angular.element(elem).parents("form").first().find("[step]:not([disabled]):visible");
         var genericList = angular.element("[step]:not([disabled]):visible");
-        if(list.index(elem)<list.length-1){
-
+        //if(genericList.index(elem)<genericList.length-1){
+        if(angular.element(genericList[genericList.index(elem)+1]).parents("form").first().is(angular.element(elem).parents("form").first())){
             $timeout(function(){
-                if(angular.element(list[list.index(elem)+1]).hasClass("autoclick")){
-                    angular.element(list[list.index(elem)+1]).focus().click();
-                }else if(angular.element(list[list.index(elem)+1]).is("vlc-group")) {
+                if(angular.element(genericList[genericList.index(elem)+1]).hasClass("autoclick")){
+                    angular.element(genericList[genericList.index(elem)+1]).focus().click();
+                }else if(angular.element(genericList[genericList.index(elem)+1]).is("vlc-group")) {
                     $timeout(function(){
-                        angular.element(list[list.index(elem)+1]).find("span").first().focus();
+                        angular.element(genericList[genericList.index(elem)+1]).find("span").first().focus();
                     },0);
-                }else if(angular.element(list[list.index(elem)+1]).is("md-autocomplete")) {
-                    angular.element(list[list.index(elem)+1]).find("input").focus().click();
+                }else if(angular.element(genericList[genericList.index(elem)+1]).is("md-autocomplete")) {
+                    angular.element(genericList[genericList.index(elem)+1]).find("input").focus().click();
                 }else{
 
-                    angular.element(list[list.index(elem)+1]).focus();
+                    angular.element(genericList[genericList.index(elem)+1]).focus();
                 }
 
             },50);
 
-        }else if((angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0) || (genericList.index(elem)<genericList.length-1)){
-
+        }else if(genericList.index(elem)<genericList.length-1){
+/*(angular.element(elem).parents("form").first().nextAll("form:visible:has([step]:not([disabled]))").length>0) || */
             if(!scope.endLayer) {
-                var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
-                if(next.length==0){
+                //var next = angular.element(elem).parents("form").first().nextAll("form:has([step]:not([disabled]))").first();
+                //if(next.length==0){
                     next = angular.element(genericList[genericList.index(elem)+1]).parents("form").first();
-                }
-                var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
+                //}
+                //var nextFrm = angular.element(next).find("[step]:not([disabled])").first();
                 $timeout(function () {
                     angular.element(next).click();
                     angular.element(":focus").blur();
                     $timeout(function () {
-                        if (angular.element(nextFrm[0]).is("md-select")) {
-                            angular.element(nextFrm[0]).focus().click();
-                        } else if (angular.element(nextFrm[0]).is("vlc-group")) {
+                        if (angular.element(genericList[genericList.index(elem)+1]).is("md-select")) {
+                            angular.element(genericList[genericList.index(elem)+1]).focus().click();
+                        } else if (angular.element(genericList[genericList.index(elem)+1]).is("vlc-group")) {
                             $timeout(function () {
-                                angular.element(nextFrm[0]).find("span").first().focus();
+                                angular.element(genericList[genericList.index(elem)+1]).find("span").first().focus();
                             }, 0);
-                        }else if(angular.element(nextFrm[0]).is("md-autocomplete")) {
+                        }else if(angular.element(genericList[genericList.index(elem)+1]).is("md-autocomplete")) {
                             $timeout(function () {
-                                angular.element(nextFrm[0]).find("input").focus();
+                                angular.element(genericList[genericList.index(elem)+1]).find("input").focus();
                             }, 0);
                         } else {
-                            angular.element(nextFrm[0]).focus();
+                            angular.element(genericList[genericList.index(elem)+1]).focus();
                         }
                     }, 500);
                 }, 0);

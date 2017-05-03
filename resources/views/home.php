@@ -81,7 +81,9 @@
     <!--<ng-view layout="column" layout-padding flex></ng-view>-->
 <!--    <div id="contentHolder" flex ng-include="seccion.url" layout="column"></div>
 -->
-    <div id="contentHolder" flex ng-view layout="column"></div>
+<div id="contentHolder" flex ng-view layout="column">
+   
+</div>
 
 </div>
 

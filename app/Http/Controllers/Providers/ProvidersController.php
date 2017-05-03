@@ -35,6 +35,10 @@ class ProvidersController extends BaseController
 
         $this->middleware('auth');
     }
+    
+    public function index(){
+        return view("modules/proveedores/index",array("list"=>Provider::all()));
+    }
 
 
     public function provUpload(Request $req){
@@ -58,13 +62,17 @@ class ProvidersController extends BaseController
     }
 
 
-    public function getList(request $prvs)
+    public function getList()
     {
         $data = Provider::all();
         foreach($data as $prov){
             $prov['limCred']=$prov->limitCredit()->max("limite");
         }
         return json_encode($data);
+    }
+    public static function holamundo()
+    {
+       return "hola mundo desde controller";
     }
 
     public function getProv(request $prv)

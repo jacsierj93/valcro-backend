@@ -56,7 +56,7 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
-            <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
+            <div id="listado" ng-init='setList(<?= $list; ?>)' flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos| customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this, $index)" ng-class="{'listSel' : (item.id == prov.id),'listSelTemp' : (!item.id || (item.id == prov.id && prov.created)), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social}}</div>
@@ -121,6 +121,7 @@
                     <div style="width: 96px; height: 96px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.22); font-size: 72px; text-align: center; font-weight: 100; ">
                         P
                     </div>
+                    <?= App\Http\Controllers\Providers\ProvidersController::holamundo();?>
                     <br> Selecciones un Proveedor
                 </div>
             </div>
@@ -762,7 +763,7 @@
                                     <!--<div style="text-transform: uppercase !important;font-weight: 500 !important; height: 19px">CARGOS</div>-->
                                     <vlc-group skip-tab>
 
-                                        <span info="{{cargo.cargo}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled) || setCargo(cargo, $event)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id)}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0, 1)}}
+                                        <span info="{{cargo.cargo}}" class="iconInput iconCircle" icon-group style="margin-left: 8px;border: 1px solid #ccc;border-radius: 25px;height: 25px;width: 25px;line-height: 25px;text-align: center; display: block; float: left;" ng-click="($parent.enabled) || setCargo(cargo, $event)" ng-class="{'iconActive':cnt.cargo.includes(cargo.id+'')}" ng-repeat="cargo in cargos">{{cargo.cargo.substring(0, 1)}}
 
                                         </span>
                                     </vlc-group>
