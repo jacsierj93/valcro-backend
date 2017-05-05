@@ -1179,7 +1179,8 @@ MyApp.config(['$routeProvider', '$locationProvider',
             $routeProvider.when('/'+v.key,data);
         });
         $routeProvider.when('/', {
-            templateUrl: 'modules/home/index'
+            //templateUrl: 'modules/home/index'
+            templateUrl: '/home'
         });
         $routeProvider.otherwise({ redirectTo: '/' });
         //$locationProvider.html5Mode(true);

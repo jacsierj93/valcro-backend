@@ -52,7 +52,19 @@
 </head>
 
 <body id="inicio" ng-cloak layout="column" ng-controller="AppMain" style="overflow: hidden;">
+<code id="countries" style="display: none">
+    <?= $countrie; ?>
+</code>
 
+<code id="languajes" style="display: none">
+    <?= $languajes; ?>
+</code>
+<code id="ports" style="display: none">
+    <?= $ports; ?>
+</code>
+<code id="lines" style="display: none">
+    <?= $lines; ?>
+</code>
 
 <div class="cabezera" layout="row" layout-align="start center">
     <div layout layout-align="start center" style="width: 132px; height: 48px;">
@@ -112,6 +124,7 @@
 
 </div>
 <div ng-controller="LayersCtrl"></div>
+
 <!--<next-row></next-row>
 
 <div ng-controller="notificaciones" ng-include="template"></div>

@@ -56,7 +56,7 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
-            <div id="listado" ng-init='setList(<?= $list; ?>)' flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
+            <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos| customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this, $index)" ng-class="{'listSel' : (item.id == prov.id),'listSelTemp' : (!item.id || (item.id == prov.id && prov.created)), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social}}</div>
@@ -2486,5 +2486,8 @@
                                                                         <div ng-controller="notificaciones" ng-include="template"></div>
                                                                         <div ng-controller="FilesController" ng-include="template"></div>
                                                                         </div>
+<code id="listado" style="display: none">
+    <?= $list; ?>
+</code>
 
 

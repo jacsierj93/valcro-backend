@@ -46,14 +46,18 @@ MyApp.service("masterLists",function(masters) {
     var commonCountry = [{"id" : 11,"cant" : 1},{"id" : 48,"cant" : 21},{"id" : 55,"cant" : 1},{"id" : 56,"cant" : 2},{"id" : 58,"cant" : 1},{"id" : 64,"cant" : 2},{"id" : 67,"cant" : 13},{"id" : 74,"cant" : 2},{"id" : 88,"cant" : 2},{"id" : 94,"cant" : 1},{"id" : 107,"cant" : 1},{"id" : 109,"cant" : 42},{"id" : 172,"cant" : 5},{"id" : 183,"cant" : 2},{"id" : 222,"cant" : 5},{"id" : 230,"cant" : 5},{"id" : 235,"cant" : 2}];
     return {
         setMain:function(){
-            countries = masters.query({ type:"getCountries"});
+            countries = eval(angular.element("code#countries").text());//masters.query({ type:"getCountries"});
+            angular.element("code#countries").remove();
             typeDir =  masters.query({ type:"addressType"});
             provType = masters.query({ type:"getProviderType"});
             provTypeSend = masters.query({ type:"getProviderTypeSend"});
             coins = masters.query({ type:"getCoins"});
-            prodLines = masters.query({ type:"prodLines"});
-            languaje = masters.query({type:"languajes"});
-            ports = masters.query({type:"getPorts"});
+            prodLines = eval(angular.element("code#lines").text());//masters.query({ type:"prodLines"});
+            angular.element("code#lines").remove();
+            languaje = eval(angular.element("code#languajes").text());//masters.query({type:"languajes"});
+            angular.element("code#languajes").remove();
+            ports = eval(angular.element("code#ports").text());//masters.query({type:"getPorts"});
+            angular.element("code#ports").remove();
         },
         getCountries:function(){
             return countries;
@@ -605,11 +609,12 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
         return valid;
     };
 
-    
-    $scope.setList = function(data){
+    setGetProv.setList( $scope.todos = eval(angular.element("code#listado").text()));
+    angular.element("code#listado").remove();
+    /*$scope.setList = function(data){
         //console.log(data);
         setGetProv.setList( $scope.todos = data);
-    }
+    }*/
     $scope.$parent.list = $scope.todos
     $scope.prov = setGetProv.getProv();
     $scope.$watch('prov.id',function(nvo){

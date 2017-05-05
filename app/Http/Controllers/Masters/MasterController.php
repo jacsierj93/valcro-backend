@@ -42,7 +42,13 @@ class MasterController extends BaseController
     }
     
     public function mainIndex(){
-        return view("home",array("countries"=>$this->getCountries()));
+        return view("home",array(
+                    "countrie"=>$this->getCountries(),
+                    "languajes"=>$this->getLanguajes(),
+                    "lines"=>$this->getLines(),
+                    "ports"=>$this->getPorts()
+                )
+            );
         
     }
 
