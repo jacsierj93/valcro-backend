@@ -37,7 +37,7 @@ class ProvidersController extends BaseController
     }
     
     public function index(){
-        return view("modules/proveedores/index",array("list"=>Provider::all()));
+        return view("modules/proveedores/index",array("list"=>$this->getList()));
     }
 
 

@@ -15,6 +15,7 @@
 
 $app->get('home','Masters\MasterController@mainIndex');
 $app->get('providers','Providers\ProvidersController@index');
+$app->get('generador','Generador\GeneradorController@index');
 
 $app->get('/date', function () use ($app) {
     return date("Y-m-d H:i:s");

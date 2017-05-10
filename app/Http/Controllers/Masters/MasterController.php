@@ -46,6 +46,7 @@ class MasterController extends BaseController
                     "countrie"=>$this->getCountries(),
                     "languajes"=>$this->getLanguajes(),
                     "lines"=>$this->getLines(),
+                    "coins"=>$this->getCoins(),
                     "ports"=>$this->getPorts()
                 )
             );

@@ -322,7 +322,7 @@ MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsService
     }
 }]);
 
-MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','productsServices','masterSrv',function ($scope,$timeout, setNotif,productos,productsServices,masterSrv)  {
+MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','productsServices','masterSrv',function ($scope,$timeout, setNotif,productos,productsServices,masterSrv) {
     $scope.listProviders = productsServices.getProvs();
     $scope.lines = masterSrv.getLines();
     $scope.prod = productsServices.getToSavedProd();

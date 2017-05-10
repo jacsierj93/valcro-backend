@@ -17,7 +17,7 @@ MyApp.directive('iconGroup', function ($timeout) {
                 }else if(e.which=="37"){
                     var prev = (angular.element(elem).prev().length>0)?angular.element(elem).prev():angular.element(elem).nextAll().last();
                     prev[0].focus();
-                }
+                } 
             });
 
 
@@ -51,7 +51,8 @@ MyApp.service("masterLists",function(masters) {
             typeDir =  masters.query({ type:"addressType"});
             provType = masters.query({ type:"getProviderType"});
             provTypeSend = masters.query({ type:"getProviderTypeSend"});
-            coins = masters.query({ type:"getCoins"});
+            coins = eval(angular.element("code#coins").text()); //masters.query({ type:"getCoins"});
+            angular.element("code#coins").remove();
             prodLines = eval(angular.element("code#lines").text());//masters.query({ type:"prodLines"});
             angular.element("code#lines").remove();
             languaje = eval(angular.element("code#languajes").text());//masters.query({type:"languajes"});
@@ -609,8 +610,9 @@ MyApp.controller('ListProv', function ($scope,setGetProv,providers, $location, $
         return valid;
     };
 
-    setGetProv.setList( $scope.todos = eval(angular.element("code#listado").text()));
-    angular.element("code#listado").remove();
+    //setGetProv.setList( $scope.todos = eval(angular.element("code#listado").text()));
+    $scope.todos = setGetProv.seeList();
+    angular.element("code#list").remove();
     /*$scope.setList = function(data){
         //console.log(data);
         setGetProv.setList( $scope.todos = data);
@@ -650,7 +652,9 @@ MyApp.service("setGetProv",function($http,providers,$q){
     var prov = {id:false,type:"",description:"",siglas:"",envio:"",contraped:true,limCred:0,created:false};
     var fullProv = {};
     var itemsel = {};
-    var list = {};
+    //var list = {};
+    var list = providers.query({type:"provList"})
+    
     var statusProv = {change:false};
     var rollBack = {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
     var changes =  {"dataProv":{},"dirProv":{},"valName":{},"contProv":{},"infoBank":{},"limCred":{},"payCond":{},"factConv":{},"point":{},"timeProd":{},"timeTrans":{},"provCoin":{},"priceList":{}};
@@ -1027,7 +1031,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
         return elem.descripcion.toLowerCase().indexOf(text.toLowerCase()) != -1;
     };
 
-    $scope.$watch('ctrl.selPais.id',function(nvo,old){
+    $scope.$watch('dir.pais',function(nvo,old){
         //console.log("pais",nvo);
         if((nvo) && $filter("filterSearch")(masterLists.getCommonCountry(),[nvo]).length <= 0 && $scope.direccionesForm.$dirty){
             setNotif.addNotif("alert","al parecer este pais no es muy comun, esta seguro que esta correcto?", [
@@ -1047,7 +1051,7 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             ])
         }
 
-        $scope.dir.pais = nvo;
+        //$scope.dir.pais = nvo;
         asignPort.setCountry(nvo);
         if(nvo){
             var preVal = angular.element("#dirPhone").val();
@@ -1083,12 +1087,12 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
     $scope.searchPort = function(ports,pais){
         return ports.pais_id == pais;
     };
-    $scope.$watch('ctrl.dirType.id',function(nvo){
+    /*$scope.$watch('ctrl.dirType.id',function(nvo){
         if($scope.direccionesForm.$dirty){
             $scope.dir.tipo = nvo;
         }
         // setGetProv.setComplete("address",nvo);
-    });
+    });*/
 
 
 
@@ -1101,10 +1105,8 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             $scope.dir.id = dirSel.id;
             $scope.dir.id_prov = dirSel.prov_id;
             $scope.dir.direccProv = dirSel.direccion;
-            //$scope.dir.tipo = dirSel.tipo_dir;
-            $scope.ctrl['selPais'] = dirSel.pais;
-            $scope.ctrl['dirType'] = dirSel.tipo;
-            // $scope.dir.pais = dirSel.pais_id;
+            $scope.dir.tipo = dirSel.tipo_dir;
+            $scope.dir.pais = dirSel.pais_id;
             asignPort.setCountry(dirSel.pais_id);
             $scope.dir.provTelf = dirSel.telefono;
             $scope.dir.ports = dirSel.ports;
@@ -1112,7 +1114,6 @@ MyApp.controller('provAddrsController', function ($scope,setGetProv,providers,ma
             $scope.dir.zipCode = parseInt(dirSel.codigo_postal);
             currentOrig = angular.copy($scope.dir);
             setGetProv.addToRllBck($scope.dir,"dirProv");
-
         },addrs.add)
 
     };

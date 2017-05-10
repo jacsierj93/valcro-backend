@@ -47,6 +47,7 @@
     <?= HTML::script("components/angular-tree-control/angular-tree-control.js") ?>
 
 
+
     
     <base href="<?=$_SERVER['REQUEST_URI'] ?>">
 </head>
@@ -64,6 +65,9 @@
 </code>
 <code id="lines" style="display: none">
     <?= $lines; ?>
+</code>
+<code id="coins" style="display: none">
+    <?= $coins; ?>
 </code>
 
 <div class="cabezera" layout="row" layout-align="start center">

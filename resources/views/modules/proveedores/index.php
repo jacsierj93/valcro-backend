@@ -1,6 +1,5 @@
 <!-- 1) ########################################## CONTENEDOR GENERAL DE LA SECCION ########################################## -->
 <div layout="column" class="md-whiteframe-1dp" flex ng-controller="AppCtrl" global>
-
     <!-- 2) ########################################## AREA DEL MENU ########################################## -->
     <!--<div layout="row" flex="none" class="menuBarHolder">
 
@@ -56,15 +55,15 @@
             <!-- 6) ########################################## LISTADO LATERAL ########################################## -->
             <!--<md-content flex class="barraLateral" ng-controller="ListProv">-->
             <div id="launchList" style="width:0px;height: 0px;" tabindex="-1" list-box></div>
-            <div id="listado" flex  style="overflow-y:auto;" ng-click="showAlert(45)" >
+            <div id="listado" flex  style="overflow-y:auto;"  >
                 <!-- 7) ########################################## ITEN A REPETIR EN EL LISTADO DE PROVEEDORES ########################################## -->
                 <div class="boxList"  layout="column" list-box flex ng-repeat="item in todos| customFind : filterProv : filterList" id="prov{{item.id}}" ng-click="setProv(this, $index)" ng-class="{'listSel' : (item.id == prov.id),'listSelTemp' : (!item.id || (item.id == prov.id && prov.created)), 'reserved':(item.reserved)}">
                     <div style="overflow: hidden; text-overflow: ellipsis;" flex>{{ item.razon_social}}</div>
                     <div style="height:40px; font-size:31px; overflow: hidden;">{{(item.limCred)?item.limCred:'0' | number:2}}</div>
                     <div style="height:40px;">
-                        <!--<i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>-->
+                        <i ng-show="(item.contraped==1)" class="fa fa-gift" style="font-size:24px;"></i>
 
-                       <!-- <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />-->
+                        <img ng-show="(item.contrapedido==1)" src="images/contra_pedido.png" />
 
                         <span ng-show="(item.contrapedido == 1)" class=" icon-Contrapedidos" style="font-size: 23px"></span>
                         <span ng-show="(item.tipo_envio_id == 1 || item.tipo_envio_id == 3)" style="font-size: 23px" class="icon-Aereo" style="font-size: 24px"></span>
@@ -534,19 +533,16 @@
                                     <md-autocomplete md-selected-item="ctrl.dirType"
                                                      flex
                                                      required
-                                                     required-match="true"
                                                      info="es facturacion o Almacen?"
-                                                     md-selected-item-change="dir.tipo = ctrl.dirType.id"
+                                                     model="dir.tipo"
                                                      skip-tab
                                                      id="dirType"
                                                      md-search-text="ctrl.searchType"
                                                      ng-disabled="$parent.enabled"
                                                      md-items="item in tipos | stringKey : ctrl.searchType: 'descripcion'"
                                                      md-item-text="item.descripcion"
-                                                     md-select-on-focus
                                                      md-no-asterisk
                                                      md-min-length=0>
-
                                         <md-item-template>
                                             <span>{{item.descripcion}}</span>
                                         </md-item-template>
@@ -567,9 +563,8 @@
                                     <md-autocomplete md-selected-item="ctrl.selPais"
                                                      flex
                                                      require
-                                                     require-match="true"
                                                      id="dirPais"
-                                                     md-selected-item-change="dir.pais = ctrl.selPais.id"
+                                                     model="dir.pais"
                                                      info="indica el pais de la direccion"
                                                      skip-tab
                                                      md-search-text="ctrl.searchCountry"
@@ -579,7 +574,6 @@
                                                      md-no-asterisk
                                                      md-input-minlength="0"
                                                      md-min-length=0>
-
                                         <md-item-template>
                                             <span>{{item.short_name}}</span>
                                         </md-item-template>
@@ -2486,8 +2480,5 @@
                                                                         <div ng-controller="notificaciones" ng-include="template"></div>
                                                                         <div ng-controller="FilesController" ng-include="template"></div>
                                                                         </div>
-<code id="listado" style="display: none">
-    <?= $list; ?>
-</code>
 
 

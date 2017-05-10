@@ -286,7 +286,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group">
                                     <label>Proforma</label><br>
-                                    <input id="img_proforma" type="file" class="file" value="{{$data->img_proforma}}">
+                                    <input id="img_proforma" type="file" class="filevalue="{{$data->img_proforma}}>
                                 </div>
                             </div>
                         </div>

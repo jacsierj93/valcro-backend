@@ -41,6 +41,11 @@ var urls = [
         key:'usuarios',
         url: 'modules/usuarios/index',
         selct: 'btnPie'
+    }, {
+        secc: 'Generador',
+        key:'generador',
+        url: 'generador',
+        selct: 'btnPie'
     }];
 
 var MyApp = angular.module('MyApp', dependency, function() {
@@ -210,8 +215,12 @@ MyApp.filter('filterSelect', function() {
         if(!id){
             id="id";
         }
+        if(typeof(arr2)!="array"){
+        	arr2 = [arr2];
+        }
 
         return arr1.filter(function(val) {
+        	
             return arr2.indexOf(eval("val."+id)) === -1;//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     };

@@ -101,7 +101,7 @@ class MasterProductController extends BaseController
         }
 		// designa el origen como "PEDIDOS" --------------------------------
 		$prod->origen_cre =$orgn;
-		
+			
         $prod->save();
         return Product::find($prod->id) ;
 

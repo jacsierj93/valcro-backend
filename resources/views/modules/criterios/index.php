@@ -209,7 +209,7 @@
                 <md-content class="cntLayerHolder" layout="row" flex style="padding: 0 0 0 0 !important;">
 
 
-                        <div  style="width:440px;padding:8px" layout="column">
+                        <div  style="width:840px;padding:8px" layout="column">
                                 <form flex name="LineProd" layout="row" class="focused" ng-controller="formPreview">
                                     <div active-left></div>
                                     <div flex layout="column">
@@ -236,7 +236,25 @@
                         </div>
 
 
-                    <div flex></div>
+                    <div ng-controller="formCreatorController" flex layout="column" >
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                            <div>
+                                Agregar Nuevo Campo
+                            </div>
+                            <!--  <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
+                        </div>
+                        <lmb-collection
+                                lmb-type="list"
+                                lmb-model="critField.type"
+                                lmb-itens="tipos"
+                                lmb-icon="icon"
+                                lmba-pop-up-open="{'nuevoConst':{before:bef ,after:aft}}"
+
+                                flex
+                        >
+
+                        </lmb-collection>
+                    </div>
 
                 </md-content>
                 <show-next on-next="endCriterio" ></show-next>
@@ -650,7 +668,7 @@
                             <div layout="row" flex>
                                 <div style="background: url(images/shadowLeft.jpg) right repeat-y; width:1px"></div>
                                 <div flex layout="column">
-                                    <div style="height: 160px; border-bottom:1px solid #ccc">
+                                    <div style="height: 160px: border-bottom:1px solid #ccc">
 
                                             <div class="titulo_formulario row" layout="row" layout-align="start start" >
                                                 <div>
@@ -740,8 +758,9 @@
 
                     </div>
                 </md-content>
-                <div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()" ng-mouseleave="over = false;">
-                </div>
+                <show-next valid="checkValid" on-next="saveDependency" on-error="showAlert" ></show-next>
+                <!--<div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()" ng-mouseleave="over = false;">
+                </div>-->
             </div>
 
         </md-sidenav>
@@ -770,6 +789,49 @@
                             </treecontrol>
                         </div>
 
+                    </div>
+
+                </form>
+
+            </md-content>
+        </md-sidenav>
+
+        <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" style="width:calc(100% - 928px);" md-disable-backdrop="true" md-component-id="nuevoConst" id="nuevoConst" >
+            <md-content class="cntLayerHolder" layout="column" layout-padding flex>
+                <input type="hidden" >
+                <form name="fieldForm" layout="row" class="focused" ng-controller="treeController">
+                    <div style="width:24px; height: 100%;"></div>
+                    <div flex auto-close="{before:null,after:null}" layout="column">
+                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                            <div>
+                                Nombre del Campo
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <md-input-container class="md-block" flex>
+                                <label>da nombre al campo</label>
+                                <md-autocomplete md-selected-item="ctrl.prov"
+                                                 flex
+                                                 id="critField"
+                                                 info="puede seleccionar uno de la lista o crear uno nuevo"
+                                                 model="field"
+                                                 skip-tab
+                                                 md-search-text="ctrl.searchDesc"
+                                                 md-items="item in fields | stringKey : ctrl.searchDesc : 'descripcion'"
+                                                 md-item-text="item.descripcion"
+                                                 require
+                                                 require-match="true"
+                                                 md-no-asterisk
+                                                 md-min-length="0">
+                                    <input >
+                                    <md-item-template>
+                                        <span>{{item.descripcion}}</span>
+                                    </md-item-template>
+                                </md-autocomplete>
+
+                            </md-input-container>
+                        </div>
                     </div>
 
                 </form>
