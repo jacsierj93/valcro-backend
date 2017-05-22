@@ -408,6 +408,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.listOptions = critForm.getOptions();
 
     function saveCriterio(){
+        console.log("enter")
         wait = $q.defer();
         var ret = wait.promise;
         criterios.put({type:"save"},{crite:$scope.elem,options:$scope.opcValue},function(data){
@@ -435,9 +436,11 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     }
 
     $scope.saveCrit = function(){
+        console.log($scope.fieldForm.$pristine , angular.equals(backCrit.crit,$scope.elem), angular.equals(backCrit.opc,$scope.opcValue))
         if($scope.fieldForm.$pristine || (angular.equals(backCrit.crit,$scope.elem) && angular.equals(backCrit.opc,$scope.opcValue))){
             return true;
         }
+        console.log("entoroooooo")
         saveCriterio().then(closeConst);
 
     };
@@ -728,7 +731,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                 angular.forEach($scope.critField.opcs.Opcion, function(valor, key){
                     $scope.opcValue.opts.valor.push(valor.pivot.value);
                 });
-                backCrit.crit = ($scope.elem);
+                backCrit.crit = angular.copy($scope.elem);
                 backCrit.opc = angular.copy($scope.opcValue)
             },0)
         }
@@ -838,6 +841,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                         popUpService.popUpOpen({
                             'lyrConfig':{
                                 before:function(){
+                                    critForm.setDepend(false)
                                     $scope.openDep=true;
                                 },
                                 after:null
@@ -848,7 +852,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             ])
         }else{
             deps = deps || false;
-            //critForm.setDepend(deps)
+            critForm.setDepend(deps)
             $mdSidenav("lyrConfig").open().then(function(){
                 $scope.opendDep = true;
             });
@@ -930,12 +934,13 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         popUpService.popUpOpen({
             'nuevoConst':{
                 before:function(){
-                    critForm.setEdit(campo);
+
                     return true;
                 },
                 after:null
             }
         })
+        critForm.setEdit(campo);
         /*$scope.openConstruct(function () {
             critForm.setEdit(campo);
         });*/
@@ -974,11 +979,12 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     $scope.$watchCollection("line.listado",function(n,o){
         $scope.criteria = n;
     });
-    $scope.currentLct = critForm.getEdit();
+    //$scope.currentLct = critForm.getEdit();
     $scope.configDep = critForm.getDepend();
-    $scope.$watch("currentLct.id",function(nvo){
+    $scope.$watch("configDep.lct_id",function(nvo){
         if(nvo){
             $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
+
         }
     });
 
@@ -1004,6 +1010,7 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
 
     var updateDependency = function(dat,act){
+        console.log(dat,act)
         depend = (act=="upd")?$filter("filterSearch")($scope.currentCrit.deps,[dat.id])[0]:{};
         depend.id = dat.id
         depend.lct_id = dat.parent_id
@@ -1146,7 +1153,9 @@ MyApp.directive('lmbCollection', function() {
 
             var done = function(){
                 var dat = $scope.curVal;
+
                 if($scope.multi){
+
                     if(typeof($scope.model) !='object'){
                         $scope.model = [];
                     }
@@ -1158,6 +1167,10 @@ MyApp.directive('lmbCollection', function() {
 
                 }else{
                     $scope.model = eval("dat."+$scope.key);
+                }
+
+                if($scope.prntFrm){
+                    $scope.prntFrm.$setDirty();
                 }
 
                 if($scope.also){
@@ -1181,10 +1194,22 @@ MyApp.directive('lmbCollection', function() {
 
         },
         link:function(scope,elem,attr,model){
-            
+            scope.ident = attr;
             scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
             scope.also = ('lmbAlso' in attr)?attr.lmbAlso:false;
+            scope.prntFrm = false;
+            if((elem.parents("form").length>0)){
+                var sup = scope.$parent;
+                do{
+                    if((elem.parents("form").attr("name") in sup)){
+                        scope.prntFrm = sup[elem.parents("form").attr("name")];
+                    }else{
+                        sup = sup.$parent;
+                    }
+                }while(!scope.prntFrm)
+
+            }
             attr.$observe('disabled', function (newValue) {
                 if(newValue){
                     elem.css("color","#f1f1f1");
@@ -1193,7 +1218,8 @@ MyApp.directive('lmbCollection', function() {
                 }
             });
             attr.$observe('multiple', function (newValue) {
-                if(newValue){
+
+                if(newValue || ("multiple" in attr)){
                     scope.multi = true;
                 }else{
                     scope.multi = false;

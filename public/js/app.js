@@ -1101,7 +1101,7 @@ MyApp.controller('login', ['$scope', '$http', function ($scope, $http) {
             }
         }).then(function successCallback(response) {
             if (response.data.success) {
-                location.replace(PATHAPP +'#home');
+                location.replace(PATHAPP +'home');
             }
         }, function errorCallback(response) {
             console.log(response);
@@ -1189,10 +1189,11 @@ MyApp.config(['$routeProvider', '$locationProvider',
             $routeProvider.when('/'+v.key,data);
         });
         $routeProvider.when('/', {
-
-            templateUrl: 'home'
+            //templateUrl: 'modules/home/index'
+            templateUrl: '/home'
         });
         $routeProvider.otherwise({ redirectTo: '/' });
+        //$locationProvider.html5Mode(true);
     }]);
 
 MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){

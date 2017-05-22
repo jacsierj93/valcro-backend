@@ -715,7 +715,7 @@ MyApp.directive('formPreview', function() {
 
             };
             var isShow = function(val){
-                /*console.log(val);
+
                 if(!val.childs){
                     return false;
                 }
@@ -757,7 +757,7 @@ MyApp.directive('formPreview', function() {
 
 
 
-                });*/
+                });
                 //return show;
             };
         },

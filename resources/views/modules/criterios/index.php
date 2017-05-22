@@ -197,8 +197,6 @@
                     <div flex></div>
                 </md-content>
                 <show-next valid="(LineProd.$valid && !LineProd.$pristine)" on-next="saveNewLine" on-error="showMsg"></show-next>
-                <!--<div class="showNext" style="width: 16px;" ng-mouseover="(LineProd.$valid && !LineProd.$pristine)?$parent.showNext(true,saveNewLine):showMsg()" ng-mouseleave="over = false;">
-                </div>-->
             </div>
         </md-sidenav>
 
@@ -228,7 +226,8 @@
                                                  test="{{field.id}}"
                                                  form-preview="{{field.type.directive}}"
                                                  ng-dblclick="setEdit(field)"
-                                                 ng-show="isShow[field.id] ||  isShow.indexOf(field.id)==-1"
+                                                 ng-hide="isShow[field.id]===false"
+
                                                  >
 
                                             </div>
@@ -245,7 +244,7 @@
                                 <div>
                                     Agregar Nuevo Campo
                                 </div>
-                                <!--  <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
+
                             </div>
                             <lmb-collection
                                     lmb-type="list"
@@ -710,7 +709,7 @@
                                     </md-input-container>
                                 </div>
                             </div>
-                            <div flex>
+                            <div flex layout="column">
                                 <div class="titulo_formulario row focused" layout="column" layout-align="start start">
                                     <div >
                                         Opciones
@@ -719,7 +718,7 @@
 
                                 <md-content flex layout="column">
 
-                                    <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
+                                    <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevInfo">
                                         <md-input-container class="md-block" flex >
                                             <label>info</label>
                                             <input skip-tab
@@ -731,7 +730,7 @@
                                     </div>
 
 
-                                    <div layout="column" class="optHolder" flex tabindex="0" id="prevInfo">
+                                    <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevInfo">
                                         <md-input-container class="md-block" flex >
                                             <label>placeholder</label>
                                             <input skip-tab
@@ -744,7 +743,7 @@
 
 
 
-                                    <div layout="column" flex tabindex="0" id="prevReq" >
+                                    <div layout="column" flex="initial" tabindex="0" id="prevReq" >
                                         <div class="row" layout="row">
                                             <md-input-container class="md-block" flex>
                                                 <md-switch ng-model="opcValue.req.valor"
@@ -794,7 +793,7 @@
                                     <div ng-if="elem.tipo_id == 2 || elem.tipo_id == 4" flex>
 
 
-                                        <div layout="column" class="optHolder" flex tabindex="0" id="prevMin">
+                                        <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevMin">
                                             <md-input-container class="md-block" flex >
                                                 <label>Minimo</label>
                                                 <input skip-tab
@@ -816,7 +815,7 @@
 
 
 
-                                        <div layout="column" class="optHolder" flex tabindex="0" id="prevMax">
+                                        <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevMax">
                                             <md-input-container class="md-block" flex >
                                                 <label>Maximo</label>
                                                 <input skip-tab
@@ -837,7 +836,7 @@
                                         </div>
 
 
-                                        <div layout="column" class="optHolder" flex tabindex="0" id="prevMinI">
+                                        <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevMinI">
                                             <md-input-container class="md-block" flex >
                                                 <label>Minimo Imposible</label>
                                                 <input skip-tab
@@ -858,7 +857,7 @@
                                         </div>
 
 
-                                        <div layout="column" class="optHolder" flex tabindex="0" id="prevMaxI">
+                                        <div layout="column" class="optHolder" flex="initial" tabindex="0" id="prevMaxI">
                                             <md-input-container class="md-block" flex >
                                                 <label>Maximo  Imposible</label>
                                                 <input skip-tab
@@ -964,7 +963,7 @@
                                     </div>
                                 </md-content>-->
                                 <md-input-container class="md-block" flex>
-                                    <label>selecciona el campo</label>
+                                    <label>selecciona el campo {{configDep.lct_id}}</label>
                                     <md-autocomplete md-selected-item="ctrl.itemSel"
                                                      flex
                                                      id="critField"
@@ -1063,10 +1062,10 @@
                                             <lmb-collection class="rad-contain"
                                                             layout="column"
                                                             lmb-type="list"
-                                                            multiple
                                                             ng-disabled="configDep.action == 'true' || configDep.action == 'false'"
                                                             lmb-model="configDep.action"
                                                             lmb-display="elem.nombre"
+                                                            multiple
                                                             lmb-itens="selCrit.options.Opcion"
                                                             lmb-key="elem.id"
 
