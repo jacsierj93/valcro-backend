@@ -171,12 +171,7 @@ MyApp.controller('pagosCtrll', ['$scope', '$mdSidenav', '$http', 'Upload', 'pays
 
         function closeLayer(all) {
             if (all) {
-                while ($scope.index != 0) {
-                    var layer = historia[$scope.index];
-                    historia[$scope.index] = null;
-                    $scope.index--;
-                    $mdSidenav(layer).close();
-                }
+                $scope.LayersAction({close:true});
             } else {
                 layer = historia[$scope.index];
                 historia[$scope.index] = null;

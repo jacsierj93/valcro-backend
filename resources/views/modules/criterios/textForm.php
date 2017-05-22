@@ -10,6 +10,7 @@
     <input skip-tab
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
+           info-nowait
            autocomplete="off"
            ng-required="{{field.options.Requerido[0].pivot.value || false}}"
            min-length="{{field.options.Minimo[0].pivot.value || 0}}"
@@ -36,9 +37,11 @@
     <input skip-tab
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
+           info-nowait
            autocomplete="off"
            ng-required="{{field.options.Requerido[0].pivot.value || false}}"
            number
+           type="number"
            min="{{field.options.Minimo[0].pivot.value || 0}}"
            max="{{field.options.Max[0].pivot.value || 9999}}"
            lmb-min-imp="{{field.options.MinImp[0].pivot.value || 0}}"
@@ -62,6 +65,7 @@
                      skip-tab
                      ng-required="{{field.options.Requerido[0].pivot.value || ''}}"
                      info="{{field.options.Info[0].pivot.value || ''}}"
+                     info-nowait
                      md-search-text="ctrl[field.id].searchSel"
                      key="item.elem.id"
                      md-no-cache

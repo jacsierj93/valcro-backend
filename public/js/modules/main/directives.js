@@ -694,7 +694,10 @@ MyApp.directive('formPreview', function() {
             $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
-                
+                if(!field.id){
+                    return false;
+                }
+
                 $scope.crit[''+field.id] = {value : "",childs:[]};
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
@@ -709,9 +712,13 @@ MyApp.directive('formPreview', function() {
 
 
                 }
+
             };
             var isShow = function(val){
-
+                /*console.log(val);
+                if(!val.childs){
+                    return false;
+                }
                 angular.forEach(val.childs,function(dep,k){
                     var ret = eval(dep.accion);
                     switch (dep.operador){
@@ -750,7 +757,7 @@ MyApp.directive('formPreview', function() {
 
 
 
-                });
+                });*/
                 //return show;
             };
         },

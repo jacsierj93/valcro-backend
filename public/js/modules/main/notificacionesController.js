@@ -11,7 +11,8 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
     $scope.ok = function(call, data){
 
         if(call.opc.action){
-            call.opc.action(call,data);
+
+            setNotif.setPromise(call.opc.action(call,data));
             $scope.saveAnswer(call,data );
         }else{
             $scope.curFocus.focus();
@@ -190,7 +191,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
 
 
 
-MyApp.service("setNotif",function($filter,$timeout){
+MyApp.service("setNotif",function($filter,$timeout,$q){
     var list =  {
         ok: [],
         alert: [],
@@ -198,11 +199,19 @@ MyApp.service("setNotif",function($filter,$timeout){
         info: [],
         input: []
     };
+    var def = $q.defer();
+    var promise = def.promise;
     return {
         listNotif : function(){
             return list;
         },
+        setPromise:function(val){
+
+            def.resolve(val)
+        },
         addNotif : function(obj,mnsg,opcs,param){
+            x = undefined;
+
             if($filter("customFind")(list[obj],mnsg,function(current,compare){return current.content == compare}).length<=0 && list.error.length == 0) {
                 var Self = this;
                 var uid = Math.random();
@@ -215,7 +224,13 @@ MyApp.service("setNotif",function($filter,$timeout){
                         })[0]), 1);
                     }, param.autohidden);
                 }
+
+            }else{
+                def.reject(null)
+
             }
+
+            return promise;
         },
         hideByContent: function(type,content){
             var noti = $filter("customFind")(list[type],content,function(current,compare){return current.content == compare});

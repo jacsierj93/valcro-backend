@@ -712,18 +712,19 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
             if(("src" in  attrs)) {
 
             }*/
+
             if(element.is("md-autocomplete") &&  attrs.model){
+
                 var aliasTxt =attrs.mdItems.split(/ in /i)[0];
                 var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
                 var ngmodel = attrs.model;
                 var local = false;
                 var keyVal = attrs.key || aliasTxt+".id";
 
-                //var text = attrs.mdItemText.split(".")[0];
+
 
                 model.scope.itemChange = function(cambio){
-                    console.log(aliasTxt);
-                    //console.log(cambio);
+
                     if(typeof(cambio)=="undefined"){
                         return false;
                     }
@@ -785,7 +786,6 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 });
 
             }
-/*
             element.bind("blur", function(e) {
                 $timeout(function() {
                     setNotif.hideByContent("info",attrs.info);
@@ -802,9 +802,10 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                             old.info = attrs.info;
                         }
                         $timeout.cancel(ref);
+                        time = (attrs.infoNowait)?0:30000;
                         ref = $timeout(function() {
                             old = {element:"",info:""};
-                        },30000);
+                        },time);
                     }, 0);
                 }
             };
@@ -852,7 +853,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                 element.bind("focus", function(e){
                     showInfo();
                 });
-            }*/
+            }
 
 
         }
@@ -1188,11 +1189,10 @@ MyApp.config(['$routeProvider', '$locationProvider',
             $routeProvider.when('/'+v.key,data);
         });
         $routeProvider.when('/', {
-            //templateUrl: 'modules/home/index'
-            templateUrl: '/home'
+
+            templateUrl: 'home'
         });
         $routeProvider.otherwise({ redirectTo: '/' });
-        //$locationProvider.html5Mode(true);
     }]);
 
 MyApp.controller("FilesController" ,['$filter','$scope','$mdSidenav','$resource','$timeout','Upload','SYSTEM','filesService','Layers','setNotif', function($filter, $scope,$mdSidenav,$resource,$timeout,Upload ,SYSTEM,filesService, Layers,setNotif){

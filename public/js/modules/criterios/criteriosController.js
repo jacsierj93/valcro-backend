@@ -44,8 +44,8 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var ListOptions = criterios.query({ type:"optionLists"});
     var curLine = {id:false,listado:[]};
     var factory = {
-        linea_id: "1",
-        campo_id: "1",
+        linea_id: "",
+        campo_id: "",
         tipo_id: "2",
         line:{},
         field:$filter("filterSearch")(fields,[1])[0],
@@ -73,21 +73,32 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         action:null
     };
 
+    var curCrit = {};
+
     return {
         setLine:function(elem,force){
-            //console.log(angular.equals(curLine.listado,listadobkup))
+
             if(!angular.equals(curLine.listado,listadobkup) && !force){
                 return false;
             }
-
+            if(curLine.listado.length==0 && curLine.id){
+                $filter("filterSearch")(lines,[curLine.id])[0].hasCrit=false;
+            }
             if(!elem){
+                console.log("entro en donde deveria setear a 0")
                 curLine.id = false;
                 listadobkup = [];
                 curLine.listado = [];
                 return true;
+
             }
+
+
+
             curLine.id = elem.id;
             criterios.query({ type:"getCriteria",id:elem.id},function(data){
+
+                elem.hasCrit = true;
                 listadobkup = angular.copy(data) || [];
                 curLine.listado = data || [];
 
@@ -98,32 +109,27 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         },
         getLine:function(){
             return curLine;
-        },
+        }  ,
         add:function(datos){
-            var elem = {};
-            elem = $filter("filterSearch")(curLine.listado,[datos.id])[0]
-            if(!elem){
-                elem = angular.copy(factory);
-                curLine.listado.push(elem);
-            }
-            elem.id=datos.id;
-            elem.ready = datos.ready;
-            elem.linea_id=datos.line;
-            elem.line = $filter("filterSearch")(lines,[datos.line])[0];
-            elem.campo_id=datos.field;
-            elem.field = $filter("filterSearch")(fields,[datos.field])[0];
-            elem.tipo_id=datos.type;
-            elem.type = $filter("filterSearch")(tipos,[datos.type])[0];
-            //elem.opcs = elem.type.cfg;
+            //curCrit = (datos.id)?$filter("filterSearch")(curLine.listado,[datos.id])[0]:false;
+            curCrit = angular.copy(factory);
+            curCrit.linea_id = curLine.id;
+            curLine.listado.push(curCrit);
+
+            return curCrit;
+        },
+        rm:function(id){
+            curLine.listado.splice(curLine.listado.indexOf($filter("filterSearch")(curLine.listado,[id])[0]),1);
         },
         get:function(){
             return listado;
         },
         setEdit:function(campo){
             edit.id = campo.id || false;
-            edit.line = campo.linea_id || curLine.id;
+             /*edit.line = campo.linea_id || curLine.id;
             edit.field = campo.campo_id || null;
-            edit.type = campo.tipo_id || null;
+            edit.type = campo.tipo_id || null;*/
+            edit.curCrit = (campo.id)?$filter("filterSearch")(curLine.listado,[campo.id])[0]:false;
             edit.opcs = campo.options || [];
 
         },
@@ -132,6 +138,8 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         },
         updOptions:function (opt) {
             var aux = $filter("filterSearch")(curLine.listado,[opt.field_id])[0];
+            //var aux = curCrit;
+            //console.log(opt,$filter("filterSearch")(curLine.listado,[opt.field_id]))
             if(!("options" in aux)) aux.options = [];
             if(opt.opc_id == 4){
                 if(!("Opcion" in aux.options)){
@@ -184,6 +192,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                     aux.options[define.descripcion]= [temp];
                 }
             }
+            console.log("depois",aux,curLine.listado)
         },
         delOption :function(opt){
             var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
@@ -215,6 +224,7 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
 
     $scope.openCrit = function(line){
         if(critForm.setLine(line)){
+
             $scope.$parent.LayersAction({open:{name:"critLayer1"}});
         }else{
             setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo, los cambios se guardaron automaticamente",[{
@@ -302,10 +312,10 @@ MyApp.controller('lineController',['$scope', 'setNotif','mastersCrit','$mdSidena
     
 }]);
 
-MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout","App",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout,App) {
+MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSidenav','critForm','criterios','$filter',"$timeout","App","popUpService","$q",function ($scope, setNotif, mastersCrit,$mdSidenav,critForm,criterios,$filter,$timeout,App,popUpService,$q) {
 
 
-
+    var backCrit = {crit:{},opc:{}};
     $scope.nxtAction = null;
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old){
         $scope.index = nvo[1];
@@ -315,27 +325,10 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             if($scope.index == 0){
                 critForm.setLine(false);
             }
-            if(old[0] == 'critLayer1'){
-                if(!$mdSidenav(old[0]).isOpen()){
-                    $scope.closeConstruct()
-                }
-            }
 
         })
     });
 
-    $scope.closeConstruct = function(){
-        if(App.getSeccion().key!=="criterios"){
-            return false;
-        }
-        $mdSidenav("lyrConst1").close();
-        $timeout(function(){
-            $mdSidenav("lyrConst2").close()
-        },250);
-        $timeout(function(){
-            $mdSidenav("lyrConst3").close()
-        },500);
-    };
 
     $scope.endCriterio = function(){
         $scope.LayersAction({close:{all:true,before:function(){
@@ -347,16 +340,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }}});
 
     }
-    
 
-    $scope.showNext = function(status,to){
-        if(status){
-            $scope.nxtAction = to;
-            $mdSidenav("NEXT").open()
-        }else{
-            $mdSidenav("NEXT").close()
-        }
-    };
     $scope.newCrit = function(){
         if(critForm.setLine(false)){
             $scope.LayersAction({open:{name:"critlayer0"}});
@@ -394,10 +378,113 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.critField = critForm.getEdit();
     $scope.$watchCollection("line.listado",function(n,o){
         $scope.criteria = n
+        if(n.id != o.id){
+            chngLine(n,o);
+        }
+    });
+    $scope.newField = {type:false}
+    $scope.elem = {};
+    $scope.$watch("newField.type",function(n,o){
+
+        if(n){
+            //$scope.critField.type = n
+
+            popUpService.popUpOpen({
+                'nuevoConst':{
+                    before:function(){
+                        $scope.elem = critForm.add($scope.critField);
+                        $scope.elem.tipo_id=n;
+                        $scope.elem.type = $filter("filterSearch")($scope.tipos,[n])[0];
+                        return true;
+                    },
+                    after:null
+                }
+            })
+        }
+
     });
     var accept = false;
 
     $scope.listOptions = critForm.getOptions();
+
+    function saveCriterio(){
+        wait = $q.defer();
+        var ret = wait.promise;
+        criterios.put({type:"save"},{crite:$scope.elem,options:$scope.opcValue},function(data){
+            $scope.elem.id = data.id;
+            wait.resolve(data.id);
+
+            angular.forEach(data.opciones, function(value, key){
+
+                if(key.match(/^[^\$]/g) && ("id" in value)) {
+                    $scope.opcValue[key].id = value.id;
+                    $scope.opcValue[key].field_id = data.id;
+                    critForm.updOptions($scope.opcValue[key]);
+                }else if(key.match(/^[^\$]/g) && value.action == "del"){
+                    critForm.delOption(angular.copy($scope.opcValue[key]))
+                    $scope.opcValue[key].id = false;
+                    $scope.opcValue[key].msg = ''
+                }
+            });
+            $scope.elem.deps = [];
+            setNotif.addNotif("ok", "datos guardados", [
+            ],{autohidden:1000});
+
+        });
+        return ret;
+    }
+
+    $scope.saveCrit = function(){
+        if($scope.fieldForm.$pristine || (angular.equals(backCrit.crit,$scope.elem) && angular.equals(backCrit.opc,$scope.opcValue))){
+            return true;
+        }
+        saveCriterio().then(closeConst);
+
+    };
+    
+    $scope.precheck = function () {
+        if(!$scope.fieldForm.$pristine && !$scope.fieldForm.$valid){
+            setNotif.addNotif("error", "existen campos necesarios que no han sido llenos ", [],{autohidden:2000});
+            return false;
+        }
+        return true;
+    };
+
+    $scope.closeConst = function(){
+        if(!$scope.fieldForm.$pristine){
+            setNotif.addNotif("alert", "si cierra perdera todos los datos no guardados, porfavor haga click > para guardar", [
+                {
+                    name:"descartar los cambios ",
+                    action:function(){
+                        closeConst()
+                    }
+                },
+                {
+                    name:"continuar editando/creando",
+                    action:null,
+                }
+            ]);
+            return false;
+        }
+        closeConst()
+
+    };
+    function closeConst(){
+        popUpService.popUpClose({
+            'nuevoConst':{
+                before:null,
+                after:function() {
+                    //console.log($scope.elem);
+                    if(!$scope.elem.id){
+                        critForm.rm($scope.elem.id);
+                    }
+                    $scope.newField.type = false;
+                    $scope.fieldForm.$setUntouched();
+                    $scope.fieldForm.$setPristine();
+                }
+            }
+        })
+    }
 
     $scope.opcValue = {
         coder: {
@@ -490,7 +577,6 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
        })
     };
 
-
     $scope.checkSave = function(e,model){
         var self = angular.element(e.currentTarget).parents(".optHolder").first();
         var parent = angular.element(e.relatedTarget).parents("#"+self.attr("id"));
@@ -559,8 +645,6 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     };
 
-
-
     var saveOptions = function(datos){
         criterios.put({type:"saveOptions"},$scope.opcValue,function(data){
             angular.forEach(data, function(value, key){
@@ -582,20 +666,80 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         });
     };
 
-    $scope.$watch("critField.type",function(val,old){
+    $scope.$watchCollection("critField",function(n,o){
+        if(n.type != o.type){
             $scope.options = (val)?$filter("filterSearch")($scope.tipos ,[val])[0].cfg:[];
             advertOpcion();
+        }
 
-    });
+        if(n.id != o.id){
+            $timeout(function(){
 
-    $scope.$watchCollection("critField",function(n,o){
-        if(n.id == o.id && n.line != null && n.type != null && n.field != null){
+                $scope.elem = n.curCrit;
+                val = $scope.elem.id;
+                $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
+                $scope.opcValue.coder.field_id= val;
+                $scope.opcValue.coder.id= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.id : false;
+                $scope.opcValue.coder.valor= ("codificador" in $scope.critField.opcs)?parseInt($scope.critField.opcs.codificador[0].pivot.value): 0;
+                $scope.opcValue.coder.msg= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.message : "";
+
+                $scope.opcValue.multi.field_id= val;
+                $scope.opcValue.multi.id= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.id : false;
+                $scope.opcValue.multi.valor= ("multi" in $scope.critField.opcs)?parseInt($scope.critField.opcs.multi[0].pivot.value): 0;
+                $scope.opcValue.multi.msg= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.message : "";
+
+                $scope.opcValue.info.field_id= val;
+                $scope.opcValue.info.id= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.id : false;
+                $scope.opcValue.info.valor= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.value : "";
+                $scope.opcValue.info.msg= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.message : "";
+
+                $scope.opcValue.place.field_id= val;
+                $scope.opcValue.place.id= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.id : false;
+                $scope.opcValue.place.valor= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.value : "";
+                $scope.opcValue.place.msg= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.message : "";
+
+                $scope.opcValue.req.field_id= val;
+                $scope.opcValue.req.id= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.id : false;
+                $scope.opcValue.req.valor= ("Requerido" in $scope.critField.opcs)?parseInt($scope.critField.opcs.Requerido[0].pivot.value): "";
+                $scope.opcValue.req.msg= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.message : "";
+
+                $scope.opcValue.min.field_id= val;
+                $scope.opcValue.min.id= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.id : false;
+                $scope.opcValue.min.valor= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.value : "";
+                $scope.opcValue.min.msg= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.message : "";
+
+                $scope.opcValue.max.field_id= val;
+                $scope.opcValue.max.id =  ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.id : false;
+                $scope.opcValue.max.valor= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.value : "";
+                $scope.opcValue.max.msg= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.message : "";
+
+                $scope.opcValue.maxI.field_id= val;
+                $scope.opcValue.maxI.id = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.id : false;
+                $scope.opcValue.maxI.valor = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.value : "";
+                $scope.opcValue.maxI.msg = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.message : "";
+
+                $scope.opcValue.minI.field_id= val;
+                $scope.opcValue.minI.id = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.id : false;
+                $scope.opcValue.minI.valor = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.value : "";
+                $scope.opcValue.minI.msg = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.message : "";
+
+                $scope.opcValue.opts.field_id = $scope.critField.id;
+                $scope.opcValue.opts.valor = [];
+                angular.forEach($scope.critField.opcs.Opcion, function(valor, key){
+                    $scope.opcValue.opts.valor.push(valor.pivot.value);
+                });
+                backCrit.crit = ($scope.elem);
+                backCrit.opc = angular.copy($scope.opcValue)
+            },0)
+        }
+
+        /*if(n.id == o.id && n.line != null && n.type != null && n.field != null){
             criterios.put({type:"save"},$scope.critField,function(data){
                 $scope.critField.id = data.id;
                 $scope.critField.ready = data.ready;
                 critForm.add($scope.critField);
             });
-        }
+        }*/
 
     });
 
@@ -623,66 +767,6 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             }
         ])
     };
-    $scope.$watch("line.id",chngLine);
-    $scope.$watch("critField.id",function(val){
-
-        $timeout(function(){
-            //accept = false;
-            $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
-            $scope.opcValue.coder.field_id= val;
-            $scope.opcValue.coder.id= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.id : false;
-            $scope.opcValue.coder.valor= ("codificador" in $scope.critField.opcs)?parseInt($scope.critField.opcs.codificador[0].pivot.value): 0;
-            $scope.opcValue.coder.msg= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.message : "";
-
-            $scope.opcValue.multi.field_id= val;
-            $scope.opcValue.multi.id= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.id : false;
-            $scope.opcValue.multi.valor= ("multi" in $scope.critField.opcs)?parseInt($scope.critField.opcs.multi[0].pivot.value): 0;
-            $scope.opcValue.multi.msg= ("multi" in $scope.critField.opcs)?$scope.critField.opcs.multi[0].pivot.message : "";
-
-            $scope.opcValue.info.field_id= val;
-            $scope.opcValue.info.id= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.id : false;
-            $scope.opcValue.info.valor= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.value : "";
-            $scope.opcValue.info.msg= ("Info" in $scope.critField.opcs)?$scope.critField.opcs.Info[0].pivot.message : "";
-
-            $scope.opcValue.place.field_id= val;
-            $scope.opcValue.place.id= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.id : false;
-            $scope.opcValue.place.valor= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.value : "";
-            $scope.opcValue.place.msg= ("placeholder" in $scope.critField.opcs)?$scope.critField.opcs.placeholder[0].pivot.message : "";
-
-            $scope.opcValue.req.field_id= val;
-            $scope.opcValue.req.id= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.id : false;
-            $scope.opcValue.req.valor= ("Requerido" in $scope.critField.opcs)?parseInt($scope.critField.opcs.Requerido[0].pivot.value): "";
-            $scope.opcValue.req.msg= ("Requerido" in $scope.critField.opcs)?$scope.critField.opcs.Requerido[0].pivot.message : "";
-
-            $scope.opcValue.min.field_id= val;
-            $scope.opcValue.min.id= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.id : false;
-            $scope.opcValue.min.valor= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.value : "";
-            $scope.opcValue.min.msg= ("Minimo" in $scope.critField.opcs)?$scope.critField.opcs.Minimo[0].pivot.message : "";
-
-            $scope.opcValue.max.field_id= val;
-            $scope.opcValue.max.id =  ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.id : false;
-            $scope.opcValue.max.valor= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.value : "";
-            $scope.opcValue.max.msg= ("Max" in $scope.critField.opcs)?$scope.critField.opcs.Max[0].pivot.message : "";
-
-            $scope.opcValue.maxI.field_id= val;
-            $scope.opcValue.maxI.id = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.id : false;
-            $scope.opcValue.maxI.valor = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.value : "";
-            $scope.opcValue.maxI.msg = ("MaxImp" in $scope.critField.opcs)?$scope.critField.opcs.MaxImp[0].pivot.message : "";
-
-            $scope.opcValue.minI.field_id= val;
-            $scope.opcValue.minI.id = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.id : false;
-            $scope.opcValue.minI.valor = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.value : "";
-            $scope.opcValue.minI.msg = ("MinImp" in $scope.critField.opcs)?$scope.critField.opcs.MinImp[0].pivot.message : "";
-
-            $scope.opcValue.opts.field_id = $scope.critField.id;
-            $scope.opcValue.opts.valor = [];
-            angular.forEach($scope.critField.opcs.Opcion, function(valor, key){
-                $scope.opcValue.opts.valor.push(valor.pivot.value);
-            });
-
-        },0)
-
-    });
 
     $scope.$watch("opcValue.opts.valor.length",function(n){
         advertOpcion();
@@ -719,14 +803,12 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         }
 
     };
-    $scope.opennext = function(){
-        $scope.LayersAction({open:{name:"layer1"}});
-    };
-    
-    $scope.addField= function(type){
-        critForm.add(type);
-    };
 
+    $scope.$watchCollection("elem",function(n,o){
+        if(n.tipo_id){
+            n.type = $filter("filterSearch")($scope.tipos ,[n.tipo_id])[0];
+        }
+    });
     $scope.callNew = function(){
         $mdSidenav("newField").open()
     };
@@ -743,12 +825,36 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     $scope.opendDep = false;
     $scope.addDepend = function(deps){
-        deps = deps || false;
-        critForm.setDepend(deps)
-        $mdSidenav("lyrConfig").open().then(function(){
-            $scope.opendDep = true; 
-        });
-        angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()+468)+"px"},500)
+        if(!$scope.elem.id){
+            setNotif.addNotif("alert","primero debemos guardar lo que ha creado hasta ahora, ¿esta deacuerdo?",[
+                {
+                    name: "CANCELAR",
+                    action: null
+                },
+                {
+                    name:"GUARDALO",
+                    action: function(){
+                        deps = deps || false;
+                        popUpService.popUpOpen({
+                            'lyrConfig':{
+                                before:function(){
+                                    $scope.openDep=true;
+                                },
+                                after:null
+                            }
+                        })
+                    }
+                }
+            ])
+        }else{
+            deps = deps || false;
+            //critForm.setDepend(deps)
+            $mdSidenav("lyrConfig").open().then(function(){
+                $scope.opendDep = true;
+            });
+        }
+
+        //angular.element("#lyrConst3").animate({"width": (angular.element("#lyrConst3").width()+468)+"px"},500)
     };
 
     $scope.closeDepend = function(){
@@ -809,7 +915,7 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
 }]);
 
 
-MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter) {
+MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter','popUpService',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter,popUpService) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
     //$scope.criteria =$scope.line.listado;
@@ -821,9 +927,18 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         $scope.criteria = n
     });
     $scope.setEdit = function(campo){
-        $scope.openConstruct(function () {
+        popUpService.popUpOpen({
+            'nuevoConst':{
+                before:function(){
+                    critForm.setEdit(campo);
+                    return true;
+                },
+                after:null
+            }
+        })
+        /*$scope.openConstruct(function () {
             critForm.setEdit(campo);
-        });
+        });*/
     };
     $scope.formId = critForm.getEdit();
 
@@ -911,7 +1026,7 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
     
     $scope.showAlert = function(){
-        console.log($scope.configDep)
+        
         setNotif.addNotif("error", "datos incomṕletos", [
         ],{autohidden:1000});
     };
@@ -949,12 +1064,6 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         }
 
     })
-
-}]);
-
-MyApp.controller('formCreatorController',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','mastersCrit','criterios',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,mastersCrit,criterios) {
-    $scope.fields = mastersCrit.getFields();
-    $scope.tipos = mastersCrit.getTypes();
 
 }]);
 
@@ -1026,7 +1135,7 @@ MyApp.directive('lmbCollection', function() {
                 }
             }
             $scope.setIten=function(dat){
-                console.log($scope)
+                //console.log($scope)
                 $scope.curVal = dat;
                 if($scope.valid.f(dat)){
                     done()
@@ -1050,7 +1159,13 @@ MyApp.directive('lmbCollection', function() {
                 }else{
                     $scope.model = eval("dat."+$scope.key);
                 }
+
+                if($scope.also){
+                    $scope.$eval($scope.also);
+                }
             };
+
+
 
             $scope.exist = function(dat){
                 if($scope.multi){
@@ -1069,6 +1184,7 @@ MyApp.directive('lmbCollection', function() {
             
             scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
+            scope.also = ('lmbAlso' in attr)?attr.lmbAlso:false;
             attr.$observe('disabled', function (newValue) {
                 if(newValue){
                     elem.css("color","#f1f1f1");

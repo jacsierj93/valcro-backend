@@ -739,6 +739,10 @@ body {
     height: 48px;
 }
 
+.formMargin{
+    width: 24px;
+}
+
 /**********************************************/
 .menuBarHolder {
     height: 48px;

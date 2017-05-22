@@ -9,11 +9,53 @@ MyApp.factory('productos', ['$resource',function ($resource) {
 ]);
 
 //GLOBAL
-MyApp.service("popUpService",function($mdSidenav){
+MyApp.service("popUpService",function($mdSidenav,$interval){
     var actives = [];
+    sv = this;
+    var closer = function(sideNav,fn,idx){
+        $mdSidenav(sideNav).close();
+        actives.splice(idx,1);
+        if(fn.after){
+            fn.after();
+        }
+    };
 
+    var close = function(sv,sideNav,fn){
+
+        idx = sv.exist(sideNav);
+
+        if(idx != -1){
+            if(fn.before){
+
+                pre= fn.before();
+            }else{
+                pre = true;
+            }
+
+
+            if(!pre){
+                return false;
+            }
+            else if(typeof(pre) == "object" && 'wait' in pre){
+                var x = $interval(function(){
+                    if(pre.wait===true){
+                        $interval.cancel(x);
+                        //console.log(serviceRefer,sv )
+                        closer(sideNav,fn,idx);
+                    }else if(pre.wait===false){
+                        $interval.cancel(x);
+                        return false;
+                    }
+                },1000)
+            }else{
+                closer(sideNav,fn,idx);
+            }
+
+        };
+    };
     return {
         exist : function(name){
+
             return actives.indexOf(name);
         },
         remove : function(idx){
@@ -38,14 +80,20 @@ MyApp.service("popUpService",function($mdSidenav){
                     return false;
                 }
                 var serv = this;
-                $mdSidenav(sideNav).open().then(function(){
-                    serv.add(sideNav);
-                    if(fn && fn.after){
-                        fn.after();
-                    }
-                })
+                $mdSidenav(sideNav).open();
+                serv.add(sideNav);
+                if(fn && fn.after){
+                    fn.after();
+                }
+            }else{
+                console.info("el sidenav ya se encuentra abierto",actives)
             }
 
+        },
+        popUpClose:function(obj){
+            var side = Object.keys(obj)[0];
+            //console.log(obj,side,Object.keys(obj))
+            close(this,side,obj[side]);
         }
     }
 })
@@ -132,7 +180,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             prod.datos.descripcion = edit.desc || null;
         },
         showChange:function(){
-            console.log(prod.datos,bckup)
+
            return !angular.equals(prod.datos,bckup);
         },
         getProd : function(){
@@ -870,14 +918,13 @@ MyApp.directive('showNext', function() {
                 }
             });
             $scope.show = function(){
-                console.log(typeof($scope.nextFn),$scope.nextFn);
                 if($scope.nextValid()){
                     $scope.cfg.show = true;
                     $scope.cfg.fn = $scope.nextFn;
                 }
             }
         },
-        template: '<div class="showNext" style="width: 16px;" ng-mouseover="show()"> </div>'
+        template: '<div class="showNext" style="width: 16px; height: 100%;" ng-mouseover="show()"> </div>'
     };
 });//GLOBAL
 
@@ -973,6 +1020,10 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
                 scope.fn = scope.$eval(attr.autoClose);
                 scope.sideNav = object.parents("md-sidenav").first().attr("md-component-id");
 
+               /* scope.close = function(){
+                    x[scope.sideNav] = scope.fn;
+                    popUpService.popUpClose(x);
+                }*/
                 scope.closer = function(){
                     $mdSidenav(scope.sideNav).close().then(function(){
                         popUpService.remove(idx);

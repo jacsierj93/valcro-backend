@@ -1436,7 +1436,7 @@
 
         <!-- 16) ########################################## LAYER ANALISIS DE COSTOS ########################################## -->
         <md-sidenav layout="row" style="margin-top:96px; margin-bottom:48px; width: calc(100% - 312px);" class="md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="prodLayer5" id="prodLayer5">
-            <div layout="row" flex >
+
                 <!-- 16) ########################################## CONTENEDOR DE LOS FORMULARIOS (Permite scroll) ########################################## -->
                 <md-content class="cntLayerHolder" layout="column" layout-align="start none" layout-padding flex>
                     <input type="hidden" md-autofocus>
@@ -1456,7 +1456,7 @@
                     </div>
                 </md-content>
                 <show-next on-next="goToResumen" ></show-next>
-            </div>
+
         </md-sidenav>
         
         

@@ -178,28 +178,31 @@ class CritController extends BaseController
     }
 
     public function saveCritField(Request $rq){
+        $crite = $rq->crite;
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
-        if($rq->id){
-            $crit = Criterio::find($rq->id);
+        if($crite['id']){
+            $crit = Criterio::find($crite['id']);
             $ret["action"]="upd";
 
         }else{
             $crit = new Criterio();
         }
-        $crit->linea_id = $rq->line;
-        $crit->campo_id = $rq->field;
-        $crit->tipo_id = $rq->type;
+        $crit->linea_id = $crite['linea_id'];//$rq->line;
+        $crit->campo_id = $crite['campo_id'];//$rq->field;
+        $crit->tipo_id = $crite['tipo_id'];//$rq->type;
 
         $crit->save();
         $ret["id"] = $crit->id;
         $ret["ready"] = ($crit->linea_id && $crit->campo_id && $crit->tipo_id);
+        $ret["opciones"]=self::saveOptions($crit,$rq->options);
         return $ret;
 
     }
 
-    public function saveOptions(Request  $reqs){
+    public function saveOptions($crit,$reqs){
         $ret = array();
-        foreach ($reqs->request as $k=>$rq){
+        //dd($crit->id);
+        foreach ($reqs as $k=>$rq){
             if($k != "opts"){
                 if(!$rq['id'] && $rq['valor']==""){
                     continue;
@@ -220,11 +223,11 @@ class CritController extends BaseController
                 }else{
                     $opt = new Options();
                 }
-                $opt->lct_id = $rq['field_id'];
+                $opt->lct_id = $crit->id;
                 $opt->opc_id = $rq['opc_id'];
                 $opt->value = $rq['valor'];
                 $opt->message = $rq['msg'];
-
+                //dd($opt);
                 $opt->save();
                 $ret[$k]["id"] = $opt->id;
             }else{
@@ -238,7 +241,7 @@ class CritController extends BaseController
                     if(!$regs->contains($opcion)){
                
                         $opt = new Options();
-                        $opt->lct_id = $rq['field_id'];
+                        $opt->lct_id = $crit->id;
                         $opt->opc_id = $rq['opc_id'];
                         $opt->value = $opcion;
                         $opt->save();

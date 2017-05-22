@@ -343,10 +343,7 @@
                             <md-input-container class="md-block" flex>
                                 <label>Moneda</label>
                                 <md-autocomplete
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/development
                                     flex
                                     skip-tab
                                     required
@@ -357,7 +354,6 @@
                                     info="Indique la moneda con la que se efectuo la transaccion."
                                     model="pago.moneda_id"
 
-                                    md-require-match="true"
                                     md-selected-item="ctrl.selCoin"
                                     md-search-text="ctrl.searchCoin"
                                     key="monedas.id"
@@ -381,7 +377,7 @@
 
                             <md-input-container class="md-block" flex>
                                 <label>Tipo Pago</label>
-                                <md-autocomplete 
+                                <md-autocomplete
                                     flex
                                     skip-tab
                                     required
@@ -578,11 +574,7 @@
 
                             <md-input-container class="md-block" flex="20">
                                 <label>Tipo Pago</label>
-                                <!--<md-select ng-model="abono.tipo_id" required md-no-ink>
-                                        <md-option ng-repeat="tipoPago in tipoDocsPago" value="{{tipoPago.id}}">
-                                                {{tipoPago.descripcion}}
-                                        </md-option>
-                                </md-select>-->
+
 
                                 <md-autocomplete flex
                                                 md-selected-item="abono.tipo_id"

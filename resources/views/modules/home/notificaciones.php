@@ -56,7 +56,7 @@
         <div class="alertPrevArrow" ng-click="alertPrev('error')" ng-show="alerts.error.length > 1"></div>
         <md-tabs class="alertContainer"  md-selected="selected.error" flex>
             <md-tab label="{{tab.title}}" class="alertItem" ng-class="{'toBlock':tab.param.block}" ng-repeat="tab in alerts.error">
-                <div class="alertTextContent" layout-align="center center">
+                <div class="alertTextContent" style="height: 76px" layout-align="center center">
                     {{tab.content}}
                 </div>
                 <div class="alertTextOpcs" layout="row">
