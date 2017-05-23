@@ -986,14 +986,27 @@
 
                                 </md-input-container>
                             </div>
-                            <div layout="row" flex="10">
-                                <div flex layout="column">
+                            <div layout="row" class="row">
+                                <lmb-collection class="rad-contain"
+                                                layout="row"
+                                                lmb-type="items"
+                                                lmb-model="configDep.operator"
+                                                lmb-display="descripcion"
+                                                lmb-itens="operator"
+                                                lmb-label="'cuando...'"
+                                                lmb-key="op"
+                                                lmb-filter="customFind : currentParent.type.descripcion : shower"
+                                >
+
+                                </lmb-collection>
+                                <!--<div flex layout="column">
+
                                     <md-content >
-                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || (oper.cfg.indexOf(currentParent.type.descripcion) != -1)" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
+                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || (oper.fcfg.indexO(currentParent.type.descripcion) != -1)" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
                                             {{oper.descripcion}}
                                         </div>
                                     </md-content>
-                                </div>
+                                </div>-->
                             </div>
                             <div layout="row" flex>
 

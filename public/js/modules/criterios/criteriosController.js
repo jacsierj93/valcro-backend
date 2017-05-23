@@ -1038,27 +1038,31 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         ],{autohidden:1000});
     };
 
+    $scope.shower = function(a,x){
+        return a.cfg=='all' || a.cfg.indexOf(x) != -1
+    }
+
     $scope.operator = [
         {
             op:"=",
             cfg:"all",
-            descripcion:"es Igual"
+            descripcion:" == "
         },{
             op:">",
             cfg:["texto","numerico"],
-            descripcion:"es Mayor"
+            descripcion:" > "
         },{
             op:"<",
             cfg:["texto","numerico"],
-            descripcion:"es Menor"
+            descripcion:" < "
         },{
             op:"!=",
             cfg:["texto","numerico"],
-            descripcion:"es diferente"
+            descripcion:" != "
         },{
             op:">>",
             cfg:["texto","numerico"],
-            descripcion:"existe en"
+            descripcion:" exist "
         }
     ];
     $scope.setCfg = function(cfg,val){
@@ -1109,7 +1113,6 @@ MyApp.directive("setAttr",function(){
                     }else if(v.especificacion != ""){
                         attr.$observe(v.especificacion,function(){});
                         attr[v.especificacion] = v.pivot.value;
-                        //console.log(attr);
                     }
                 })
             });
@@ -1130,6 +1133,8 @@ MyApp.directive('lmbCollection', function() {
             model: '=lmbModel',
             label: '=lmbLabel',
             valid: '=?valid',
+            filtSearch: '=?filtparm1',
+            filtSecond: '=?filtparm2',
             dis: '=?ngDisabled'
         },
         controller:function($scope){
@@ -1227,10 +1232,15 @@ MyApp.directive('lmbCollection', function() {
             });
         },
         template: function(elem,attr){
+            /*define que campo del json se va a mostrar en los item,
+            por defecto "descripcion" a menos que se especifiq otra cosa con lmb-display*/
             var show = "descripcion"
             if("lmbDisplay" in attr){
                 show = attr.lmbDisplay;
             }
+
+            /*transclude es una variable que almacena en estring atributos pasados que se copiaran a cada item creado,
+             los atributos deben especificarse con lmba-[nombre del tributo] ej. lmba-NG-CLASS*/
             transclude = ""
             angular.forEach(attr,function(v,k){
                 if(k.indexOf("lmba")!=-1){
@@ -1239,10 +1249,23 @@ MyApp.directive('lmbCollection', function() {
                 }
             });
 
-
-
-            var filt = ("filterBy" in attr)?" | "+attr.filterBy:"";
-            attr.filterBy = null;
+            /*lmbFilter se usa para pasar un filtro para el atributo items, debe ser pasado etal como si se usa normal desps del |
+                ej: filterSearch : [ids]
+             */
+            var filt = "";
+            if("lmbFilter" in attr){
+                filtPart = attr.lmbFilter.split(":");
+                filt = " | "+filtPart[0].trim()+" : filtSearch ";
+                delete attr.lmbFilter;
+                elem.removeAttr("lmb-filter")
+                attr.filtparm1 = filtPart[1];
+                if(filtPart[2]){
+                    filt+=":filtSecond ";
+                    attr.filtparm2 = filtPart[2];
+                }
+            }
+            /*si se especifica un valor en lmb-icon este sera usado como icono junto al texto de lmb-display
+            * el icono debe estar en formato .png*/
             var iconField = "item."+attr.lmbIcon || "";
             if(attr.lmbType=="items"){
                 return '<div>' +
