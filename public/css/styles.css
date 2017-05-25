@@ -1164,10 +1164,8 @@ div.activeleft{
     color:#9d9d9d;
     font-weight: bold !important;
 }
-/*
-.resumBlock{
-    border-bottom:1px solid #ccc;
-}*/
+
+
 .resumBlock > .aprov{
     background-color: rgba(0, 255, 0, 0.36)
 }
@@ -1330,6 +1328,53 @@ area para subir los archivos
 .shake {
     -webkit-animation: shake 400ms ease-in-out;
     animation: shake 400ms ease-in-out;
+}
+
+@keyframes pulseGreen{
+    0% {background-color: rgba(5,206,124,0.0)}
+    15% {background-color: rgba(5,206,124,0.3)}
+    30% {background-color: rgba(5,206,124,0.6)}
+    45% {background-color: rgba(5,206,124,1)}
+    70% {background-color: rgba(5,206,124,0.6)}
+    85% {background-color: rgba(5,206,124,0.3)}
+    100% {background-color: rgba(5,206,124,0.0)}
+}
+@-webkit-keyframes pulseGreen{
+    0% {background-color: rgba(5,206,124,0.0)}
+    15% {background-color: rgba(5,206,124,0.3)}
+    30% {background-color: rgba(5,206,124,0.6)}
+    45% {background-color: rgba(5,206,124,1)}
+    70% {background-color: rgba(5,206,124,0.6)}
+    85% {background-color: rgba(5,206,124,0.3)}
+    100% {background-color: rgba(5,206,124,0.0)}
+}
+
+@keyframes pulseGold{
+    0% {background-color: rgba(255,215,0,0.0)}
+    15% {background-color: rgba(255,215,0,0.3)}
+    30% {background-color: rgba(255,215,0,0.6)}
+    45% {background-color: rgba(255,215,0,1)}
+    70% {background-color: rgba(255,215,0,0.6)}
+    85% {background-color: rgba(255,215,0,0.3)}
+    100% {background-color: rgba(255,215,0,0.0)}
+}
+@-webkit-keyframes pulseGold{
+    0% {background-color: rgba(255,215,0,0.0)}
+    15% {background-color: rgba(255,215,0,0.3)}
+    30% {background-color: rgba(255,215,0,0.6)}
+    45% {background-color: rgba(255,215,0,1)}
+    70% {background-color: rgba(255,215,0,0.6)}
+    85% {background-color: rgba(255,215,0,0.3)}
+    100% {background-color: rgba(255,215,0,0.0)}
+}
+
+.green-pulse{
+    -webkit-animation: pulseGreen 2s ease-in-out infinite;
+    animation: pulseGreen 2s ease-in-out infinite;
+}
+.gold-pulse{
+    -webkit-animation: pulseGold 2s ease-in-out infinite;
+    animation: pulseGold 2s ease-in-out infinite;
 }
 
 

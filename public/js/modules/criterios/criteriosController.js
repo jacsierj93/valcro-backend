@@ -43,6 +43,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
     var masterOptions = criterios.query({ type:"masterOptions"});
     var ListOptions = criterios.query({ type:"optionLists"});
     var curLine = {id:false,listado:[]};
+    var depWork = {parent:false,target:false};
     var factory = {
         linea_id: "",
         campo_id: "",
@@ -214,6 +215,9 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         },
         getDepend : function(){
             return dependency;
+        },
+        dependSel : function(){
+            return depWork
         }
     }
 });
@@ -922,7 +926,8 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
 MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSidenav','$timeout','$filter','popUpService',function ($scope, setNotif, masters,critForm,$mdSidenav,$timeout,$filter,popUpService) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
-    //$scope.criteria =$scope.line.listado;
+
+    $scope.dependSel = critForm.dependSel();
 
     $scope.list = [1,2,3,4,5,6,7];
     $scope.list2 = [];
@@ -979,14 +984,23 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     $scope.$watchCollection("line.listado",function(n,o){
         $scope.criteria = n;
     });
-    //$scope.currentLct = critForm.getEdit();
+
+    $scope.dependSel = critForm.dependSel();
     $scope.configDep = critForm.getDepend();
     $scope.$watch("configDep.lct_id",function(nvo){
+        $scope.dependSel.target = nvo;
         if(nvo){
             $scope.currentCrit = $filter("filterSearch")($scope.criteria,[nvo])[0];
 
         }
     });
+
+    $scope.creating = false;
+
+    $scope.addDepend = function(deps){
+        $scope.creating = true;
+        critForm.setDepend(deps)
+    };
 
     $scope.visibility = [
         {
@@ -1010,7 +1024,6 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
 
     var updateDependency = function(dat,act){
-        console.log(dat,act)
         depend = (act=="upd")?$filter("filterSearch")($scope.currentCrit.deps,[dat.id])[0]:{};
         depend.id = dat.id
         depend.lct_id = dat.parent_id
@@ -1039,8 +1052,8 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
 
     $scope.shower = function(a,x){
-        return a.cfg=='all' || a.cfg.indexOf(x) != -1
-    }
+        return a.cfg=='all' || a.cfg.indexOf(x) != -1;
+    };
 
     $scope.operator = [
         {
@@ -1070,8 +1083,10 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
     };
 
     $scope.$watch("configDep.parent_id",function(nvo){
+        $scope.dependSel.parent = nvo;
         if(nvo){
             $scope.currentParent = $filter("filterSearch")($scope.criteria,[nvo])[0];
+
         }
 
     })
@@ -1121,176 +1136,3 @@ MyApp.directive("setAttr",function(){
         }
     };
 })
-
-MyApp.directive('lmbCollection', function() {
-
-    return {
-        replace: true,
-        transclude: true,
-        require: '?ngModel',
-        scope: {
-            itens: '=lmbItens',
-            model: '=lmbModel',
-            label: '=lmbLabel',
-            valid: '=?valid',
-            filtSearch: '=?filtparm1',
-            filtSecond: '=?filtparm2',
-            dis: '=?ngDisabled'
-        },
-        controller:function($scope){
-
-            $scope.curVal = {};
-            if(!("valid" in $scope)){
-                $scope.valid = {
-                    f:function(){return true},
-                    c:function(){return true},
-                }
-            }
-            $scope.setIten=function(dat){
-                //console.log($scope)
-                $scope.curVal = dat;
-                if($scope.valid.f(dat)){
-                    done()
-                }else{
-                    $scope.valid.c(done)
-                }
-            };
-
-            var done = function(){
-                var dat = $scope.curVal;
-
-                if($scope.multi){
-
-                    if(typeof($scope.model) !='object'){
-                        $scope.model = [];
-                    }
-                    if($scope.model.indexOf(eval("dat."+$scope.key)) != -1){
-                        $scope.model.splice($scope.model.indexOf(eval("dat."+$scope.key)),1);
-                    }else{
-                        $scope.model.push(eval("dat."+$scope.key));
-                    }
-
-                }else{
-                    $scope.model = eval("dat."+$scope.key);
-                }
-
-                if($scope.prntFrm){
-                    $scope.prntFrm.$setDirty();
-                }
-
-                if($scope.also){
-                    $scope.$eval($scope.also);
-                }
-            };
-
-
-
-            $scope.exist = function(dat){
-                if($scope.multi){
-                    if($scope.model){
-                        return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
-                    }
-
-                }else{
-                    return $scope.model == eval("dat."+$scope.key);
-                }
-
-            };
-
-        },
-        link:function(scope,elem,attr,model){
-            scope.ident = attr;
-            scope.multi = ('multiple' in attr);
-            scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
-            scope.also = ('lmbAlso' in attr)?attr.lmbAlso:false;
-            scope.prntFrm = false;
-            if((elem.parents("form").length>0)){
-                var sup = scope.$parent;
-                do{
-                    if((elem.parents("form").attr("name") in sup)){
-                        scope.prntFrm = sup[elem.parents("form").attr("name")];
-                    }else{
-                        sup = sup.$parent;
-                    }
-                }while(!scope.prntFrm)
-
-            }
-            attr.$observe('disabled', function (newValue) {
-                if(newValue){
-                    elem.css("color","#f1f1f1");
-                }else{
-                    elem.css("color","#000");
-                }
-            });
-            attr.$observe('multiple', function (newValue) {
-
-                if(newValue || ("multiple" in attr)){
-                    scope.multi = true;
-                }else{
-                    scope.multi = false;
-                }
-            });
-        },
-        template: function(elem,attr){
-            /*define que campo del json se va a mostrar en los item,
-            por defecto "descripcion" a menos que se especifiq otra cosa con lmb-display*/
-            var show = "descripcion"
-            if("lmbDisplay" in attr){
-                show = attr.lmbDisplay;
-            }
-
-            /*transclude es una variable que almacena en estring atributos pasados que se copiaran a cada item creado,
-             los atributos deben especificarse con lmba-[nombre del tributo] ej. lmba-NG-CLASS*/
-            transclude = ""
-            angular.forEach(attr,function(v,k){
-                if(k.indexOf("lmba")!=-1){
-                    transclude+=' '+(k.replace("lmba","").replace(/\W+/g, '-')
-                            .replace(/([a-z\d])([A-Z])/g, '$1-$2'))+'="'+v+'"'
-                }
-            });
-
-            /*lmbFilter se usa para pasar un filtro para el atributo items, debe ser pasado etal como si se usa normal desps del |
-                ej: filterSearch : [ids]
-             */
-            var filt = "";
-            if("lmbFilter" in attr){
-                filtPart = attr.lmbFilter.split(":");
-                filt = " | "+filtPart[0].trim()+" : filtSearch ";
-                delete attr.lmbFilter;
-                elem.removeAttr("lmb-filter")
-                attr.filtparm1 = filtPart[1];
-                if(filtPart[2]){
-                    filt+=":filtSecond ";
-                    attr.filtparm2 = filtPart[2];
-                }
-            }
-            /*si se especifica un valor en lmb-icon este sera usado como icono junto al texto de lmb-display
-            * el icono debe estar en formato .png*/
-            var iconField = "item."+attr.lmbIcon || "";
-            if(attr.lmbType=="items"){
-                return '<div>' +
-                    '<div flex layout="column">' +
-                        '<div style="height:10px; font-size: 10px; color:rgba(0,0,0,0.54); font-weight:bold; text-transform: uppercase">{{label}}</div>' +
-                            '<div style="height:27px;margin-top: 3px" layout="row">' +
-                                '<div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" '+transclude+' ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="row" layout-align="center center">' +
-                                    '<md-tooltip>{{item.'+show+'}}</md-tooltip>' +
-                                '<div ng-if="item.icon" layout="column" layout-align="center center" class="{{item.icon}}">' +
-                                    '<img ng-if="item.icon.indexOf(\'.png\')!=-1" ng-src="images/{{item.icon}}"/>' +
-                                '</div>' +
-                                    '<span>{{item.'+show+'}}</span>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-            }else{
-                return '<md-content flex layout="column">'+
-                    '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" '+transclude+' ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'
-
-                +'</md-content>';
-            }
-
-            
-        }
-
-    };
-});

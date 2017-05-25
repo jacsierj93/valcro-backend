@@ -684,7 +684,6 @@ MyApp.service('formPreviewSrv',function(){
         }
     }
 });
-
 //directive with controller for draw Criterios FORM (productos and Criterios)
 MyApp.directive('formPreview', function() {
     return {
@@ -797,6 +796,464 @@ MyApp.directive('critModel', function(formPreviewSrv) {
 
     };
 });
+
+
+/*directiva lmb-collection,*/
+MyApp.directive('lmbCollection', function() {
+
+    return {
+        replace: true,
+        transclude: true,
+        require: '?ngModel',
+        scope: {
+            itens: '=lmbItens',
+            model: '=lmbModel',
+            label: '=lmbLabel',
+            valid: '=?valid',
+            filtSearch: '=?filtparm1',
+            filtSecond: '=?filtparm2',
+            dis: '=?ngDisabled'
+        },
+        controller:function($scope){
+
+            $scope.curVal = {};
+            if(!("valid" in $scope)){
+                $scope.valid = {
+                    f:function(){return true},
+                    c:function(){return true},
+                }
+            }
+            $scope.setIten=function(dat){
+                //console.log($scope)
+                $scope.curVal = dat;
+                if($scope.valid.f(dat)){
+                    done()
+                }else{
+                    $scope.valid.c(done)
+                }
+            };
+
+            var done = function(){
+                var dat = $scope.curVal;
+
+                if($scope.multi){
+
+                    if(typeof($scope.model) !='object'){
+                        $scope.model = [];
+                    }
+                    if($scope.model.indexOf(eval("dat."+$scope.key)) != -1){
+                        $scope.model.splice($scope.model.indexOf(eval("dat."+$scope.key)),1);
+                    }else{
+                        $scope.model.push(eval("dat."+$scope.key));
+                    }
+
+                }else{
+                    $scope.model = eval("dat."+$scope.key);
+                }
+
+                if($scope.prntFrm){
+                    $scope.prntFrm.$setDirty();
+                }
+
+                if($scope.also){
+                    $scope.$eval($scope.also);
+                }
+            };
+
+
+
+            $scope.exist = function(dat){
+                if($scope.multi){
+                    if($scope.model){
+                        return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
+                    }
+
+                }else{
+                    return $scope.model == eval("dat."+$scope.key);
+                }
+
+            };
+
+        },
+        link:function(scope,elem,attr,model){
+            scope.ident = attr;
+            scope.multi = ('multiple' in attr);
+            scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
+            scope.also = ('lmbAlso' in attr)?attr.lmbAlso:false;
+            scope.prntFrm = false;
+            if((elem.parents("form").length>0)){
+                var sup = scope.$parent;
+                do{
+                    if((elem.parents("form").attr("name") in sup)){
+                        scope.prntFrm = sup[elem.parents("form").attr("name")];
+                    }else{
+                        sup = sup.$parent;
+                    }
+                }while(!scope.prntFrm)
+
+            }
+            attr.$observe('disabled', function (newValue) {
+                if(newValue){
+                    elem.css("color","#f1f1f1");
+                }else{
+                    elem.css("color","#000");
+                }
+            });
+            attr.$observe('multiple', function (newValue) {
+
+                if(newValue || ("multiple" in attr)){
+                    scope.multi = true;
+                }else{
+                    scope.multi = false;
+                }
+            });
+        },
+        template: function(elem,attr){
+            /*define que campo del json se va a mostrar en los item,
+             por defecto "descripcion" a menos que se especifiq otra cosa con lmb-display*/
+            var show = "descripcion"
+            if("lmbDisplay" in attr){
+                show = attr.lmbDisplay;
+            }
+
+            /*transclude es una variable que almacena en estring atributos pasados que se copiaran a cada item creado,
+             los atributos deben especificarse con lmba-[nombre del tributo] ej. lmba-NG-CLASS*/
+            transclude = ""
+            angular.forEach(attr,function(v,k){
+                if(k.indexOf("lmba")!=-1){
+                    transclude+=' '+(k.replace("lmba","").replace(/\W+/g, '-')
+                            .replace(/([a-z\d])([A-Z])/g, '$1-$2'))+'="'+v+'"'
+                }
+            });
+
+            /*lmbFilter se usa para pasar un filtro para el atributo items, debe ser pasado etal como si se usa normal desps del |
+             ej: filterSearch : [ids]
+             */
+            var filt = "";
+            if("lmbFilter" in attr){
+                filtPart = attr.lmbFilter.split(":");
+                filt = " | "+filtPart[0].trim()+" : filtSearch ";
+                delete attr.lmbFilter;
+                elem.removeAttr("lmb-filter")
+                attr.filtparm1 = filtPart[1];
+                if(filtPart[2]){
+                    filt+=":filtSecond ";
+                    attr.filtparm2 = filtPart[2];
+                }
+            }
+            /*si se especifica un valor en lmb-icon este sera usado como icono junto al texto de lmb-display
+             * el icono debe estar en formato .png*/
+            var iconField = "item."+attr.lmbIcon || "";
+            if(attr.lmbType=="items"){
+                return '<div>' +
+                    '<div flex layout="column">' +
+                    '<div style="height:10px; font-size: 10px; color:rgba(0,0,0,0.54); font-weight:bold; text-transform: uppercase">{{label}}</div>' +
+                    '<div style="height:27px;margin-top: 3px" layout="row">' +
+                    '<div ng-repeat="item in itens'+filt+'" ng-click="(!dis)?setIten(item):false" '+transclude+' ng-class="{\'field-sel\':exist(item)}" class="rad-button" flex layout="row" layout-align="center center">' +
+                    '<md-tooltip>{{item.'+show+'}}</md-tooltip>' +
+                    '<div ng-if="item.icon" layout="column" layout-align="center center" class="{{item.icon}}">' +
+                    '<img ng-if="item.icon.indexOf(\'.png\')!=-1" ng-src="images/{{item.icon}}"/>' +
+                    '</div>' +
+                    '<span>{{item.'+show+'}}</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+            }else{
+                return '<md-content flex layout="column">'+
+                    '<div layout="row" ng-repeat="item in itens'+filt+'" class="row" ng-click="(!dis)?setIten(item):false" '+transclude+' ng-class="{\'field-sel\':exist(item)}" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc"> <div flex>{{item.'+show+'}}</div><div ng-show="'+iconField+' != \'\'" flex><img ng-src="images/{{'+iconField+'}}"/></div> </div>'
+
+                    +'</md-content>';
+            }
+
+
+        }
+
+    };
+});
+
+/*servicio y directiva de los pop-up*/
+MyApp.service("popUpService",function($mdSidenav,$interval){
+    var actives = [];
+    sv = this;
+    var closer = function(sideNav,fn,idx){
+        $mdSidenav(sideNav).close();
+        actives.splice(idx,1);
+        if(fn.after){
+            fn.after();
+        }
+    };
+
+    var close = function(sv,sideNav,fn){
+
+        idx = sv.exist(sideNav);
+
+        if(idx != -1){
+            if(fn.before){
+
+                pre= fn.before();
+            }else{
+                pre = true;
+            }
+
+
+            if(!pre){
+                return false;
+            }
+            else if(typeof(pre) == "object" && 'wait' in pre){
+                var x = $interval(function(){
+                    if(pre.wait===true){
+                        $interval.cancel(x);
+                        //console.log(serviceRefer,sv )
+                        closer(sideNav,fn,idx);
+                    }else if(pre.wait===false){
+                        $interval.cancel(x);
+                        return false;
+                    }
+                },1000)
+            }else{
+                closer(sideNav,fn,idx);
+            }
+
+        };
+    };
+    return {
+        exist : function(name){
+
+            return actives.indexOf(name);
+        },
+        remove : function(idx){
+            actives.splice(idx,1);
+        },
+        add:function(name){
+            actives.push(name);
+        },
+        popUpOpen:function(datos){
+
+            var sideNav = Object.keys(datos)[0];
+            var fn = datos[sideNav];
+
+            if(this.exist(sideNav)==-1){
+                if(fn && fn.before){
+                    pre = fn.before();
+                }else{
+                    pre = true;
+                }
+
+                if(!pre){
+                    return false;
+                }
+                var serv = this;
+                $mdSidenav(sideNav).open();
+                serv.add(sideNav);
+                if(fn && fn.after){
+                    fn.after();
+                }
+            }else{
+                console.info("el sidenav ya se encuentra abierto",actives)
+            }
+
+        },
+        popUpClose:function(obj){
+            var side = Object.keys(obj)[0];
+            //console.log(obj,side,Object.keys(obj))
+            close(this,side,obj[side]);
+        }
+    }
+})
+MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
+
+    return {
+        scope:{
+            side:"=popUpOpen"
+        },
+        link:function(scope,object,attr){
+            scope.open = function(){
+
+                var sideNav = Object.keys(scope.side)[0];
+                var fn = scope.side[sideNav];
+
+                if(popUpService.exist(sideNav)==-1){
+                    if(fn && fn.before){
+                        pre = fn.before();
+                    }else{
+                        pre = true;
+                    }
+
+                    if(!pre){
+                        return false;
+                    }
+                    $mdSidenav(sideNav).open().then(function(){
+                        popUpService.add(sideNav);
+                        if(fn && fn.after){
+                            fn.after();
+                        }
+                    })
+                }
+
+            };
+            object.bind("click",function(){
+                scope.open();
+            })
+
+        }
+    };
+})//GLOBAL
+    .directive('autoClose',function(popUpService,$mdSidenav,$compile,$interval){
+        return {
+            terminal: true, //this setting is important, see explanation below
+            priority: 1000, //this setting is important, see explanation below
+
+            link:function(scope,object,attr){
+                scope.fn = scope.$eval(attr.autoClose);
+                scope.sideNav = object.parents("md-sidenav").first().attr("md-component-id");
+
+                /* scope.close = function(){
+                 x[scope.sideNav] = scope.fn;
+                 popUpService.popUpClose(x);
+                 }*/
+                scope.closer = function(){
+                    $mdSidenav(scope.sideNav).close().then(function(){
+                        popUpService.remove(idx);
+                        if(scope.fn.after){
+                            scope.fn.after();
+                        }
+                    });
+                };
+                scope.close = function(){
+
+                    idx = popUpService.exist(scope.sideNav);
+                    if(idx != -1){
+                        if(scope.fn.before){
+                            pre= scope.fn.before();
+                        }else{
+                            pre = true;
+                        }
+
+
+                        if(!pre){
+                            return false;
+                        }
+                        else if(typeof(pre) == "object" && 'wait' in pre){
+                            var x = $interval(function(){
+                                if(pre.wait===true){
+                                    $interval.cancel(x);
+                                    scope.closer();
+                                }else if(pre.wait===false){
+                                    $interval.cancel(x);
+                                    return false;
+                                }
+                            },1000)
+                        }else{
+                            scope.closer();
+                        }
+
+                    };
+                };
+
+                object.attr("click-out","close()")
+                object.removeAttr("auto-close");
+                $compile(object)(scope);
+            },
+        }
+    });//GLOBAL
+
+/*servicio y directiva que muestra la flechita de next, con los siguientes parametros
+    valid=llama una funcion de validacion que condiciona la apricion ono de la flecha
+    on-next= si se pasa una funcion la configura para ser llamada al  hacer click en le next,
+            tambien se puede pasar un string que sea el nombre de un sidenav para abrilo
+    on-error=si valid retorna false, y esta ocpion esta configurada, llamara a la funcion aqui especificada*/
+
+MyApp.service("nxtService",function(){
+    var cfg = {
+        nxtFn : null,
+        show : undefined
+    };
+
+    return {
+        getCfg : function(){
+            return cfg;
+        }
+    }
+});//GLOBAL
+MyApp.directive('showNext', function() {
+
+    return {
+        replace: true,
+        transclude: true,
+        scope:{
+            nextFn:"=?onNext",
+            nextValid:"=?valid"
+
+        },
+        controller:function($scope,$mdSidenav,nxtService,$timeout,Layers){
+            $scope.cfg = nxtService.getCfg();
+            if(!("onNext" in  $scope)){
+                $scope.onNext = ($scope.$parent)
+            }
+            if(!("nextValid" in  $scope)){
+                $scope.nextValid = function(){return true};
+            }
+
+            $scope.$watch("cfg.show",function (status) {
+                if(typeof(status)!="boolean" ){
+                    return false;
+                }
+                if(status){
+                    $mdSidenav("NEXT").open();
+                }else{
+                    $mdSidenav("NEXT").close()
+                }
+            });
+            $scope.show = function(){
+                if($scope.nextValid()){
+                    $scope.cfg.show = true;
+                    $scope.cfg.fn = $scope.nextFn;
+                }
+            }
+        },
+        template: '<div class="showNext" style="width: 16px; height: 100%;" ng-mouseover="show()"> </div>'
+    };
+});//GLOBAL
+
+/*directiva que crea la flecha next y la asocia a los datos de showNext
+para usarla es <next-row></next-row>
+ */
+MyApp.directive('nextRow', function() {
+
+    return {
+
+        scope:{
+
+        },
+        controller:function($scope,$mdSidenav,nxtService,Layers){
+            $scope.LayersAction = Layers.setAccion;
+
+            $scope.cfg = nxtService.getCfg();
+            $scope.nxtAction = function(e){
+                console.log(typeof($scope.cfg.fn),$scope.cfg.fn);
+                if(typeof($scope.cfg.fn) === "string"){
+                    $scope.LayersAction({open:{name:$scope.cfg.fn}});
+                }else{
+                    $scope.cfg.fn();
+                }
+
+                $scope.hideNext();
+            };
+            $scope.hideNext = function(){
+                $scope.cfg.show = false;
+            }
+        },
+        template: '<md-sidenav style="z-index:100; margin-top:96px; margin-bottom:48px; width:96px; background-color: transparent; background-image: url(\'images/btn_backBackground.png\');" layout="column" layout-align="center center" class="md-sidenav-right" md-disable-backdrop="true" md-component-id="NEXT" ng-mouseleave="hideNext()">'+
+        '<img src="images/btn_nextArrow.png" ng-click="nxtAction(\$event)"/>'+
+        '</md-sidenav>'
+    };
+});//GLOBAL
+
+
+
+
+
 
 
 

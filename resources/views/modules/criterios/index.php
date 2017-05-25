@@ -222,12 +222,11 @@
 
                                         <md-content layout="column" flex style="margin: 0px 4px 0px 4px">
                                             <div ng-repeat="field in criteria" class="row"
-                                                 ng-class="{'field-sel':field.id==formId.id}"
+                                                 ng-class="{'md-whiteframe-2dp':field.id==formId.id,'gold-pulse':dependSel.parent==field.id,'green-pulse':(dependSel.target==field.id && dependSel.parent)}"
                                                  test="{{field.id}}"
                                                  form-preview="{{field.type.directive}}"
                                                  ng-dblclick="setEdit(field)"
                                                  ng-hide="isShow[field.id]===false"
-
                                                  >
 
                                             </div>
@@ -952,16 +951,12 @@
                             <div>
                                 Configuraciones
                             </div>
-                            <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)"> + </div>
+                            <div style="width: 24px; font-size:24px;" ng-click="creating=true"> + </div>
                             <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)"> - </div>
                         </div>
-                        <div layout="column" flex>
+                        <div layout="column" flex ng-if="creating">
                             <div layout="row" flex="10">
-                              <!--  <md-content flex layout="column">
-                                    <div ng-repeat="field in criteria " id="cfg_{{field.id}}" ng-class="{'field-sel':configDep.parent_id == field.id}" ng-click="setCfg('parent_id',field.id)" class="row itemCrit" layout="column" layout-align="center left" style="padding: 4px;">
-                                        {{field.field.descripcion}}
-                                    </div>
-                                </md-content>-->
+
                                 <md-input-container class="md-block" flex>
                                     <label>selecciona el campo {{configDep.lct_id}}</label>
                                     <md-autocomplete md-selected-item="ctrl.itemSel"
@@ -986,7 +981,7 @@
 
                                 </md-input-container>
                             </div>
-                            <div layout="row" class="row">
+                            <div layout="row" class="row" ng-if="configDep.parent_id">
                                 <lmb-collection class="rad-contain"
                                                 layout="row"
                                                 lmb-type="items"
@@ -1011,7 +1006,7 @@
                             <div layout="row" flex>
 
                                 <div flex layout="column">
-                                    <div style="height: 160px: border-bottom:1px solid #ccc">
+                                    <div ng-if="configDep.operator" style="height: 160px: border-bottom:1px solid #ccc">
 
                                         <div class="titulo_formulario row" layout="row" layout-align="start start" >
                                             <div>
@@ -1043,7 +1038,7 @@
                                         </md-input-container>
 
                                     </div>
-                                    <div flex>
+                                    <div flex ng-if="configDep.condition">
                                         <div class="titulo_formulario row" layout="row" layout-align="start start" >
                                             <div>
                                                 Acciones
@@ -1097,6 +1092,21 @@
 
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                <div ng-click="(creating)?creating=false:null">
+                                    Configuradas
+                                </div>
+
+                            </div>
+                        </div>
+                        <div flex layout="column" ng-if="!creating">
+                            <md-content flex>
+                                <div ng-repeat="dep in currentCrit.deps track by $index" ng-click="addDepend(dep)" class="row" layout="row" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                    {{dep.parent.descripcion}} {{dep.operador}} {{dep.valor}} <img ng-if="(dep.accion=='true' || dep.accion=='false')" ng-src="images/eye_{{dep.accion}}.png"><span ng-if="(dep.accion!='true' && dep.accion!='false')"> filtro</span>
+                                </div>
+                            </md-content>
                         </div>
 
                     </div>
