@@ -663,7 +663,7 @@
             </div>
             <md-content class="cntLayerHolder" layout="column" layout-padding flex>
                 <input type="hidden" >
-                <form name="fieldForm" layout="row" class="focused">
+                <form name="fieldForm" layout="row" flex class="focused">
                     <div flex layout="column">
                         <div>
                             <lmb-collection
@@ -923,7 +923,7 @@
                             <div class="row">
                                 <div ng-click="addDepend(elem.id)" class="titulo_formulario row focused" layout="column" layout-align="center center">
                                     <div >
-                                        Dependencia
+                                        <h2 style="margin:0px;">Dependencias >>></h2>
                                     </div>
                                 </div>
                             </div>
@@ -955,147 +955,150 @@
                             <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)"> - </div>
                         </div>
                         <div layout="column" flex ng-if="creating">
-                            <div layout="row" flex="10">
+                            <form name="setDependFrm" flex layout="column">
+                                <div layout="row" flex="10">
 
-                                <md-input-container class="md-block" flex>
-                                    <label>selecciona el campo {{configDep.lct_id}}</label>
-                                    <md-autocomplete md-selected-item="ctrl.itemSel"
-                                                     flex
-                                                     id="critField"
-                                                     info="puede seleccionar uno de la lista o crear uno nuevo"
-                                                     model="configDep.parent_id "
-                                                     skip-tab
-                                                     md-search-text="ctrl.searchFiel"
-                                                     md-items="item in criteria | stringKey : ctrl.searchFiel : 'descripcion'| filterSelect: configDep.lct_id"
-                                                     md-item-text="item.field.descripcion"
-                                                     require
-                                                     at="{{configDep.lct_id}}"
-                                                     require-match="true"
-                                                     md-no-asterisk
-                                                     md-min-length="0">
-                                        <input >
-                                        <md-item-template>
-                                            <span>{{item.field.descripcion}}</span>
-                                        </md-item-template>
-                                    </md-autocomplete>
+                                    <md-input-container class="md-block" flex>
+                                        <label>selecciona el campo {{configDep.lct_id}}</label>
+                                        <md-autocomplete md-selected-item="ctrl.itemSel"
+                                                         flex
+                                                         id="critField"
+                                                         info="puede seleccionar uno de la lista o crear uno nuevo"
+                                                         model="configDep.parent_id "
+                                                         skip-tab
+                                                         md-search-text="ctrl.searchFiel"
+                                                         md-items="item in criteria | stringKey : ctrl.searchFiel : 'descripcion'| filterSelect: configDep.lct_id"
+                                                         md-item-text="item.field.descripcion"
+                                                         require
+                                                         at="{{configDep.lct_id}}"
+                                                         require-match="true"
+                                                         md-no-asterisk
+                                                         md-min-length="0">
+                                            <input >
+                                            <md-item-template>
+                                                <span>{{item.field.descripcion}}</span>
+                                            </md-item-template>
+                                        </md-autocomplete>
 
-                                </md-input-container>
-                            </div>
-                            <div layout="row" class="row" ng-if="configDep.parent_id">
-                                <lmb-collection class="rad-contain"
-                                                layout="row"
-                                                lmb-type="items"
-                                                lmb-model="configDep.operator"
-                                                lmb-display="descripcion"
-                                                lmb-itens="operator"
-                                                lmb-label="'cuando...'"
-                                                lmb-key="op"
-                                                lmb-filter="customFind : currentParent.type.descripcion : shower"
-                                >
+                                    </md-input-container>
+                                </div>
+                                <div layout="row" class="row" ng-if="configDep.parent_id">
+                                    <lmb-collection class="rad-contain"
+                                                    layout="row"
+                                                    lmb-type="items"
+                                                    lmb-model="configDep.operator"
+                                                    lmb-display="descripcion"
+                                                    lmb-itens="operator"
+                                                    lmb-label="'cuando...'"
+                                                    lmb-key="op"
+                                                    lmb-filter="customFind : currentParent.type.descripcion : shower"
+                                    >
 
-                                </lmb-collection>
-                                <!--<div flex layout="column">
+                                    </lmb-collection>
+                                    <!--<div flex layout="column">
 
-                                    <md-content >
-                                        <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || (oper.fcfg.indexO(currentParent.type.descripcion) != -1)" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
-                                            {{oper.descripcion}}
-                                        </div>
-                                    </md-content>
-                                </div>-->
-                            </div>
-                            <div layout="row" flex>
-
-                                <div flex layout="column">
-                                    <div ng-if="configDep.operator" style="height: 160px: border-bottom:1px solid #ccc">
-
-                                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
-                                            <div>
-                                                Condicion
-                                            </div>
-                                        </div>
-                                        <md-content flex  ng-if="currentParent.type.descripcion == 'selector' || currentParent.type.descripcion == 'opciones'">
-                                            <div
-                                                    ng-repeat="opt in currentParent.options.Opcion track by $index"
-
-                                                    ng-click="setCfg('condition',opt.pivot.value)"
-                                                    class="row"
-                                                    ng-class="{'field-sel':configDep.condition == opt.pivot.value}"
-                                                    layout="column"
-                                                    layout-align="center center"
-                                                    style="border-bottom: 1px solid #ccc">
-                                                {{getoptSet(opt.pivot.value).nombre}}
+                                        <md-content >
+                                            <div ng-repeat="oper in operator" id="cfg_{{$index}}" ng-if="oper.cfg=='all' || (oper.fcfg.indexO(currentParent.type.descripcion) != -1)" ng-click="setCfg('operator',oper.op)" ng-class="{'field-sel':configDep.operator == oper.op}"  class="row itemCrit" layout="column" layout-align="center center">
+                                                {{oper.descripcion}}
                                             </div>
                                         </md-content>
-                                        <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto' || currentParent.type.descripcion == 'numerico'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
-                                            <label>valor</label>
-                                            <input skip-tab
-                                                   info="ingrese el valor contra el que se comparara"
-                                                   autocomplete="off"
-                                                   ng-model="configDep.condition"
-                                                   md-no-asterisk
-                                            >
+                                    </div>-->
+                                </div>
+                                <div layout="row" flex>
 
-                                        </md-input-container>
+                                    <div flex layout="column">
+                                        <div ng-if="configDep.operator" style="height: 160px: border-bottom:1px solid #ccc">
 
-                                    </div>
-                                    <div flex ng-if="configDep.condition">
-                                        <div class="titulo_formulario row" layout="row" layout-align="start start" >
-                                            <div>
-                                                Acciones
-                                            </div>
-                                        </div>
-                                        <md-input-container class="md-block row">
-                                            <lmb-collection class="rad-contain"
-                                                            layout="row"
-                                                            style="width:100px;"
-                                                            lmb-type="items"
-                                                            lmb-model="configDep.action"
-                                                            lmb-display="nombre"
-                                                            lmb-itens="visibility"
-                                                            lmb-key="id"
-
-                                            >
-
-                                        </md-input-container>
-                                        <div class="row"></div>
-                                        <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
-                                            <div class="row">
-                                                <div class="titulo_formulario row" layout="row" layout-align="start start" >
-                                                    <div>
-                                                        Valores posibles
-                                                    </div>
+                                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                                <div>
+                                                    Condicion
                                                 </div>
                                             </div>
+                                            <md-content flex  ng-if="currentParent.type.descripcion == 'selector' || currentParent.type.descripcion == 'opciones'">
+                                                <div
+                                                        ng-repeat="opt in currentParent.options.Opcion track by $index"
 
-                                            <lmb-collection class="rad-contain"
-                                                            layout="column"
-                                                            lmb-type="list"
-                                                            ng-disabled="configDep.action == 'true' || configDep.action == 'false'"
-                                                            lmb-model="configDep.action"
-                                                            lmb-display="elem.nombre"
-                                                            multiple
-                                                            lmb-itens="selCrit.options.Opcion"
-                                                            lmb-key="elem.id"
-
-                                            >
-
-                                            </lmb-collection>
-                                            <!--<md-content flex>
-                                                <div ng-repeat="opt in opcValue.opts.valor track by $index" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
-                                                    {{getoptSet(opt).nombre}}
+                                                        ng-click="setCfg('condition',opt.pivot.value)"
+                                                        class="row"
+                                                        ng-class="{'field-sel':configDep.condition == opt.pivot.value}"
+                                                        layout="column"
+                                                        layout-align="center center"
+                                                        style="border-bottom: 1px solid #ccc">
+                                                    {{getoptSet(opt.pivot.value).nombre}}
                                                 </div>
                                             </md-content>
--->
+                                            <md-input-container id="text" class="md-block" flex prevText ng-if="currentParent.type.descripcion == 'texto' || currentParent.type.descripcion == 'numerico'" ng-class="{'onlyread' : (field.type.directive == 'prevText')}">
+                                                <label>valor</label>
+                                                <input skip-tab
+                                                       info="ingrese el valor contra el que se comparara"
+                                                       autocomplete="off"
+                                                       ng-model="configDep.condition"
+                                                       md-no-asterisk
+                                                >
+
+                                            </md-input-container>
+
                                         </div>
+                                        <div flex ng-if="configDep.condition">
+                                            <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                                <div>
+                                                    Acciones
+                                                </div>
+                                            </div>
+                                            <md-input-container class="md-block row">
+                                                <lmb-collection class="rad-contain"
+                                                                layout="row"
+                                                                style="width:100px;"
+                                                                lmb-type="items"
+                                                                lmb-model="configDep.action"
+                                                                lmb-display="nombre"
+                                                                lmb-itens="visibility"
+                                                                lmb-key="id"
+
+                                                >
+
+                                            </md-input-container>
+                                            <div class="row"></div>
+                                            <div flex ng-if="currentCrit.type.descripcion == 'selector' || currentCrit.type.descripcion == 'opciones'">
+                                                <div class="row">
+                                                    <div class="titulo_formulario row" layout="row" layout-align="start start" >
+                                                        <div>
+                                                            Valores posibles
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <lmb-collection class="rad-contain"
+                                                                layout="column"
+                                                                lmb-type="list"
+                                                                ng-disabled="configDep.action == 'true' || configDep.action == 'false'"
+                                                                lmb-model="configDep.action"
+                                                                lmb-display="elem.nombre"
+                                                                multiple
+                                                                lmb-itens="selCrit.options.Opcion"
+                                                                lmb-key="elem.id"
+
+                                                >
+
+                                                </lmb-collection>
+                                                <!--<md-content flex>
+                                                    <div ng-repeat="opt in opcValue.opts.valor track by $index" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                                        {{getoptSet(opt).nombre}}
+                                                    </div>
+                                                </md-content>
+    -->
+                                            </div>
+                                        </div>
+
+
                                     </div>
-
-
                                 </div>
-                            </div>
+                            </form>
+
                         </div>
                         <div class="row">
                             <div class="titulo_formulario row" layout="row" layout-align="start start" >
-                                <div ng-click="(creating)?creating=false:null">
+                                <div ng-click="(creating)?toList():false">
                                     Configuradas
                                 </div>
 
@@ -1111,7 +1114,7 @@
 
                     </div>
                 </md-content>
-                <show-next valid="checkValid" on-next="saveDependency" on-error="showAlert" ></show-next>
+                <show-next valid="checkValid" on-next="closeDepend" on-error="showAlert" ></show-next>
                 <!--<div class="showNext" style="width: 16px;" ng-mouseover="(checkValid())?$parent.showNext(true,saveDependency):showAlert()" ng-mouseleave="over = false;">
                 </div>-->
             </div>

@@ -25,6 +25,7 @@ use App\Models\Sistema\Criterios\CritCampoOption as Options;
 use App\Models\Sistema\Criterios\OpcionList as Lista ;
 use App\Models\Sistema\Criterios\CritOption;
 use App\Models\Sistema\Criterios\CritDependency;
+use Carbon\Carbon;
 use App\Models\Sistema\Criterios\CritDependencyAction;
 
 
@@ -71,11 +72,13 @@ class CritController extends BaseController
         $crit = Criterio::where("linea_id",$line)
             ->whereNotNull("campo_id")
             ->whereNotNull("tipo_id")
+            ->with("line")
+            ->with("field")
+            ->with("type")
+            ->orderBy("posicion")
             ->get();
         foreach ($crit as $field){
-            $field->line;
-            $field->field;
-            $field->type;
+            $field['hasProd'] = $field->products()->exists();
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
                 $dep['parent'] = $dep->parent()->first();
@@ -180,12 +183,12 @@ class CritController extends BaseController
     public function saveCritField(Request $rq){
         $crite = $rq->crite;
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
-        if($crite['id']){
+        if($crite['id'] && !$rq->adapt){
             $crit = Criterio::find($crite['id']);
             $ret["action"]="upd";
-
         }else{
             $crit = new Criterio();
+            $crit->posicion = ($rq->adapt)?$crite['posicion']:Criterio::where("linea_id",$crite['linea_id'])->max("posicion")+1;
         }
         $crit->linea_id = $crite['linea_id'];//$rq->line;
         $crit->campo_id = $crite['campo_id'];//$rq->field;
@@ -195,6 +198,14 @@ class CritController extends BaseController
         $ret["id"] = $crit->id;
         $ret["ready"] = ($crit->linea_id && $crit->campo_id && $crit->tipo_id);
         $ret["opciones"]=self::saveOptions($crit,$rq->options);
+        if($rq->adapt){
+            if($rq->adapt['act']=="stay"){
+                $this->migrateDependency($crite['id'],$crit->id);
+                $old = Criterio::find($crite['id']);
+                $old->obsoleto=Carbon::now();
+                $old->save();
+            }
+        }
         return $ret;
 
     }
@@ -210,7 +221,7 @@ class CritController extends BaseController
                 if($rq['id']){
                     $opt = Options::find($rq['id']);
 
-                    if($opt->value == $rq['valor'] && $opt->message == $rq['msg']){
+                    if($opt->value == $rq['valor'] && $opt->message == $rq['msg'] && $opt->lct_id == $crit->id){
                         continue;
                     }
 
@@ -256,6 +267,15 @@ class CritController extends BaseController
 
     }
 
+    private function migrateDependency($oid,$nid){
+        $deps = CritDependency::where("lct_id",$oid);
+        foreach ($deps as $dep){
+            $aux = $dep->replicate();
+            $aux->lct_id = $nid;
+            $aux->save();
+        }
+    }
+
     public function saveDependency(Request $rq){
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
         if($rq->id){
@@ -284,4 +304,18 @@ class CritController extends BaseController
         //}
         return $ret;
     }
+    
+    public function ajustOrder(){
+    	$criterio = Criterio::orderBy("linea_id")->get();
+    	//$criterio->groupBy("linea_id");
+        $i=1;
+        $aux=false;
+    	foreach($criterio as $crit){
+            $crit->posicion = $i;
+            $crit->save();
+            $i=($aux==$crit->linea_id)?$i+1:1;
+            $aux=$crit->linea_id;
+        }
+    }
+    
 }

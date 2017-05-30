@@ -693,6 +693,7 @@ MyApp.directive('formPreview', function() {
             $scope.formFilters = formPreviewSrv.getFilters();
             var validators = {};
             $scope.createModel = function(field){
+
                 if(!field.id){
                     return false;
                 }
@@ -711,7 +712,6 @@ MyApp.directive('formPreview', function() {
 
 
                 }
-
             };
             var isShow = function(val){
 

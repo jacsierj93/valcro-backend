@@ -50,4 +50,10 @@ class CritLinCamTip extends customBaseModel
             }))
             ->with('children');
     }
+
+    public function products(){
+        return $this->belongsToMany('App\Models\Sistema\Product\Product', 'tbl_prod_crit', 'crit_id', 'prod_id')
+            ->withTimestamps()
+            ->whereNull("tbl_prod_crit.deleted_at");
+    }
 }

@@ -411,11 +411,11 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     $scope.listOptions = critForm.getOptions();
 
-    function saveCriterio(){
-        console.log("enter")
+    function saveCriterio(ext=false){
+
         wait = $q.defer();
         var ret = wait.promise;
-        criterios.put({type:"save"},{crite:$scope.elem,options:$scope.opcValue},function(data){
+        criterios.put({type:"save"},{crite:$scope.elem,options:$scope.opcValue,adapt:ext},function(data){
             $scope.elem.id = data.id;
             wait.resolve(data.id);
 
@@ -431,12 +431,44 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                     $scope.opcValue[key].msg = ''
                 }
             });
-            $scope.elem.deps = [];
+            if("deps" in $scope.elem){
+               $scope.elem.deps = [];
+            }
+
             setNotif.addNotif("ok", "datos guardados", [
             ],{autohidden:1000});
 
         });
         return ret;
+    }
+
+    function preSave(){
+        console.log(backCrit.crit,$scope.elem)
+        if($scope.elem.hasProd && !angular.equals(backCrit.crit,$scope.elem)){
+            setNotif.addNotif("alert", "ya existen productos creados que implementan este criterio, ¿que desea hacer?", [
+                {
+                    name:"resetear los campos",
+                    action:function(){
+                        alert("algo");
+                    }
+                },
+                {
+                    name:"adecuar",
+                    action:function(){
+                        alert("adecuar");
+                    }
+                },
+                {
+                    name:"mantenerlos",
+                    action:function(){
+                        saveCriterio({act:"stay"}).then(closeConst);
+                    }
+                }
+
+                ]);
+        }else{
+            saveCriterio().then(closeConst);
+        }
     }
 
     $scope.saveCrit = function(){
@@ -445,7 +477,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
             return true;
         }
         console.log("entoroooooo")
-        saveCriterio().then(closeConst);
+        preSave();
 
     };
     
@@ -735,8 +767,11 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                 angular.forEach($scope.critField.opcs.Opcion, function(valor, key){
                     $scope.opcValue.opts.valor.push(valor.pivot.value);
                 });
-                backCrit.crit = angular.copy($scope.elem);
-                backCrit.opc = angular.copy($scope.opcValue)
+                $timeout(function(){
+                    backCrit.crit = angular.copy($scope.elem);
+                    backCrit.opc = angular.copy($scope.opcValue)
+                },100)
+
             },0)
         }
 
@@ -978,7 +1013,7 @@ MyApp.controller('treeController',['$scope', 'setNotif','masters','critForm','$m
 
 }]);
 
-MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter','criterios',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter,criterios) {
+MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSidenav','$timeout','$filter','criterios','$q',function ($scope, setNotif,critForm,$mdSidenav,$timeout,$filter,criterios,$q) {
     $scope.line = critForm.getLine();
     $scope.listOptions = critForm.getOptions();
     $scope.$watchCollection("line.listado",function(n,o){
@@ -1013,15 +1048,64 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         }
     ];
 
-    $scope.saveDependency = function(){
-        criterios.put({type:"saveDep"},$scope.configDep,function(data){
-            $scope.configDep.id = data.id;
-            updateDependency($scope.configDep,data.action);
-            setNotif.addNotif("ok", "GUARDADO!!", [
-            ],{autohidden:1000});
-            $scope.$parent.closeDepend();
-        });
+    $scope.closeDepend = function(){
+        saveDepend().then($scope.$parent.closeDepend)
     };
+    $scope.toList = function(){
+        saveDepend().then(function(){
+            $scope.creating=false;
+        })
+    };
+
+
+    function clearDepend(){
+        $scope.configDep.id = false;
+        $scope.configDep.parent_id = false;
+        $scope.configDep.operator = '';
+        $scope.configDep.condition = '';
+        $scope.configDep.condition = null;
+        $scope.setDepend.$setPristine();
+        $scope.setDepend.$setUntouched();
+    }
+
+
+    function saveDepend(){
+        var defer = $q.defer();
+        var promise = defer.promise;
+        console.log($scope.setDependFrm,$scope)
+        if($scope.setDepend.$pristine && $scope.setDepend.$untouched){
+            defer.resolve();
+        }
+
+        if($scope.configDep.parent_id && $scope.configDep.operator!='' && $scope.configDep.condition != '' && $scope.configDep.condition != null){
+            criterios.put({type:"saveDep"},$scope.configDep,function(data){
+                $scope.configDep.id = data.id;
+                updateDependency($scope.configDep,data.action);
+                setNotif.addNotif("ok", "GUARDADO!!", [
+                ],{autohidden:1000});
+               defer.resolve();
+            });
+        }else{
+            setNotif.addNotif("alert", "los datos estan incompletos que desea hacer?", [
+                {
+                    name:"descartarlos",
+                    action:function(){
+                        clearDepend();
+                        defer.resolve();
+                    }
+                },
+                {
+                    name:"Corregir",
+                    action:function(){
+                        defer.reject();
+                    }
+                }
+            ]);
+        }
+
+        return promise;
+
+    }
 
     var updateDependency = function(dat,act){
         depend = (act=="upd")?$filter("filterSearch")($scope.currentCrit.deps,[dat.id])[0]:{};
@@ -1034,6 +1118,11 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         if(act=="new"){
             $scope.currentCrit.deps.push(depend);
         }
+        //console.log($scope.criteria);
+        $scope.currentCrit = angular.copy($scope.currentCrit);
+        idx = $scope.criteria.indexOf($scope.currentCrit);
+        $scope.criteria.splice(idx,1,$scope.currentCrit);
+        clearDepend();
     };
 
 
@@ -1121,7 +1210,6 @@ MyApp.directive("setAttr",function(){
                         }else if(v.especificacion != ""){
                             attr[v.especificacion] = scope[v.especificacion+"_live"].value;
                         }
-
                     });
                     if(v.especificacion == "label"){
                         elem.parent().find("label").html(v.pivot.value);
