@@ -221,8 +221,9 @@
                                         </div>
 
                                         <md-content layout="column" flex style="margin: 0px 4px 0px 4px">
-                                            <div ng-repeat="field in criteria" class="row"
-                                                 ng-class="{'md-whiteframe-2dp':field.id==formId.id,'gold-pulse':dependSel.parent==field.id,'green-pulse':(dependSel.target==field.id && dependSel.parent)}"
+                                            <div ng-repeat="field in criteria"
+                                                 class="row"
+                                                 ng-class="{'md-whiteframe-2dp':field.id==formId.id,'gold-pulse':dependSel.parent && dependSel.parent==field.id,'green-pulse':(dependSel.target==field.id && dependSel.parent)}"
                                                  test="{{field.id}}"
                                                  form-preview="{{field.type.directive}}"
                                                  ng-dblclick="setEdit(field)"
@@ -693,7 +694,7 @@
                                                          model="elem.campo_id"
                                                          skip-tab
                                                          md-search-text="ctrl.searchDesc"
-                                                         md-items="item in fields | stringKey : ctrl.searchDesc : 'descripcion'"
+                                                         md-items="item in fields | stringKey : ctrl.searchDesc : 'descripcion' | customFind : criteria : used"
                                                          md-item-text="item.descripcion"
                                                          required
                                                          require-match="true"
@@ -758,7 +759,6 @@
                                                 <md-switch ng-model="opcValue.coder.valor"
                                                            ng-true-value="1"
                                                            ng-false-value="0"
-
                                                            class="Frm-value"
                                                 >
                                                     &nbsp;COD

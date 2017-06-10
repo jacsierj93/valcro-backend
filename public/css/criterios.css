@@ -99,6 +99,14 @@ treecontrol  li  li  li  li  li  li  li  li  li  li  li  li{
 	background-image:url("images/eye_true.png");
 }
 
+.obsolete{
+    text-decoration: line-through;
+    text-decoration-color: #a3a3a3;
+}
+.obsolete label{
+    text-decoration: line-through;
+}
+
 .menu_shadow{
 -webkit-box-shadow: -2px 2px 2px -2px rgba(0,0,0,0.5) !important;
 -moz-box-shadow: -2px 2px 2px -2px rgba(0,0,0,0.5) !important;

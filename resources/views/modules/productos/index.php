@@ -512,7 +512,7 @@
                                                                  md-search-text="ctrl.searchLine"
                                                                  md-items="item in lines | stringKey : ctrl.searchLine : 'linea' "
                                                                  md-item-text="item.linea"
-                                                                 ng-disabled="dataCrit.length > 0 || prodCritFrm.$dirty"
+                                                                 ng-disabled="prodCritFrm.$dirty"
                                                                  require
                                                                  require-match="true"
                                                                  md-no-asterisk

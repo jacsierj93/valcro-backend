@@ -670,7 +670,8 @@ MyApp.service('formPreviewSrv',function(){
     var commons = {
         crit:[],
         isShow:[],
-        formFilters:[]
+        formFilters:[],
+        watchers:{}
     };
     return {
         getCrits:function(){
@@ -681,6 +682,9 @@ MyApp.service('formPreviewSrv',function(){
         },
         getFilters:function(){
             return commons.formFilters;
+        },
+        getWatchers:function(){
+            return commons.watchers;
         }
     }
 });
@@ -691,23 +695,49 @@ MyApp.directive('formPreview', function() {
             $scope.crit = formPreviewSrv.getCrits();
             $scope.isShow = formPreviewSrv.getShows();
             $scope.formFilters = formPreviewSrv.getFilters();
+            $scope.watchers = formPreviewSrv.getWatchers();
             var validators = {};
+
+            function clearWatchers(line){
+                $scope.watchers[line].forEach(function(v,k){
+                    v();
+                    if(k==$scope.watchers[line].length-1){
+                        delete $scope.watchers[line];
+                    }
+                })
+            }
             $scope.createModel = function(field){
 
                 if(!field.id){
                     return false;
                 }
 
-                $scope.crit[''+field.id] = {value : "",childs:[]};
+                $scope.crit[''+field.id] = {
+                    value :null,
+                    childs:[]
+                };
+                if(field.value != null){
+                    $scope.crit[''+field.id].value =(field.value.indexOf(">>")!=-1)?field.value.split(">>"):(parseInt(field.value)==field.value)?parseInt(field.value):field.value;
+
+                }
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
+
+                if(!(field.linea_id in $scope.watchers)){
+                    if(Object.keys($scope.watchers).length>0){
+                        clearWatchers(Object.keys($scope.watchers)[0]);
+                    }
+                    $scope.watchers[field.linea_id]=[];
+                }
                 for(i=0;i<field.deps.length;i++){
-                    var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");+
-                        key.childs.push(field.deps[i]);
+                    var key = $scope.$eval("crit["+field.deps[i].lct_id+"]");
+                        if(key)key.childs.push(field.deps[i]);
                     if($filter("customFind")($scope.$$watchers,"crit["+field.deps[i].lct_id+"]",function(a,b){ return a.exp == b;}).length==0){
-                        $scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
+
+
+                        $scope.watchers[field.linea_id].push($scope.$watchCollection("crit["+field.deps[i].lct_id+"]",function(n,o){
                             isShow(n);
-                        });
+                        }));
                     }
 
 
@@ -715,7 +745,7 @@ MyApp.directive('formPreview', function() {
             };
             var isShow = function(val){
 
-                if(!val.childs){
+                if(!val || ("childs" in  val)){
                     return false;
                 }
                 angular.forEach(val.childs,function(dep,k){
@@ -791,7 +821,7 @@ MyApp.directive('critModel', function(formPreviewSrv) {
     return {
         link: function(scope, elem, attr){
             scope[attr.critModel] = formPreviewSrv.getCrits();
-            console.log("linked")
+
         }
 
     };
@@ -837,12 +867,15 @@ MyApp.directive('lmbCollection', function() {
                 var dat = $scope.curVal;
 
                 if($scope.multi){
+                    //console.log($scope.model)
+                    if(typeof($scope.model) !='object' || $scope.model==null){
 
-                    if(typeof($scope.model) !='object'){
                         $scope.model = [];
                     }
-                    if($scope.model.indexOf(eval("dat."+$scope.key)) != -1){
-                        $scope.model.splice($scope.model.indexOf(eval("dat."+$scope.key)),1);
+
+                    if($scope.model.indexOf(eval("dat."+$scope.key)) != -1 || $scope.model.indexOf(eval("dat."+$scope.key)+"") !== -1){
+                        idx = ($scope.model.indexOf(eval("dat."+$scope.key))!=-1)?$scope.model.indexOf(eval("dat."+$scope.key)):$scope.model.indexOf(eval("dat."+$scope.key)+"");
+                        $scope.model.splice(idx,1);
                     }else{
                         $scope.model.push(eval("dat."+$scope.key));
                     }
@@ -865,7 +898,7 @@ MyApp.directive('lmbCollection', function() {
             $scope.exist = function(dat){
                 if($scope.multi){
                     if($scope.model){
-                        return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1;
+                        return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1 || $scope.model.indexOf(eval("dat."+$scope.key)+"") !== -1;
                     }
 
                 }else{

@@ -4,10 +4,11 @@
                     flex
                     prevText
                     ng-if="(field.type.directive == 'prevText' || field.type.directive == null)"
-                    ng-class="{'onlyread' : (field.type.directive == 'prevText')}"
+                    ng-class="{'onlyread' : (field.type.directive == 'prevText'),'obsolete':field.obsoleto}"
                     >
-    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
+    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}} {{(field.obsoleto)?'OBSOLETO':''}}</label>
     <input skip-tab
+           ng-disabled="field.obsoleto"
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
            info-nowait
@@ -16,6 +17,7 @@
            min-length="{{field.options.Minimo[0].pivot.value || 0}}"
            max-lenght="{{field.options.Max[0].pivot.value || 9999}}"
            md-no-asterisk
+
            erro-listener
            min-imp-msg = "{t:'error',m:field.options.MinImp[0].pivot.message || ''}"
            min-length-msg="{t:'alert',m:field.options.Minimo[0].pivot.message || ''}"
@@ -31,10 +33,11 @@
                     flex
                     prevNum
                     ng-if="(field.type.directive == 'prevNum' || field.type.directive == null)"
-                    ng-class="{'onlyread' : (field.type.directive == 'prevNum')}"
+                    ng-class="{'onlyread' : (field.type.directive == 'prevNum'),'obsolete':field.obsoleto}"
                     >
-    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
+    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}} {{(field.obsoleto)?'OBSOLETO':''}}</label>
     <input skip-tab
+           ng-disabled="field.obsoleto"
            ng-model="crit[field.id].value"
            info="{{field.options.Info[0].pivot.value || ''}}"
            info-nowait
@@ -57,10 +60,11 @@
 </md-input-container>
 
 
-<md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')" layout="row">
-    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}}</label>
+<md-input-container flex prevAutocomplete  ng-if="(field.type.directive == 'prevAutocomplete')" layout="row" ng-class="{'obsolete':field.obsoleto}">
+    <label>{{field.options.placeholder[0].pivot.value || field.field.descripcion}} {{(field.obsoleto)?'OBSOLETO':''}}</label>
     <md-autocomplete md-selected-item="ctrl[field.id].sel"
                      model="crit[field.id].value"
+                     ng-disabled="field.obsoleto"
                      flex
                      skip-tab
                      ng-required="{{field.options.Requerido[0].pivot.value || ''}}"
@@ -84,6 +88,7 @@
 
 <lmb-collection class="rad-contain"
                 layout="row"
+                ng-disabled="field.obsoleto"
                 lmb-type="items"
                 lmb-model="crit[field.id].value"
                 lmb-display="elem.nombre"

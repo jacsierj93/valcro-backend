@@ -8,7 +8,7 @@
  */
 $app->get("productos/provsProds",'Products\ProductController@getProviders');
 $app->get("productos/prodsByProv/{id}",'Products\ProductController@listByProv');
-$app->get("productos/getCriterio/{line}",'Criterio\CritController@getCriterio');
+$app->get("productos/getCriterio/{line}/{prod}",'Products\ProductController@getCritProd');
 
 $app->post("productos/prodSave",'Products\ProductController@saveProd');
 $app->post("productos/savePoints",'Products\ProductController@savePoint');

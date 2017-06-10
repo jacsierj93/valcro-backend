@@ -45,10 +45,7 @@ class ProductController  extends BaseController
             ->with(array("getType"=>function($q){
                 return $q->selectRaw("id,descripcion");
             }))
-            ->with(array("prodCrit"=>function($q){
-                //dd($q->selectRaw("crit_id,value"));
-                return $q->selectRaw("crit_id,value");
-            }))
+
             ->with(array("commons"=>function($q){
                 return $q->selectRaw("codigo,descripcion,serie,linea_id")->with(array("line"=>function($query){
                     return $query->selectRaw("id,linea");
@@ -65,6 +62,11 @@ class ProductController  extends BaseController
         foreach ($all as  $prod){
             //$prod["aprv"]=$prod->isAprov()->get();
             foreach($prod->prodCrit as $crit){
+                if($crit->obsoleto){
+                    if($prod->prodCrit->contains("crit_id",$crit->reemplazo)){
+                        $prod->prodCrit->forget($crit->id);
+                    }
+                }
                if(strpos($crit['value'],'>>' )){
                    $crit['value'] = explode(">>",$crit['value']);
                }
@@ -116,6 +118,13 @@ class ProductController  extends BaseController
             return $datos->get();
 
 
+    }
+
+    public function getCritProd($line,$prod,Request $rq){
+        //dd($prod=="false");
+        $prods = ($prod!="false")?Product::find($prod):false;
+
+        return app('App\Http\Controllers\Criterio\CritController')->getCriterio($line,$prods->prodCrit()->selectRaw("crit_id,value")->get()->keyBy("crit_id"),$rq);
     }
 
     public function saveProd(Request $req){

@@ -68,16 +68,43 @@ class CritController extends BaseController
         return json_encode($types);
     }
     
-    public function getCriterio($line){
+    public function getCriterio($line,$products=false, Request $rq){
+        $from = explode("/",$rq->path(),2)[0];
+
+
         $crit = Criterio::where("linea_id",$line)
             ->whereNotNull("campo_id")
             ->whereNotNull("tipo_id")
+            /*->whereNull("obsoleto")*/
             ->with("line")
             ->with("field")
             ->with("type")
-            ->orderBy("posicion")
-            ->get();
-        foreach ($crit as $field){
+            ->orderBy("posicion");
+
+        if($from=="criterio" || !$products || ($products->count()==0)){
+            $crit = $crit->whereNull("obsoleto");
+        }
+        $crit = $crit->get();
+        foreach ($crit as $k=>$field){
+
+            if($field->obsoleto!=null && $products){
+
+                if(!$products->has($field->id)){
+
+                    $crit->forget($k);
+
+                    continue;
+                }else{
+                    if($products->has($field->reemplazo)){
+
+                        $crit->forget($k);
+                        continue;
+                    }
+                }
+            }
+
+            $field["value"]=($products && $products->contains("crit_id",$field->id))?$products->get($field->id)->value:null;
+
             $field['hasProd'] = $field->products()->exists();
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
@@ -95,10 +122,8 @@ class CritController extends BaseController
             foreach ($field['options']['Opcion'] as $opt){
                 $opt["elem"] = Lista::find($opt->pivot->value);
             }
-
-
         }
-        return  json_encode($crit);
+        return  $crit->values();
     }
     public function treeMap($line){
         $tree = Criterio::selectRaw('id ,linea_id, tipo_id,campo_id,RAND() as randon')->where("linea_id",$line)
@@ -175,7 +200,6 @@ class CritController extends BaseController
 
         $crit->save();
         $ret["id"] = $crit->id;
-        //$ret["ready"] = ($crit->linea_id && $crit->campo_id && $crit->tipo_id);
         return $ret;
 
     }
@@ -203,6 +227,7 @@ class CritController extends BaseController
                 $this->migrateDependency($crite['id'],$crit->id);
                 $old = Criterio::find($crite['id']);
                 $old->obsoleto=Carbon::now();
+                $old->reemplazo = $crit->id;
                 $old->save();
             }
         }

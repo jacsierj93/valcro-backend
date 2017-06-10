@@ -121,6 +121,7 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
         },
         rm:function(id){
             curLine.listado.splice(curLine.listado.indexOf($filter("filterSearch")(curLine.listado,[id])[0]),1);
+            curCrit = new Object();
         },
         get:function(){
             return listado;
@@ -193,7 +194,6 @@ MyApp.service("critForm",function(criterios,mastersCrit,$filter){
                     aux.options[define.descripcion]= [temp];
                 }
             }
-            console.log("depois",aux,curLine.listado)
         },
         delOption :function(opt){
             var define = $filter("filterSearch")(masterOptions,[opt.opc_id])[0];
@@ -443,7 +443,6 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     }
 
     function preSave(){
-        console.log(backCrit.crit,$scope.elem)
         if($scope.elem.hasProd && !angular.equals(backCrit.crit,$scope.elem)){
             setNotif.addNotif("alert", "ya existen productos creados que implementan este criterio, ¿que desea hacer?", [
                 {
@@ -517,6 +516,8 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                     if(!$scope.elem.id){
                         critForm.rm($scope.elem.id);
                     }
+                    critForm.setEdit(false);
+                    //critForm.setLine(false);
                     $scope.newField.type = false;
                     $scope.fieldForm.$setUntouched();
                     $scope.fieldForm.$setPristine();
@@ -661,7 +662,6 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                 }
             ]);
         }else{
-
             saveOptions($scope.opcValue);
         }
 
@@ -910,11 +910,17 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
     };
 
-    $scope.used = function(field){
+   /* $scope.used = function(field){
         return $filter("customFind")($scope.criteria,field,function(c,v){
             return c.campo_id == v.id;
         }).length > 0
-    };
+    };*/
+
+    $scope.used=function(c,v){
+        return $filter("customFind")(v,c,function(c,v){
+                return c.campo_id == v.id;
+            }).length == 0
+    }
 
     $scope.isUsed = function(){
         setNotif.addNotif("error", "no se puede usar este campo dos veces", [
@@ -938,7 +944,7 @@ MyApp.controller('createFieldController',['$scope', 'setNotif','mastersCrit','$m
         $scope.newField.tipo_id = null;
         $scope.fieldForm.$setUntouched();
         $scope.fieldForm.$setPristine();
-    }
+    };
     $scope.$watchGroup(['fieldForm.$valid','fieldForm.$pristine'], function(nuevo) {
         if(nuevo[0] && !nuevo[1]) {
             criterios.put({type:"saveNewField"},$scope.newField,function(data){

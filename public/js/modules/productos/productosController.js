@@ -1,6 +1,6 @@
 MyApp.factory('productos', ['$resource',function ($resource) {
-        return $resource('productos/:type/:id', {}, {
-            query: {method: 'GET', cancellable:true, params: {type: "",id:""}, isArray: true},
+        return $resource('productos/:type/:id/:sec', {}, {
+            query: {method: 'GET', cancellable:true, params: {type: "",id:"",sec:""}, isArray: true},
             filt: {method: 'POST', cancellable:true, params: {type: "",id:""}, isArray: true},
             get:   {method: 'POST', params: {type: ""}, isArray: false},
             put:   {method: 'POST', params: {type: ""}, isArray: false}
@@ -98,10 +98,10 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         },
         getProd : function(){
             return prod
-        },
+        },/*
         getDataCrit : function(){
             return prod.datos.prod_crit;
-        },
+        },*/
         getToSavedProd:function(){
             return prodToSave;
         },
@@ -289,7 +289,7 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.prod = productsServices.getToSavedProd();
     $scope.prodCrit = [];
     $scope.criteria = [];
-    $scope.dataCrit = [];
+    //$scope.dataCrit = [];
     $scope.criterioShared = productsServices.getCriteria();
     $scope.$watch("prod.prov",function(n,o){
         $timeout(function(){
@@ -302,22 +302,16 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
         },0)
 
     });
-    $scope.$watch("prod.id",function(n,o){
-        if(n){
-            $scope.dataCrit = productsServices.getDataCrit();
-            $timeout(function(){
-                angular.forEach($scope.dataCrit,function(v,k){
-                    $scope.prodCrit[v.crit_id].value = v.value;
-                })
+   /* $scope.$watch("prod.id",function(n,o){
 
-            },2000)
-        }
 
-    });
+    });*/
+
+
     $scope.$watchCollection("prod",function(n,o){
         if(n.line && (n.line!=o.line)){
 
-                productos.query({ type:"getCriterio",id:n.line},function(data){
+                productos.query({ type:"getCriterio",id:n.line,sec:n.id},function(data){
                     $scope.prodCrit.splice(0,$scope.prodCrit.length);
                     $timeout(function(){
                         $scope.criteria = data;
@@ -328,6 +322,8 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 
 
         }
+
+
 
     });
 
