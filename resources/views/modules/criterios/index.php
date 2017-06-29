@@ -217,7 +217,7 @@
                                             <div>
                                                 Linea
                                             </div>
-                                            <div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>
+                                            <!--<div style="width: 24px; font-size:24px;" ng-click="setEdit(true)">+</div>-->
                                         </div>
 
                                         <md-content layout="column" flex style="margin: 0px 4px 0px 4px">

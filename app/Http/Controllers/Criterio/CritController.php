@@ -13,6 +13,7 @@ use App\Models\Sistema\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
+use League\Flysystem\Exception;
 use Session;
 use Validator;
 
@@ -108,10 +109,15 @@ class CritController extends BaseController
             $field['hasProd'] = $field->products()->exists();
             $field['deps'] = $field->dependency()->get();
             foreach ($field['deps'] as $dep){
-                $dep['parent'] = $dep->parent()->first();
-                if(!($dep['accion']=="true" || $dep['accion']=="false")){
-                    $dep['accion'] = explode(",",$dep['accion']);
+                try{
+                    $dep['parent'] = $dep->parent()->first();
+                    if(!($dep['accion']=="true" || $dep['accion']=="false")){
+                        $dep['accion'] = explode(",",$dep['accion']);
+                    }
+                }catch(Exception $e){
+                    continue;
                 }
+
             }
             $field['options'] = $field->options()->get()->groupBy("descripcion");
 
@@ -184,7 +190,6 @@ class CritController extends BaseController
         }
 
     }
-
     public function saveField(Request $rq){
         $ret = array("action"=>"new","id"=>false,"ready"=>false);
         if($rq->id){
@@ -214,9 +219,9 @@ class CritController extends BaseController
             $crit = new Criterio();
             $crit->posicion = ($rq->adapt)?$crite['posicion']:Criterio::where("linea_id",$crite['linea_id'])->max("posicion")+1;
         }
-        $crit->linea_id = $crite['linea_id'];//$rq->line;
-        $crit->campo_id = $crite['campo_id'];//$rq->field;
-        $crit->tipo_id = $crite['tipo_id'];//$rq->type;
+        $crit->linea_id = $crite['linea_id'];
+        $crit->campo_id = $crite['campo_id'];
+        $crit->tipo_id = $crite['tipo_id'];
 
         $crit->save();
         $ret["id"] = $crit->id;
@@ -224,7 +229,6 @@ class CritController extends BaseController
         $ret["opciones"]=self::saveOptions($crit,$rq->options);
         if($rq->adapt){
             if($rq->adapt['act']=="stay"){
-                $this->migrateDependency($crite['id'],$crit->id);
                 $old = Criterio::find($crite['id']);
                 $old->obsoleto=Carbon::now();
                 $old->reemplazo = $crit->id;
@@ -233,6 +237,10 @@ class CritController extends BaseController
         }
         return $ret;
 
+    }
+
+    public function notif(){
+        View::make('emails/modules/Embarques/Internal/resumen',['data'=>['titulo'=>'Notificacion de demo'], 'model'=>["updated_at"=>"2017-05-20",'id'=>"0100"]]);
     }
 
     public function saveOptions($crit,$reqs){
@@ -263,7 +271,6 @@ class CritController extends BaseController
                 $opt->opc_id = $rq['opc_id'];
                 $opt->value = $rq['valor'];
                 $opt->message = $rq['msg'];
-                //dd($opt);
                 $opt->save();
                 $ret[$k]["id"] = $opt->id;
             }else{

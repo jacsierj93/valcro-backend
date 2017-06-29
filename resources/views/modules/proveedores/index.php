@@ -1888,6 +1888,7 @@
                                                                                                     <label>Referencia</label>
                                                                                                     <input autocomplete="off" required ng-disabled="$parent.enabled" ng-model="lp.ref">
                                                                                                 </md-input-container>
+
                                                                                                 <div style="width:100px; padding: 3px;">
                                                                                                     <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
                                                                                                     <div ng-click="openAdj($event)" ng-class="{'ng-disable':$parent.enabled}" skip-tab="autoClik" class="vlc-buttom" style="float:left">

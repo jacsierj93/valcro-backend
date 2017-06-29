@@ -1070,18 +1070,15 @@ MyApp.controller('dependencyController',['$scope', 'setNotif','critForm','$mdSid
         $scope.configDep.operator = '';
         $scope.configDep.condition = '';
         $scope.configDep.condition = null;
-        $scope.setDepend.$setPristine();
-        $scope.setDepend.$setUntouched();
+        /*$scope.setDepend.$setPristine();
+        $scope.setDepend.$setUntouched();*/
     }
 
 
     function saveDepend(){
         var defer = $q.defer();
         var promise = defer.promise;
-        console.log($scope.setDependFrm,$scope)
-        if($scope.setDepend.$pristine && $scope.setDepend.$untouched){
-            defer.resolve();
-        }
+
 
         if($scope.configDep.parent_id && $scope.configDep.operator!='' && $scope.configDep.condition != '' && $scope.configDep.condition != null){
             criterios.put({type:"saveDep"},$scope.configDep,function(data){

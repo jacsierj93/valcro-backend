@@ -19,6 +19,7 @@ use Validator;
 use App\Models\Sistema\Providers\Provider;
 use App\Models\Sistema\Product\Product;
 use App\Models\Sistema\Product\ProductComponent;
+use App\Models\Sistema\Product\ProductRelationed;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController  extends BaseController
@@ -47,6 +48,11 @@ class ProductController  extends BaseController
             }))
 
             ->with(array("commons"=>function($q){
+                return $q->selectRaw("codigo,descripcion,serie,linea_id")->with(array("line"=>function($query){
+                    return $query->selectRaw("id,linea");
+                }));
+            }))
+            ->with(array("relationed"=>function($q){
                 return $q->selectRaw("codigo,descripcion,serie,linea_id")->with(array("line"=>function($query){
                     return $query->selectRaw("id,linea");
                 }));
@@ -124,7 +130,7 @@ class ProductController  extends BaseController
         //dd($prod=="false");
         $prods = ($prod!="false")?Product::find($prod):false;
 
-        return app('App\Http\Controllers\Criterio\CritController')->getCriterio($line,$prods->prodCrit()->selectRaw("crit_id,value")->get()->keyBy("crit_id"),$rq);
+        return app('App\Http\Controllers\Criterio\CritController')->getCriterio($line,($prods)?$prods->prodCrit()->selectRaw("crit_id,value")->get()->keyBy("crit_id"):false,$rq);
     }
 
     public function saveProd(Request $req){
@@ -138,9 +144,15 @@ class ProductController  extends BaseController
 
         $prod->prov_id = $req->prov;
         $prod->codigo = $req->cod;
+        $prod->codigo_profit = $req->cod;
+        $prod->descripcion_profit = $req->desc;
+        $prod->casas_id = 1;
         $prod->linea_id = $req->line;
+        $prod->sublinea_id = 1;
         $prod->descripcion = $req->desc;
         $prod->serie = $req->serie;
+        $prod->tipo_producto_id = 1;
+        $prod->almacen_id = 1;
         if($prod->isDirty()){
             $prod->save();
         }else{
@@ -177,6 +189,26 @@ class ProductController  extends BaseController
         }
         return $result;
     }
+    public function saveRela(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $comm =  ProductRelationed::findOrFail($req->id);
+            $result['action']="upd";
+        }else{
+            $comm =  new ProductRelationed();
+        }
+        $comm->id_prod = $req->parent;
+        $comm->id_prod_rel = $req->prod;
+        $comm->comentario = $req->comment;
+
+
+        if($comm->isDirty()){
+            $comm->save();
+        }else{
+            $result['action']="equal";
+        }
+        return $result;
+    }
     public function savePoint(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){
@@ -185,7 +217,9 @@ class ProductController  extends BaseController
         }
 
         $prod->point_buy = $req->pntBuy;
+        $prod->pbuy_unit = $req->pntBuyU;
         $prod->point_credit = $req->pntSald;
+        $prod->pcred_unit = $req->pntSaldU;
         if($prod->isDirty()){
             $prod->save();
         }else{

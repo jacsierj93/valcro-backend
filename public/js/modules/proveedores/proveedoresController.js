@@ -2276,9 +2276,10 @@ MyApp.controller('bankInfoController', function ($scope,masters,masterLists,prov
         }else{
             if(!$scope.isShow){
                 $scope.bnk.bankBenef = $scope.prov.description;
-                $scope.bnk.bankBenefAddr = $filter("customFind")(setGetProv.getAddress(),["1","3"],function(c,v){
-                        return v.indexOf(c.tipo_dir.toString())!==-1;
-                    })[0].direccion || "";
+                var direccion =$filter("customFind")(setGetProv.getAddress(),["1","3"],function(c,v){
+                    return v.indexOf(c.tipo_dir.toString())!==-1;
+                })[0];
+                $scope.bnk.bankBenefAddr = (direccion)?direccion.direccion:"";
             }
         }
         $timeout(function(){$scope.setting = false;},100)

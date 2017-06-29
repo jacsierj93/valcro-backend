@@ -745,7 +745,7 @@ MyApp.directive('formPreview', function() {
             };
             var isShow = function(val){
 
-                if(!val || ("childs" in  val)){
+                if(!val || !("childs" in  val)){
                     return false;
                 }
                 angular.forEach(val.childs,function(dep,k){
@@ -753,7 +753,6 @@ MyApp.directive('formPreview', function() {
                     switch (dep.operador){
                         case "=":
                             if(typeof(ret) == "boolean"){
-
                                 $scope.isShow[dep.sub_lct_id] = (val.value == dep.valor)?ret:!ret;
 
                             }else{
@@ -1145,9 +1144,10 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
                  x[scope.sideNav] = scope.fn;
                  popUpService.popUpClose(x);
                  }*/
-                scope.closer = function(){
+                scope.closer = function(idx){
+                    popUpService.remove(idx)
                     $mdSidenav(scope.sideNav).close().then(function(){
-                        popUpService.remove(idx);
+                        ;
                         if(scope.fn.after){
                             scope.fn.after();
                         }
@@ -1156,6 +1156,7 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
                 scope.close = function(){
 
                     idx = popUpService.exist(scope.sideNav);
+                    console.log("close",idx)
                     if(idx != -1){
                         if(scope.fn.before){
                             pre= scope.fn.before();
@@ -1171,14 +1172,14 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
                             var x = $interval(function(){
                                 if(pre.wait===true){
                                     $interval.cancel(x);
-                                    scope.closer();
+                                    scope.closer(idx);
                                 }else if(pre.wait===false){
                                     $interval.cancel(x);
                                     return false;
                                 }
                             },1000)
                         }else{
-                            scope.closer();
+                            scope.closer(idx);
                         }
 
                     };

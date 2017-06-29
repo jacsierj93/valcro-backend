@@ -745,6 +745,8 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
 
                     if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
                             model.scope.selectedItem = (aux.length>0)?aux[0] : null;
+                    }else if(aux.length ==0){
+                        model.scope.selectedItem = null;
                     }
                 });
             }

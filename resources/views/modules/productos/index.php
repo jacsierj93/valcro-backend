@@ -625,6 +625,27 @@
                                                    ng-model="prod.pntBuy"
                                                    required>
                                         </md-input-container>
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad</label>
+                                            <md-autocomplete md-selected-item="ctrl.unitPbuy"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad para el punto de Compra"
+                                                             model="prod.pntBuyU"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchbuy"
+                                                             md-items="item in units | stringKey : ctrl.searchbuy : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             ng-require="mprod.pntBuy!=''"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
+                                        </md-input-container>
                                     </div>
                                     <div class="row" layout="row">
                                         <md-input-container class="md-block" flex>
@@ -639,6 +660,27 @@
                                                    ng-model="prod.pntSald"
                                                    required
                                             >
+                                        </md-input-container>
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad</label>
+                                            <md-autocomplete md-selected-item="ctrl.unitPcred"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad para el punto de saldo"
+                                                             model="prod.pntSaldU"
+                                                             skip-tab
+                                                             md-search-text="ctrl.searchsal"
+                                                             md-items="item in units | stringKey : ctrl.searchsal : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             ng-require="mprod.pntSald!=''"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
                                         </md-input-container>
                                     </div>
                                 </form>
@@ -1062,7 +1104,7 @@
                                 <form layout="row"  class="gridContent" flex>
                                     <div active-left></div>
                                     <div layout="column" flex=""   >
-                                        <div   ng-repeat="item in listByProv.data | filter : listByProv.filter:strict | orderBy : listByProv.order as filter">
+                                        <div   ng-repeat="item in list.rela.data | filter : list.rela.filter:strict | orderBy : list.rela.order as filter">
                                             <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
 
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
@@ -1401,7 +1443,7 @@
                                     {{prodDetail.serie}}
                                 </div>
                             </div>
-                            <div class="row" layout="row">
+                            <!--<div class="row" layout="row">
                                 <div flex="grow" layout-align="center center">
                                     <md-input-container class="md-block row">
                                         <label>cantidad que compone</label>
@@ -1413,15 +1455,15 @@
                                         >
                                     </md-input-container>
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="row" layout="row">
                                 <div flex="grow" layout-align="center center">
                                     <md-input-container class="md-block row">
-                                        <label>descripcion de complementario</label>
+                                        <label>descripcion de relacionado</label>
                                         <input
                                             autocomplete="off"
                                             skip-tab
-                                            info="como complementa este producto al principal"
+                                            info="ej. es el mismo producto pero de fabrica diferente"
                                             ng-model="prodDetail.comment"
                                         >
                                     </md-input-container>
