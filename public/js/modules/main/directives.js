@@ -1156,7 +1156,7 @@ MyApp.directive('popUpOpen', function(popUpService,$mdSidenav) {
                 scope.close = function(){
 
                     idx = popUpService.exist(scope.sideNav);
-                    console.log("close",idx)
+
                     if(idx != -1){
                         if(scope.fn.before){
                             pre= scope.fn.before();
@@ -1227,7 +1227,12 @@ MyApp.directive('showNext', function() {
             }
             if(!("nextValid" in  $scope)){
                 $scope.nextValid = function(){return true};
-            }
+            }/*else{
+                console.log(typeof($scope.nextValid))
+                if(!typeof($scope.nextValid)=="function"){
+                    $scope.nextValid = function(){return $scope.eval($scope.nextValid)};
+                }
+            }*/
 
             $scope.$watch("cfg.show",function (status) {
                 if(typeof(status)!="boolean" ){
@@ -1240,7 +1245,7 @@ MyApp.directive('showNext', function() {
                 }
             });
             $scope.show = function(){
-                if($scope.nextValid()){
+                if((!typeof($scope.nextValid)=="function")?$scope.nextValid():$scope.nextValid){
                     $scope.cfg.show = true;
                     $scope.cfg.fn = $scope.nextFn;
                 }

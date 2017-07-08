@@ -169,6 +169,7 @@ class CritController extends BaseController
         }
         $line->linea = $rq->name;
         $line->siglas = $rq->letter;
+        $line->co_lin = $rq->letter;
         $line->user_id = $usr['id'];
 
         $line->save();

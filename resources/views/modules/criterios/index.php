@@ -158,7 +158,8 @@
 
                                                autocomplete="off"
                                                duplicate="listLines"
-                                               duplicate-msg="esta linea ya existe"
+                                               erro-listener
+                                               duplicate-msg="{t:'error',m:'esta linea ya existe'}"
                                                field="linea"
                                                name="razon_social"
                                                maxlength="80"
@@ -174,7 +175,8 @@
                                         <input skip-tab
                                                info="Siglas para esta linea"
                                                duplicate="listLines"
-                                               duplicate-msg="estas siglas ya existen"
+                                               erro-listener
+                                               duplicate-msg="{t:'error',m:'estas siglas ya existen'}"
                                                field="siglas"
                                                autocomplete="off"
                                                name="linea"
@@ -798,7 +800,13 @@
                                                 <input skip-tab
                                                        ng-model="opcValue.min.valor"
                                                        class="Frm-value"
-
+                                                       number
+                                                       type="number"
+                                                       min="{{opcValue.minI.valor}}"
+                                                       max="{{opcValue.max.valor}}"
+                                                       erro-listener
+                                                       min-msg="{t:'error',m:'el valor asignado debe ser mayor al minimo Imposible'}"
+                                                       max-msg="{t:'error',m:'el valor asignado debe ser menor al Maximo'}"
                                                 >
                                             </md-input-container>
                                             <md-input-container class="md-block" flex ng-show="opcValue.min.valor != ''">
@@ -820,7 +828,13 @@
                                                 <input skip-tab
                                                        ng-model="opcValue.max.valor"
                                                        class="Frm-value"
-
+                                                       number
+                                                       type="number"
+                                                       min="{{opcValue.min.valor}}"
+                                                       max="{{opcValue.maxI.valor}}"
+                                                       erro-listener
+                                                       min-msg="{t:'error',m:'el valor asignado debe ser mayor al minimo'}"
+                                                       max-msg="{t:'error',m:'el valor asignado debe ser menor al Maximo Imposible'}"
                                                 >
                                             </md-input-container>
                                             <md-input-container class="md-block" flex ng-show="opcValue.max.valor != ''">
@@ -841,7 +855,11 @@
                                                 <input skip-tab
                                                        ng-model="opcValue.minI.valor"
                                                        class="Frm-value"
-
+                                                       number
+                                                       type="number"
+                                                       max="{{opcValue.min.valor}}"
+                                                       erro-listener
+                                                       max-msg="{t:'error',m:'el valor asignado debe ser menor al Minimo'}"
                                                 >
                                             </md-input-container>
                                             <md-input-container class="md-block" flex ng-show="opcValue.minI.valor != ''">
@@ -862,7 +880,11 @@
                                                 <input skip-tab
                                                        ng-model="opcValue.maxI.valor"
                                                        class="Frm-value"
-
+                                                       number
+                                                       type="number"
+                                                       min="{{opcValue.max.valor}}"
+                                                       erro-listener
+                                                       min-msg="{t:'error',m:'el valor asignado debe ser Mayor al Maximo'}"
                                                 >
                                             </md-input-container>
                                             <md-input-container class="md-block" flex ng-show="opcValue.maxI.valor != ''">
@@ -913,7 +935,7 @@
 
 
                                         <md-content flex>
-                                            <div ng-repeat="opt in opcValue.opts.valor track by $index" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
+                                            <div ng-repeat="opt in opcValue.opts.valor track by $index" ng-click="removeOpt($index)" class="row" layout="column" layout-align="center center" style="border-bottom: 1px solid #ccc">
                                                 {{getoptSet(opt).nombre}}
                                             </div>
                                         </md-content>

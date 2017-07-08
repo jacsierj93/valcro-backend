@@ -40,6 +40,18 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         id:false,
         parent:false,
         prod:false,
+        comment:"",
+        cant:""
+    };
+    var relaDetail = {
+        linea:"",
+        sublinea:"",
+        codigo:"",
+        descripcion:"",
+        serial:"",
+        id:false,
+        parent:false,
+        prod:false,
         comment:""
     };
     var prodToSave = {
@@ -75,16 +87,15 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             return prov;
         },
         setProd:function(item){
-            console.log("entrooo")
             prod.id = item.id || false;
             prod.datos = item || [];
             bckup = angular.copy(prod.datos);
             prodToSave.id = item.id || false;
             //prodToSave.prov = item.prov_id || false;
             prodToSave.line = item.linea_id || false;
-            prodToSave.serie = item.serie || false;
-            prodToSave.cod = item.codigo || false;
-            prodToSave.desc = item.descripcion || false;
+            prodToSave.serie = item.serie || "";
+            prodToSave.cod = item.codigo || "";
+            prodToSave.desc = item.descripcion || "";
             extraList.common.data = prod.datos.commons || [];
             extraList.rela.data = prod.datos.relationed || [];
         },
@@ -116,6 +127,9 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         },
         getCommon : function(){
             return commonDetail;
+        },
+        getRela : function(){
+            return relaDetail;
         },
 
         getCriteria:function(){
@@ -478,14 +492,27 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         })
     }
 
-    $scope.delete = function(idx,dato){
-        setNotif.addNotif("error","va desvincular este producto del compuesto, esta seguro?",[
+    $scope.delete = function(idx,dato,tipo){
+    console.log(dato)
+        if(tipo == "rel"){
+            txt = "Relacionado";
+            url = "prodDelRela"
+        }else if(tipo == "comp"){
+            txt = "Compuesto";
+            url = "prodDelCommon"
+        }
+        setNotif.addNotif("error","va desvincular este producto del <span style='font-weight: bold'>"+txt+"</span>, esta seguro?",[
             {
                 name:"Si, si lo estoy",
                 action:function(){
-                    productos.put({type:"prodDelCommon"},dato,function (data) {
+                    productos.put({type:url},dato,function (data) {
                         setNotif.addNotif("ok","producto eliminado",[],{autohidden:3000});
-                        $scope.list.common.data.splice(idx,1);
+                        if(tipo == "rel"){
+                            $scope.list.rela.data.splice(idx,1);
+                        }else if(tipo == "comp"){
+                            $scope.list.common.data.splice(idx,1);
+                        }
+
                     })
                 },
                 default:defaultTime
@@ -515,6 +542,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         console.log("AFTER");
     }
 }]);
+
 MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$timeout','masterSrv',"$filter","$q",function ($scope, setNotif,productos,$mdSidenav,productsServices,$timeout,masterSrv,$filter,$q) {
     $scope.prod = productsServices.getToSavedProd();
     $scope.lines = masterSrv.getLines();
@@ -525,6 +553,7 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         desc:"",
         prod:false
     };
+    var lineSel = null;
     $scope.prodDetail = productsServices.getCommon();
 
     $scope.$watch("prod.id",function(n,o){
@@ -544,7 +573,6 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         $scope.prodDetail.prod = false;
         $scope.filtCm.line=null;
         $scope.filtCm.sublin='';
-        $scope.filtCm.prod='';
         $scope.filtCm.desc="";
         $scope.filterLs.splice(0,$scope.filterLs.length);
         $scope.prodDetail.codigo = "";
@@ -553,6 +581,7 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         $scope.prodDetail.serie = "";
         $scope.prodDetail.cant = "";
         $scope.prodDetail.comment = "";
+        lineSel = null;
 
     }
 
@@ -589,6 +618,8 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
         $scope.prodDetail.serie = dat.serie;
         $scope.prodDetail.comment = dat.comentario;
         $scope.prodDetail.prod = dat.id;
+        $scope.prodDetail.cant = ($scope.prodDetail.cant=="")?1:$scope.prodDetail.cant;
+        lineSel = dat.line;
     };
 
     var saveCommon = function(){
@@ -602,11 +633,14 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                     pivot:{
                         id:data.id,
                         common_id:$scope.prodDetail.prod,
+                        cantidad:$scope.prodDetail.cant,
+                        comentario:$scope.prodDetail.comment,
                         parent_prod:$scope.prodDetail.parent
                     },
                     codigo:$scope.prodDetail.codigo,
                     descripcion:$scope.prodDetail.descripcion,
-                    linea:{linea:$scope.prodDetail.codigo}
+                    line:lineSel,
+                    linea_id:lineSel.id
                 })
                 def.resolve("ok");
             }else if(data.action == "upd"){
@@ -643,9 +677,41 @@ MyApp.controller('addCompController',['$scope', 'setNotif','productos','$mdSiden
                 }
             ]);
             return ret;
-        }else if($scope.prodDetail.prod){
-            saveCommon().then(clear);
-            return true;
+        }
+        else if($scope.prodDetail.prod){
+
+            if(!$scope.prodDetail.comment || $scope.prodDetail.comment ==""){
+                var ret = {wait : null};
+                setNotif.addNotif("alert","no ha dicho un comentario para este compuesto, desea guardar sin comentario ",[
+                    {
+                        name:"Si, guardarlo",
+                        action:function(){
+                            ret.wait=true;
+                            saveCommon().then(clear);
+                        }
+                    },
+                    {
+                        name:"No, cerrar y descartar",
+                        action:function(){
+                            clear();
+                            ret.wait=true;
+                        }
+                    },
+                    {
+                        name:"CANCELAR",
+                        action:function(){
+
+                            ret.wait=false;
+                        },
+                        default:defaultTime
+                    }
+                ]);
+                return ret;
+            }else{
+                saveCommon().then(clear);
+                return true;
+            }
+
         }else{
             clear();
             return true;
@@ -659,7 +725,7 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
     $scope.prod = productsServices.getToSavedProd();
     $scope.lines = masterSrv.getLines();
     $scope.list = productsServices.getLists();
-    $scope.provs = productsServices.getProvs(),
+    $scope.provs = productsServices.getProvs();
 
     $scope.filtRl = {
         line:false,
@@ -668,8 +734,8 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
         desc:"",
         prod:false
     };
-    $scope.prodDetail = productsServices.getCommon();
-
+    $scope.prodDetail = productsServices.getRela();
+    var lineSel=null;
     $scope.$watch("prod.id",function(n,o){
         $scope.filtRl.prod = n;
         $scope.prodDetail.parent = n;
@@ -680,9 +746,9 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
 
         $scope.prodDetail.prod = false;
         $scope.filtRl.line=false;
+        lineSel=null;
         $scope.filtRl.sublin=false;
         $scope.filtRl.prov=false;
-        $scope.filtRl.prod=false;
         $scope.filtRl.desc="";
         $scope.filterLs.splice(0,$scope.filterLs.length);
         $scope.prodDetail.codigo = "";
@@ -726,6 +792,7 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
         $scope.prodDetail.linea = dat.line.linea;
         $scope.prodDetail.serie = dat.serie;
         $scope.prodDetail.prod = dat.id;
+        lineSel=dat.line;
     };
 
     var saveRela = function(){
@@ -739,11 +806,13 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
                     pivot:{
                         id:data.id,
                         common_id:$scope.prodDetail.prod,
-                        parent_prod:$scope.prodDetail.parent
+                        parent_prod:$scope.prodDetail.parent,
+                        comentario:$scope.prodDetail.comment
                     },
                     codigo:$scope.prodDetail.codigo,
                     descripcion:$scope.prodDetail.descripcion,
-                    linea:{linea:$scope.prodDetail.codigo}
+                    line:lineSel,
+                    linea_id:lineSel.id
                 })
                 def.resolve("ok");
             }else if(data.action == "upd"){
@@ -759,7 +828,7 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
 
 
     $scope.onClose = function(){
-        if(($scope.filtRl.line || $scope.filtRl.sublin || $scope.filtRl.desc != "" ) && !$scope.prodDetail.prod){
+        if(($scope.filtRl.line || $scope.filtRl.sublin || $scope.filtRl.desc != "" || $scope.filtRl.prov ) && !$scope.prodDetail.prod){
             var ret = {wait : null};
 
             setNotif.addNotif("alert","ha realizado una busqueda, pero no selecciono nada, esta seguro?",[
@@ -780,8 +849,38 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
             ]);
             return ret;
         }else if($scope.prodDetail.prod){
-            saveRela().then(clear);
-            return true;
+            if(!$scope.prodDetail.comment || $scope.prodDetail.comment ==""){
+                var ret = {wait : null};
+                setNotif.addNotif("alert","no ha dicho un comentario para este Relacionado, desea guardar sin comentario ",[
+                    {
+                        name:"Si, guardarlo",
+                        action:function(){
+                            ret.wait=true;
+                            saveRela().then(clear);
+                        }
+                    },
+                    {
+                        name:"No, cerrar y descartar",
+                        action:function(){
+                            clear();
+                            ret.wait=true;
+                        }
+                    },
+                    {
+                        name:"CANCELAR",
+                        action:function(){
+
+                            ret.wait=false;
+                        },
+                        default:defaultTime
+                    }
+                ]);
+                return ret;
+            }else{
+                saveRela().then(clear);
+                return true;
+            }
+
         }else{
             clear();
             return true;

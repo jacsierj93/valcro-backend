@@ -179,7 +179,9 @@ class ProductController  extends BaseController
         }
         $comm->parent_prod = $req->parent;
         $comm->comp_prod = $req->prod;
-        $comm->comentario = $req->comment;
+        if($req->has("comment")){
+            $comm->comentario = $req->comment;
+        }
         $comm->cantidad = $req->cant;
 
         if($comm->isDirty()){
@@ -187,6 +189,7 @@ class ProductController  extends BaseController
         }else{
             $result['action']="equal";
         }
+        $result['id']=$comm->id;
         return $result;
     }
     public function saveRela(Request $req){
@@ -199,7 +202,9 @@ class ProductController  extends BaseController
         }
         $comm->id_prod = $req->parent;
         $comm->id_prod_rel = $req->prod;
-        $comm->comentario = $req->comment;
+        if($req->comment){
+            $comm->comentario = $req->comment;
+        }
 
 
         if($comm->isDirty()){
@@ -207,6 +212,7 @@ class ProductController  extends BaseController
         }else{
             $result['action']="equal";
         }
+        $result['id']=$comm->id;
         return $result;
     }
     public function savePoint(Request $req){
@@ -258,6 +264,18 @@ class ProductController  extends BaseController
         $result = array("success" => "Registro guardado con éxito", "action" => "upd","id"=>"");
         if($req->pivot['id']){
             $comm =  ProductComponent::findOrFail($req->pivot['id']);
+            if(!$comm->delete()){
+                $result['action']="err";
+            }
+        }else{
+            $result['action']="equal";
+        }
+
+    }
+    public function delRela(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "upd","id"=>"");
+        if($req->pivot['id']){
+            $comm =  ProductRelationed::findOrFail($req->pivot['id']);
             if(!$comm->delete()){
                 $result['action']="err";
             }

@@ -967,7 +967,7 @@
                                     <div layout="column" flex=""   >
                                         <div   ng-repeat="item in list.common.data | filter : list.common.filter:strict | orderBy : list.common.order as filter">
                                             <div layout="row" class="cellGridHolder" ng-dblclick="editCommon(item)" >
-                                                <div ng-click="delete($index,item)"><span class="icon-Eliminar" style="font-size: 23px"></span></div>
+                                                <div ng-click="delete($index,item,'comp')"><span class="icon-Eliminar" style="font-size: 23px"></span></div>
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
                                                 <div flex class="cellGrid" >{{item.descripcion}}</div>
                                                 <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
@@ -978,7 +978,7 @@
                                                 <div flex class="cellGrid" >{{item.getType.descripcion}}</div>
                                             </div>
                                         </div>
-                                        <div layout="column" layout-align="center center" flex ng-show="filter == 0">
+                                        <div layout="column" layout-align="center center" flex ng-show="list.common.filter == 0">
                                             No hay datos para mostrar
                                         </div>
                                     </div>
@@ -1105,8 +1105,8 @@
                                     <div active-left></div>
                                     <div layout="column" flex=""   >
                                         <div   ng-repeat="item in list.rela.data | filter : list.rela.filter:strict | orderBy : list.rela.order as filter">
-                                            <div layout="row" class="cellGridHolder" ng-click="openProd(item)" >
-
+                                            <div layout="row" class="cellGridHolder" ng-click="editRela(item)" >
+                                                <div ng-click="delete($index,item,'rel')"><span class="icon-Eliminar" style="font-size: 23px"></span></div>
                                                 <div flex class="cellGrid" >{{item.codigo}}</div>
                                                 <div flex class="cellGrid" >{{item.descripcion}}</div>
                                                 <div flex class="cellGrid" > {{item.prov.razon_social}}</div>
@@ -1117,7 +1117,7 @@
                                                 <div flex class="cellGrid" >{{item.getType.descripcion}}</div>
                                             </div>
                                         </div>
-                                        <div layout="column" layout-align="center center" flex ng-show="filter == 0">
+                                        <div layout="column" layout-align="center center" flex ng-show="list.rela.filter == 0">
                                             No hay datos para mostrar
                                         </div>
                                     </div>
@@ -1222,6 +1222,9 @@
                                 </div>
 
                             </md-content>
+                            <div ng-if="!searching && filterLs.length==0"  flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                NO HAY PRODUCTOS QUE COINCIDAN CON EL CRITERIO DE BUSQUEDA
+                            </div>
 
                         </div>
                         <div flex style="padding-top: 40px">
@@ -1406,7 +1409,9 @@
                                 </div>
 
                             </md-content>
-
+                            <div ng-if="!searching && filterLs.length==0"  flex layout="column" layout-align="center center" style="color:#ccc; font-size:24px">
+                                NO HAY PRODUCTOS QUE COINCIDAN CON EL CRITERIO DE BUSQUEDA
+                            </div>
                         </div>
                         <div flex style="padding-top: 40px">
                             <div class="row" layout="row">

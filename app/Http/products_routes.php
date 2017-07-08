@@ -16,4 +16,5 @@ $app->post("productos/saveMisc",'Products\ProductController@saveMisc');
 $app->post("productos/prodSaveCommon",'Products\ProductController@saveCommon');
 $app->post("productos/prodDelCommon",'Products\ProductController@delCommon');
 $app->post("productos/prodSaveRela",'Products\ProductController@saveRela');
+$app->post("productos/prodDelRela",'Products\ProductController@delRela');
 $app->post("productos/getFiltersProd",'Products\ProductController@filterProd');
