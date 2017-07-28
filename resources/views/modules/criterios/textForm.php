@@ -96,7 +96,7 @@
                 lmb-label="field.options.placeholder[0].pivot.value || field.field.descripcion"
                 lmb-key="elem.id"
                 id="{{field.id}}"
-                ng-attr-multiple="field.options.multi[0].pivot.value==1"
+                ng-attr-multiple="{{field.options.multi[0].pivot.value==1}}"
                 lmb-filter="filterSearch: formFilters[field.id] : 'elem.id' "
                 ng-if="(field.type.directive == 'prevRadio')"
                >

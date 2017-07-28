@@ -63,6 +63,8 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         desc:"",
         prodCrit:[]
     };
+
+    var frmProd = null;
     
     
     return{
@@ -87,17 +89,23 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
             return prov;
         },
         setProd:function(item){
-            prod.id = item.id || false;
             prod.datos = item || [];
+            if(!item){
+                item={};
+            }
+            prod.id = item.id || false;
             bckup = angular.copy(prod.datos);
             prodToSave.id = item.id || false;
-            //prodToSave.prov = item.prov_id || false;
-            prodToSave.line = item.linea_id || false;
+            prodToSave.line = item.linea_id || null;
             prodToSave.serie = item.serie || "";
             prodToSave.cod = item.codigo || "";
             prodToSave.desc = item.descripcion || "";
             extraList.common.data = prod.datos.commons || [];
             extraList.rela.data = prod.datos.relationed || [];
+            if(!(frmProd==null)){
+                frmProd.$setPristine();
+                frmProd.$setUntouched();
+            }
         },
         syncProd : function(edit){
             prod.id = edit.id || null;
@@ -115,10 +123,13 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
         },
         getProd : function(){
             return prod
-        },/*
-        getDataCrit : function(){
-            return prod.datos.prod_crit;
-        },*/
+        },
+        formProduct : function(){
+            return frmProd;
+        },
+        setformProduct : function(frm){
+            frmProd = frm;
+        },
         getToSavedProd:function(){
             return prodToSave;
         },
@@ -139,7 +150,7 @@ MyApp.service("productsServices",function(masters,masterSrv,criterios,productos,
     }
 });
 
-MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices',function ($scope, setNotif,productos,$mdSidenav,productsServices) {
+MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','$q',function ($scope, setNotif,productos,$mdSidenav,productsServices,$q) {
     $scope.nxtAction = null;
     $scope.$watchGroup(['module.layer','module.index'],function(nvo,old) {
         $scope.index = nvo[1];
@@ -147,32 +158,84 @@ MyApp.controller('mainProdController',['$scope', 'setNotif','productos','$mdSide
         $scope.layer = nvo[0];
     });
 
-    $scope.openForm = function(id){
-        $scope.LayersAction({open:{name:"prodLayer3"},before:function(){
-            productsServices.setProd(id);
-        }});
-    };
 
-    $scope.prevLayer = function(){
-        if($scope.index==1 && productsServices.showChange()){
-            setNotif.addNotif("alert","ha realizado cambios en el producto, desea salir",[
+
+    $scope.openForm = function(id){
+        var statFrm = productsServices.formProduct();
+
+        if(statFrm.$dirty && !id){
+            setNotif.addNotif("alert","¿desea comenzar un nuevo producto?, perdera lo no guardado",[
                 {
-                    name:"Si",
+                    name:"Si, descartar",
                     action:function(){
-                        $scope.LayersAction({close:true,before:function(){
-                            productsServices.setProvprod(false);
-                        }});
-                    },
-                    default:defaultTime
-                },
-                {
-                    name:"No",
-                    action:function(){
+                        productsServices.setProd(id);
+                        if(!id){
+                            //productsServices.setProd(id);
+                            $scope.LayersAction({close:"prodLayer2",after:function(){
+                                $scope.LayersAction({open:{name:"prodLayer3"}});
+                            }});
+                        }
+
 
                     }
+                },
+                {
+                    name:"CANCELAR",
+                    action:null,
+                    default:defaultTime
                 }
             ]);
         }else{
+            if(!id){
+                productsServices.setProd(id);
+                $scope.LayersAction({close:"prodLayer1",after:function(){
+                    $scope.LayersAction({open:{name:"prodLayer3"}});
+                }});
+            }
+
+            $scope.LayersAction({open:{name:"prodLayer3"}});
+        }
+
+
+    };
+
+     var onbackcall = {
+         prodLayer1:function(){
+             var def = $q.defer();
+             productsServices.setProvprod(false);
+             def.resolve();
+             return def.promise;
+         },
+         prodLayer2:function(){
+             //console.log(productsServices.showChange());
+             var def = $q.defer();
+             setNotif.addNotif("alert","¿desea volver al listado por proveedor?, perdera los datos no guardados",[
+                 {
+                     name:"Si, descartar",
+                     action:function(){
+                         productsServices.setProd(false);
+                         def.resolve();
+                     }
+                 },
+                 {
+                     name:"CANCELAR",
+                     action:function(){
+                         def.reject();
+
+                     },
+                     default:defaultTime
+                 }
+             ]);
+             return def.promise;
+         }
+     }
+
+    $scope.prevLayer = function(){
+       if($scope.layer in onbackcall){
+           onbackcall[$scope.layer]().then(function(){
+               $scope.LayersAction({close:true});
+           })
+       } else{
             $scope.LayersAction({close:true});
         }
 
@@ -211,8 +274,8 @@ MyApp.controller('listProdController',['$scope', 'setNotif','productos','product
 
     
     $scope.getByProv = function(prov,e){
-
-        if(productsServices.showChange() && $scope.prov.id){
+        var statFrm = productsServices.formProduct();
+        if((productsServices.showChange() && $scope.prov.id) || statFrm.$dirty){
             setNotif.addNotif("alert","ha realizado cambios en el producto, desea cambiarse",[
                 {
                     name:"Si",
@@ -286,7 +349,6 @@ MyApp.controller('gridAllController',['$scope', 'setNotif','productos','products
 
 }]);
 
-
 MyApp.controller('prodSumary',['$scope', 'setNotif','productos','productsServices','$timeout',function ($scope, setNotif,productos,productsServices,$timeout) {
     $scope.prod = productsServices.getProd();
 
@@ -309,7 +371,6 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
     $scope.prod = productsServices.getToSavedProd();
     $scope.prodCrit = [];
     $scope.criteria = [];
-    //$scope.dataCrit = [];
     $scope.criterioShared = productsServices.getCriteria();
     $scope.$watch("prod.prov",function(n,o){
         $timeout(function(){
@@ -329,6 +390,12 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
 
 
     $scope.$watchCollection("prod",function(n,o){
+        if(!n.line){
+            $scope.criteria = [];
+            $scope.criterioShared.line = false;
+            $scope.criterioShared.criteria = [];
+        }
+
         if(n.line && (n.line!=o.line)){
 
                 productos.query({ type:"getCriterio",id:n.line,sec:n.id},function(data){
@@ -340,15 +407,25 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
                     },0);
                 });
 
-
         }
+
+
 
 
 
     });
 
-    $scope.saveProd = function(){
+    $scope.setFrm = function(){
+        setTimeout(function(){
+           // console.log("seteo de formulario",$scope.prodMainFrm)
+            productsServices.setformProduct($scope.prodMainFrm);
+            //console.log(form)
+        },1000)
 
+    }
+
+    $scope.saveProd = function(){
+        //console.log($scope.form)
         if($scope.prodMainFrm.$invalid || $scope.prodMainFrm.$invalid){
             return false;
         }
@@ -368,15 +445,15 @@ MyApp.controller('createProd',['$scope','$timeout', 'setNotif','productos','prod
         $scope.$parent.LayersAction({open:{name:"prodLayer4"}});
     };
 
+
     $scope.isValid = function(){
+
         if($scope.prodMainFrm.$invalid ||  $scope.prodCritFrm.$invalid){
             return false;
         }
         return true;
     }
 }]);
-
-
 
 MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSidenav','productsServices','popUpService','App','generic',function ($scope, setNotif,productos,$mdSidenav,productsServices,popUpService,App,generic) {
     $scope.prod = {
@@ -434,7 +511,8 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         }
     });
 
-    $scope.saveExtraData = function(frm){
+    $scope.saveExtraData = function(frm,evn){
+        //console.log(frm,evn)
         if(App.getSeccion().key!=="productos"){
             return false;
         }
@@ -493,7 +571,6 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
     }
 
     $scope.delete = function(idx,dato,tipo){
-    console.log(dato)
         if(tipo == "rel"){
             txt = "Relacionado";
             url = "prodDelRela"
@@ -526,7 +603,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
     
     $scope.bef=function(){
 
-        /*var prod = productsServices.getCommon();
+        var prod = productsServices.getCommon();
         prod.linea = "";
         prod.codigo = "";
         prod.descripcion = "";
@@ -534,7 +611,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         prod.id = false;
         prod.prod = false
         prod.comment = "";
-        prod.cant = "";*/
+        prod.cant = "";
         return true;
 
     };
@@ -889,40 +966,52 @@ MyApp.controller('addRelaController',['$scope', 'setNotif','productos','$mdSiden
 
 }]);
 
-MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout', function ($scope, setNotif,productos,productsServices,$timeout) {
+MyApp.controller('prodResumen',['$scope', 'setNotif','productos','productsServices','$timeout','$filter', function ($scope, setNotif,productos,productsServices,$timeout,$filter) {
     $scope.prod = productsServices.getProd();
-
+    $scope.critData = productsServices.getToSavedProd();
     $scope.crit = productsServices.getCriteria();
 
-	$scope.prodCrir = 
-	[{
-		"campo" : "Serie",
-		"valor" : "Algo"
-	},{
-		"campo" : "Codigo",
-		"valor" : "Algo"
-	},{
-		"campo" : "Ancho",
-		"valor" : "111"
-	},{
-		"campo" : "Profundidad",
-		"valor" : "111"
-	},{
-		"campo" : "Unidas",
-		"valor" : "Pieza"
-	},{
-		"campo" : "Caracteristicas",
-		"valor" : "Mesedora"
-	},{
-		"campo" : "Voltaje",
-		"valor" : "220V"
-	},{
-		"campo" : "Acabdo",
-		"valor" : "Pulido"
-	},{
-		"campo" : "Acabado Base",
-		"valor" : "Cromo"
-	}];
+    $scope.$watchCollection("crit",function(){
+        console.log($scope.crit)
+    })
+
+    $scope.findOpt = function(data,opt){
+        if(opt && opt.length>0){
+            if(data.type.descripcion=='selector' || data.type.descripcion=='opciones'){
+                //console.log(opt)
+                if(opt.indexOf(data.id)){
+
+                    var opc = opt[data.id].value;
+                    if(typeof(opc)!="object"){
+                        opc = [opc];
+                    }
+                }
+                var rs = [];
+
+                angular.forEach($filter("filterSearch")(data.options.Opcion,opc,'elem.id'),function(v,k){
+                    rs.push(v.elem.nombre)
+                })
+                return rs.join(", ")
+            }else{
+
+                return opt[data.id].value
+
+            }
+
+        }
+
+        /*
+
+        //opc = (typeof($scope.critData.prodCrit[data.id].value)=="array")?$scope.critData.prodCrit[data.id].value:[$scope.critData.prodCrit[data.id].value];
+
+        if(data.type.descripcion=='selector' || data.type.descripcion=='opciones'){
+
+        } else{
+           return opc
+        }*/
+
+    }
+
 
 }]);
 

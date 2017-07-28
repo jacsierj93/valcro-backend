@@ -20,11 +20,11 @@ class FilesController extends BaseController
 	}
 
 	public function  uploadFile( Request $req){
-
+       // dd($req->file("file"));
 
 		$fil= array();
 		$archivo = new Files($req->folder);
-		$archivo->upload("file"); ///probando
+		$archivo->upload($req->file("file")); ///probando
 		$resul['accion']= "upLoad";
 
 		$fl = FileModel::findOrFail($archivo->getCurrentFileId());

@@ -215,6 +215,26 @@ class ProductController  extends BaseController
         $result['id']=$comm->id;
         return $result;
     }
+    public function saveUnits(Request $req){
+        $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
+        if($req->id){
+            $prod =  Product::findOrFail($req->id);
+            $result['action']="upd";
+        }
+
+        $prod->point_buy = $req->pntBuy;
+        $prod->pbuy_unit = $req->pntBuyU;
+        $prod->point_credit = $req->pntSald;
+        $prod->pcred_unit = $req->pntSaldU;
+        if($prod->isDirty()){
+            $prod->save();
+        }else{
+            $result['action']="equal";
+        }
+        $result['id']=$prod->id;
+
+        return $result;
+    }
     public function savePoint(Request $req){
         $result = array("success" => "Registro guardado con éxito", "action" => "new","id"=>"");
         if($req->id){

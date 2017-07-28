@@ -696,11 +696,12 @@
                                                          model="elem.campo_id"
                                                          skip-tab
                                                          md-search-text="ctrl.searchDesc"
-                                                         md-items="item in fields | stringKey : ctrl.searchDesc : 'descripcion' | customFind : criteria : used"
+                                                         md-items="item in fields | stringKey : ctrl.searchDesc : 'descripcion' | customFind : line.listado : used"
                                                          md-item-text="item.descripcion"
                                                          required
                                                          require-match="true"
                                                          md-no-asterisk
+                                                         md-no-cache
                                                          md-min-length="0">
                                             <input >
                                             <md-item-template>
@@ -768,7 +769,7 @@
                                             </md-input-container>
                                             <md-input-container class="md-block" flex>
                                                 <md-switch ng-model="opcValue.multi.valor"
-                                                           ng-if="critField.type == 1"
+
                                                            ng-true-value="1"
                                                            ng-false-value="0"
 

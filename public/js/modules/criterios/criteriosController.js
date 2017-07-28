@@ -235,7 +235,7 @@ MyApp.controller('listController',['$scope', 'setNotif','mastersCrit','$mdSidena
 
             $scope.$parent.LayersAction({open:{name:"critLayer1"}});
         }else{
-            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo, los cambios se guardaron automaticamente",[{
+            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo,perdera los cambios no guardados",[{
                 name:"deacuerdo",
                 action:function () {
                     critForm.setLine(line,true)
@@ -353,7 +353,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
         if(critForm.setLine(false)){
             $scope.LayersAction({open:{name:"critlayer0"}});
         }else{
-            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiar, los cambios se guardaron automaticamente",[{
+            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiar,perdera los cambios no guardados",[{
                 name:"deacuerdo",
                 action:function () {
                     critForm.setLine(false,true)
@@ -380,7 +380,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
             $scope.LayersAction({close:true});
         }else{
-            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo, los cambios se guardaron automaticamente",[{
+            setNotif.addNotif("alert","esta editando un criterio actualmente desea cambiarlo,perdera los cambios no guardados",[{
                 name:"deacuerdo",
                 action:function () {
                     critForm.setLine(false,true)
@@ -403,19 +403,28 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.fields = mastersCrit.getFields();
     $scope.tipos = mastersCrit.getTypes();
     $scope.critField = critForm.getEdit();
-    $scope.$watchCollection("line.listado",function(n,o){
+/*    $scope.$watchCollection("line.listado",function(n,o){
+        console.log
         closeConst()
         $scope.criteria = n
-         /*console.log(n,n.id, o.id)
-        if(n.id != o.id){
 
-            chngLine(n,o);
+    });*/
 
-        }*/
+    $scope.$watchCollection("line.id",function(n,o){
+        closeConst()
+
+        //$scope.criteria = $scope.line.listado;
+        /*console.log(n,n.id, o.id)
+         if(n.id != o.id){
+
+         chngLine(n,o);
+
+         }*/
     });
     $scope.newField = {type:false}
     $scope.elem = {};
     $scope.$watch("newField.type",function(n,o){
+
         if(n){
             //$scope.critField.type = n
 
@@ -456,7 +465,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
                     $scope.opcValue[key].id = false;
                     $scope.opcValue[key].msg = ''
                 }
-                console.log(i,Object.keys(data.opciones).length)
+                //console.log(i,Object.keys(data.opciones).length)
                 if(i==Object.keys(data.opciones).length){
                     wait.resolve(data.id);
                 }
@@ -503,7 +512,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     $scope.saveCrit = function(){
         //console.log($scope.fieldForm.$pristine , angular.equals(backCrit.crit,$scope.elem), angular.equals(backCrit.opc,$scope.opcValue))
         if($scope.fieldForm.$pristine || (angular.equals(backCrit.crit,$scope.elem) && angular.equals(backCrit.opc,$scope.opcValue))){
-          //  console.log("TRUEEE!!!")
+            closeConst();
             return true;
         }
         //console.log("entoroooooo")
@@ -541,7 +550,9 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     function closeConst(){
         popUpService.popUpClose({
             'nuevoConst':{
-                before:null,
+                before:function(){
+                    return true;
+                },
                 after:function() {
                     if(!$scope.elem.id){
                         critForm.rm($scope.elem.id);
@@ -770,7 +781,7 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
 
                 $scope.elem = n.curCrit;
                 val = $scope.elem.id;
-                $scope.selCrit = $filter("filterSearch")($scope.criteria ,[val])[0] || [];
+                $scope.selCrit = $filter("filterSearch")($scope.line.listado ,[val])[0] || [];
                 $scope.opcValue.coder.field_id= val;
                 $scope.opcValue.coder.id= ("codificador" in $scope.critField.opcs)?$scope.critField.opcs.codificador[0].pivot.id : false;
                 $scope.opcValue.coder.valor= ("codificador" in $scope.critField.opcs)?parseInt($scope.critField.opcs.codificador[0].pivot.value): 0;
@@ -965,9 +976,13 @@ MyApp.controller('CritMainController',['$scope', 'setNotif','mastersCrit','$mdSi
     };
 
     $scope.used=function(c,v){
-        return $filter("customFind")(v,c,function(c,v){
+        //console.log($scope.line.listado,c,v)
+        x = $filter("customFind")(v,c,function(c,v){
                 return c.campo_id == v.id;
             }).length == 0
+        //console.log(x);
+        return x;
+
     }
 
     $scope.isUsed = function(){
@@ -1025,7 +1040,6 @@ MyApp.controller('formPreview',['$scope', 'setNotif','masters','critForm','$mdSi
         $scope.criteria = n
     });
     $scope.setEdit = function(campo){
-        console.log(campo)
         popUpService.popUpOpen({
             'nuevoConst':{
                 before:function(){

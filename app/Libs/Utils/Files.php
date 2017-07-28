@@ -58,15 +58,17 @@ class Files
 
             Log::info("Subiendo archivo al servidor");
 
-            $file = Request::file($fileName);
-
+            $file = $fileName;
+//dd($file->getMimeType());
             $mime = $file->getMimeType();
+
+
             $this->currentFileType = $mime;
             $type = (substr($mime, 0, 5) == "image") ? $this->imagePath : $this->docsPath;
             $extension = $file->getClientOriginalExtension();
 
             Log::info("archivo subido!! obteniendo datos del archivo");
-
+//dd("hasta aqui");
             ///////generando nombre de archivo
             $archivo = new FileModel();
             $archivo->modulo = $this->module;
@@ -74,6 +76,7 @@ class Files
             $archivo->mime = $mime;
             $dataUser = Session::get("DATAUSER");
             $archivo->user_id = $dataUser["id"]; // id del ususario
+            $archivo->archivo="TEMP".'-' . $dataUser["id"] . '-' . date("Y-m-d_h_i_s");
             $archivo->save();
             ////regla para el nombre
             $fileName = $archivo->id . '-' . str_random(13) . '-' . $dataUser["id"] . '-' . date("Y-m-d_h_i_s");
@@ -115,10 +118,10 @@ class Files
             $this->currentFileId = $archivo->id;
 
             $rest->setContent("ok");
-
+           // dd($this);
 
         } catch (\Exception $e) {
-
+            //dd("error");
             Log::error("Error guardando Archivo $fileName, Ref:" . $e);
             $rest->setError("fallo");
 

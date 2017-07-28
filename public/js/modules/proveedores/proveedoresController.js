@@ -1780,7 +1780,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if (angular.isObject(chip)) {
             return chip;
         }
-        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}$");
+        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}(\\.[A-Za-z]{1,2})?$");
 
         if(!reg.test(chip)){
             setNotif.addNotif("error", "el email no tiene un formato adecuado", [
@@ -1816,18 +1816,21 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             return chip;
         }
 
-        var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}[\\)\\-\\s]{1}[0-9\\-]{10}$");
+        var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}[\\)\\-\\s]{1}[0-9\\-]{9,10}$");
+        console.log(reg.test(chip))
         if(!reg.test(chip)){
             $timeout(function(){
                 if(angular.element(":focus").parents("#contTelf").length>0){
                     if(chip!="" && chip != $scope.ctrl.pais.area_code.phone){
                         setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
                         ],{autohidden:2000});
-
+                        angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
                     }else{
+                        console.log("espacio",angular.element("#contTelf").find("input"),$scope.ctrl.pais.area_code.phone)
+                        angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
                         setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
                         ],{autohidden:2000});
-                        angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
+
                     }
                 }
 
@@ -2982,7 +2985,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     $scope.$watch('prov.id',function(nvo){
         $scope.ttr = {id:false,from:"",to:"",line:"",country:"",id_prov: $scope.prov.id||0};
         $scope.assignAddres = setGetProv.getAddress();
-        ////console.log("provCountry",$scope.assignAddres)
+        console.log("provCountry",$scope.assignAddres)
         $scope.timesT =  setGetProv.getTransTime();
     });
     $scope.$watch('timesT.length',function(nvo){
@@ -3071,7 +3074,7 @@ MyApp.controller('transTimeController', function ($scope,providers,setGetProv,$f
     };
 
     $scope.showGrid = function(elem,event){
-        if(jQuery(event.target).parents("#lyrAlert").length==0){
+        if(!event || jQuery(event.target).parents("#lyrAlert").length==0){
             $scope.isShow = elem;
             if(!elem){
                 saveTimeTrans(function(){
@@ -3419,9 +3422,9 @@ MyApp.controller('payCondItemController', function ($scope,providers,setGetProv,
     }
 });
 
-MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,filesService,setNotif,saveForm ){
+MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,providers,fileSrv,setNotif,saveForm ){
     $scope.id="priceListController";
-    filesService.setFolder("prov");
+    $scope.files = fileSrv.bin();
     $scope.openAdj = function(e){
         if(e.keyCode==32 || e.type=="click"){
             filesService.open();
@@ -3435,9 +3438,10 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
         $scope.lists = setGetProv.getListPrice();
     });
 
-    $scope.fileProcces = filesService.getProcess();
+   // $scope.fileProcces = filesService.getProcess();
 
-    $scope.$watch('fileProcces.estado', function() {//console.log($scope.fileProcces);
+    /*$scope.$watch('fileProcces.estado', function() {//console.log($scope.fileProcces);
+        console.log("fileproccess",$scope.fileProcces)
         recents = [];
         if($scope.fileProcces.estado=="finished"){
             var aux = [];
@@ -3449,12 +3453,25 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
             $scope.lp.adjs = $scope.lp.adjs.concat(aux);
             $scope.provPrecList.$setDirty();
         }
-    });
+    });*/
+
+    $scope.$watchCollection("files",function(n,o){
+        if(n.estado=="finish"){
+           /* var aux = [];
+            recents = filesService.getRecentUpload();
+            recents.forEach(function(v,k){
+                aux.push(v.id);
+                list.files.push(v);
+            });*/
+            $scope.lp.adjs.push(o.data.id);
+            $scope.provPrecList.$setDirty();
+        }
+    })
 
 
-    $scope.$watch('$parent.enabled',function(nvo) {
+    /*$scope.$watch('$parent.enabled',function(nvo) {
         filesService.setAllowUpload(!nvo);
-    });
+    });*/
 
     var list = {files:[]};
     var currentOrig = {};

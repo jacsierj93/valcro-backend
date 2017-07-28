@@ -159,11 +159,12 @@ class ProvidersController extends BaseController
             //$pnt->linea = ($pnt->linea)?$pnt->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }
         $data->prodTime = $data->prodTime()->get();
+        //dd($data->prodTime);
         foreach ($data->prodTime as $time) {
             if($time->linea_id){
                 $time->lines;
             }else{
-                $pnt->lines = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
+                $time->lines = array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
             }
             //$time->lines = ($time->linea)?$time->linea:array("id"=>"0","linea"=>"TODAS","siglas"=>"todo");
         }

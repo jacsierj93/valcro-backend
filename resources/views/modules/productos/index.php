@@ -73,7 +73,7 @@
                     <span class="icon-Agregar" style="font-size: 23px"></span>
                     <?/*= HTML::image("images/agregar.png") */?>
                 </div>
-                <div layout="column" layout-align="center center" ng-click="openForm(prod.id)" ng-show="prod.id">
+                <div layout="column" layout-align="center center" ng-click="openForm(prod.id)" ng-show="prod.id && layer == 'prodLayer2'">
                     <span class="icon-Actualizar" style="font-size: 23px"></span>
                    <!-- --><?/*= HTML::image("images/actualizar.png") */?>
                 </div>
@@ -458,7 +458,7 @@
                         <div active-left ></div>
                         <div layout="column" flex>
                             <div style="height: 160px;">
-                                <form name="prodMainFrm" ng-class="{'focused':true}" >
+                                <form name="prodMainFrm" ng-init="setFrm()"ng-class="{'focused':true}" >
                                     <div class="titulo_formulario" layout="row" layout-align="start start"  class="row">
                                         <div>
                                             Producto
@@ -590,7 +590,7 @@
 
                     </div>
                 </md-content>
-                <show-next on-next="saveProd" valid="isValid"></show-next>
+                <show-next valid="isValid" on-next="saveProd" on-error="'porfavor complete los campos requeridos (amarillo)'"></show-next>
             </div>
         </md-sidenav>
         <!-- 16) ########################################## LAYER CON DATA EXTRA DEL PRODUCTO ########################################## -->
@@ -603,7 +603,62 @@
                         <div active-left ></div>
                         <div flex="33" layout="column">
                             <div flex>
-                                <form name="frmPoints" click-out="saveExtraData('frmPoints')">
+                                <form focused name="frmUnits" click-out="saveExtraData('frmUnits',$event)">
+                                    <div layout="row" flex class="form-row-head form-row-head-select">
+                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                            <div>
+                                                <span>Unidades Default</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" layout="row">
+
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad de Compra</label>
+                                            <md-autocomplete md-selected-item="ctrl.unitBuy"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad en la que se compra normalmente este producto"
+                                                             model="units.buy"
+                                                             skip-tab
+                                                             md-search-text="ctrl.srchbuy"
+                                                             md-items="item in units | stringKey : ctrl.srchbuy : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
+                                        </md-input-container>
+
+                                        <md-input-container class="md-block" flex>
+                                            <label>Unidad de Venta</label>
+                                            <md-autocomplete md-selected-item="ctrl.unitSell"
+                                                             flex
+                                                             id="prodStorage"
+                                                             info="unidad en la que se compra normalmente este producto"
+                                                             model="units.sell"
+                                                             skip-tab
+                                                             md-search-text="ctrl.srchsell"
+                                                             md-items="item in units | stringKey : ctrl.srchsell : 'descripcion'"
+                                                             md-item-text="item.descripcion"
+                                                             require-match="true"
+                                                             md-no-asterisk
+                                                             md-min-length="0">
+                                                <input >
+                                                <md-item-template>
+                                                    <span>{{item.descripcion}}</span>
+                                                </md-item-template>
+                                            </md-autocomplete>
+                                        </md-input-container>
+
+
+                                    </div>
+                                </form>
+                                <form focused name="frmPoints" click-out="saveExtraData('frmPoints',$event)">
                                     <div layout="row" flex class="form-row-head form-row-head-select">
                                         <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
                                             <div>
@@ -684,7 +739,7 @@
                                         </md-input-container>
                                     </div>
                                 </form>
-                                <form name="frmMisc" click-out="saveExtraData('frmMisc')">
+                                <form focused name="frmMisc" click-out="saveExtraData('frmMisc',$event)">
                                     <div class="row" layout="row">
                                         <div layout="row" flex class="form-row-head form-row-head-select">
                                             <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
@@ -1523,7 +1578,7 @@
                             <div layout="column" class="form-row-head form-row-head-select">
                                 <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
                                     <div>
-                                        <span>Resumen</span>
+                                        <span>Resumen Final =)</span>
                                     </div>
                                 </div>
                             </div>
@@ -1601,19 +1656,25 @@
                                 </div>
                             </div>
                             <div flex layout="column">
-                            	<!-- ----------------------- CAMPOS DEL CRITERIO ----------------------- -->
-                                <div style="height: 40px" layout="row" ng-repeat="data in prodCrir">
-                                    <div flex layout="column" layout-align="start start">
-                                        <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
-                                            <div layout="column" layout-align="start start" style="padding-top:0px">
-                                                <span>{{data.campo}}</span>
+                                <md-content flex layout="column">
+                                    <!-- ----------------------- CAMPOS DEL CRITERIO ----------------------- -->
+                                    <div class="row-adapt" ng-repeat="data in crit.criteria">
+                                        <div layout="row" flex>
+                                            <div flex layout="column" layout-align="start start">
+                                                <div class="titulo_formulario" style="color: rgb(92, 183, 235);" flex>
+                                                    <div layout="column" layout-align="start start" style="padding-top:0px">
+                                                        <span>{{data.field.descripcion}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div flex>
+                                                {{findOpt(data,critData.prodCrit)}}
                                             </div>
                                         </div>
+
                                     </div>
-                                    <div flex>
-                                        {{data.valor}}
-                                    </div>
-                                </div>
+                                </md-content>
+
                             	
                             </div>
 						</div>

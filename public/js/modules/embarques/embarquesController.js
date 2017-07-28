@@ -5388,7 +5388,7 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             bin.data = file;
             bin.estado = 'up';
             var send = { folder:folder, file: file.file};
-            console.log("send==>",send);
+            //console.log("send==>",send);
             Upload.upload({
                 url: 'master/files/upload',
                 data :send
@@ -5446,6 +5446,7 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
             return upload;
         }
         ,storage : function (data) {
+            //console.log("nuevo folder",data)
             folder = data;
         }
         ,clear : function () {

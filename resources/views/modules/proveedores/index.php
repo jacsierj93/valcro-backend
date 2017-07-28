@@ -602,7 +602,7 @@
                                 </md-input-container>
                                 <md-input-container class="md-block" flex="30">
                                     <label>Telefono</label>
-                                    <input skip-tab id="dirPhone" phone info="telefono de oficina ej (+58)0001234567" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-model="dir.provTelf" ng-disabled="$parent.enabled" />
+                                    <input skip-tab ng-model="dir.provTelf" id="dirPhone" phone erro-listener phone-msg="{t:'error',m:'el formato de telefono no coincide'}" info="telefono de oficina ej (+58)0001234567" autocomplete="off" ng-blur="checkCode()" name="dirprovTelf" required md-no-asterisk ng-disabled="$parent.enabled" />
                                 </md-input-container>
 
                             </div>
@@ -1788,7 +1788,7 @@
                                                                                 </form>
 
                                                                                 <!-- ########################################## FORMULARIO TIEMPO TRANSITO ########################################## -->
-                                                                                <form name="timeTrans" layout="row" ng-controller="transTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':timesT.length == 0}" ng-click="showGrid(true, $event)" click-out="showGrid(false,$event)">
+                                                                                <form name="timeTrans" layout="row" ng-controller="transTimeController" global ng-class="{'focused':isShow,'preNew':!prov.id, 'required':timesT.length == 0}" frm-disabled="assignAddres==0" dis-msg="debe agregar direcciones primero para poder cargar estos datos" ng-click="showGrid(true, $event)" click-out="showGrid(false,$event)">
                                                                                     <div active-left></div>
                                                                                     <div flex>
                                                                                         <div class="titulo_formulario row" layout="row" layout-align="start start" flex ng-class="{'onlyread' : (!$parent.edit)}">
@@ -1830,7 +1830,9 @@
                                                                                                                      flex
                                                                                                                      id="paistimeP"
                                                                                                                      info="pais de origen"
-                                                                                                                     md-selected-item-change="ttr.country = ctrl.pais.id"
+                                                                                                                     model="ttr.country"
+                                                                                                                     key="pais.id"
+                                                                                                                     prela-msg="debe crear direcciones de almacen para poder establecer paises"
                                                                                                                      skip-tab
                                                                                                                      md-require-match="true"
                                                                                                                      md-search-text="ctrl.searchCountry"
@@ -1891,7 +1893,7 @@
 
                                                                                                 <div style="width:100px; padding: 3px;">
                                                                                                     <span style="float: left;height: 25px;margin-top: 3px;padding-right: 4px;background: #f1f1f1;padding-left: 4px;">listas</span>
-                                                                                                    <div ng-click="openAdj($event)" ng-class="{'ng-disable':$parent.enabled}" skip-tab="autoClik" class="vlc-buttom" style="float:left">
+                                                                                                    <div pop-up-open="{'sideFiles':{}}" ng-class="{'ng-disable':$parent.enabled}" skip-tab="autoClik" class="vlc-buttom" style="float:left">
                                                                                                         {{lp.adjs.length|| 0}}
                                                                                                     </div>
                                                                                                 </div>
@@ -2384,7 +2386,17 @@
                                                                             </div>
                                                                         </md-sidenav>
 
+                                                                        <md-sidenav  layout="row" class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="sideFiles" id="sideFiles" >
 
+                                                                            <md-content  layout="row" flex class="sideNavContent" ng-init="localizame = true" >
+                                                                                <div layout="row" flex style="padding: 4px; overflow-x: hidden;" auto-close="{before:trysave,after:null}">
+                                                                                    <!--<div class="activeleft "
+                                                                                         ng-click="closeSide()" ng-class="{'white': ('detalleDoc'!=layer)}"  style="" ng-show="expand"></div>-->
+                                                                                    <vld-file-up-img style="border-bottom: solid 0.1px #ccc;" funciones="AdjFn" up-model="adjuntos" fn-file-up="fnfile" key="MailCtrl" up-adjs="loades" storage="prov"></vld-file-up-img>
+                                                                                </div>
+
+                                                                            </md-content>
+                                                                        </md-sidenav>
                                                                         <md-sidenav class="popUp md-sidenav-right md-whiteframe-2dp" md-disable-backdrop="true" md-component-id="aprovLayr" id="aprovLayr">
                                                                             <md-content class="cntLayerHolder" layout="column" layout-padding flex  ng-controller="aprovLayrCtrlr">
                                                                                 <input type="hidden" md-autofocus>

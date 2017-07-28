@@ -75,6 +75,12 @@ form:not(:last-child){
     padding-right: 4px;
     width:calc(100% - 8px);
 }
+.row-adapt {
+    min-height: 40px;
+    padding-right: 4px;
+    margin-top:8px;
+    width:calc(100% - 8px);
+}
 
 /*==================================================*/
 /*==================================================*/

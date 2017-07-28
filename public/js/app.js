@@ -234,6 +234,7 @@ MyApp.filter('filterSearch', function() {
             return arr1;
         }
         return arr1.filter(function(val) {
+            //console.log(arr2)
             return (arr2.indexOf(eval("val."+id+".toString()")) !== -1 || arr2.indexOf(parseInt(eval("val."+id))) !== -1);//el punto id trunca a que el filtro sera realizado solo por el atributo id del array pasado
         });
     };
@@ -378,6 +379,7 @@ MyApp.directive('alpha', function () {
 
 MyApp.directive('phone', function (setNotif) {
     return {
+        require: '?ngModel',
         link: function (scope, elem, attrs,ctrl) {
 
             elem[0].addEventListener('input', function(){
@@ -389,6 +391,19 @@ MyApp.directive('phone', function (setNotif) {
                     setNotif.hideByContent("error","no se permiten estos valores");
                 }
             },false);
+
+            if(!ctrl){
+                return false;
+            }
+            var patt = new RegExp("^(\\(?(00|\\+)[0-9]{1,2}\\)?)\\-?[0-9]{8,10}$");
+            ctrl.$validators.phone = function(modelValue, viewValue) {
+                if (ctrl.$isEmpty(modelValue) || ctrl.$pristine || modelValue===true) {
+                    //console.log("entrooooo",modelValue)
+                    return true;
+                }
+                return patt.test(modelValue);
+
+            };
 
         }
     };
@@ -693,6 +708,89 @@ MyApp.directive('skipNotif', function ($compile,$timeout) {
     };
 });
 
+
+MyApp.directive('model', function($timeout,setNotif,$filter, $sce,$parse) {
+   // var old = {element: "", info: "", scope: null};
+    //var ref = false;
+
+    return {
+        restrict: 'A',
+        require: '?mdAutocomplete',
+        link: function (scope, element, attrs, model) {
+            if(element.is("md-autocomplete") &&  attrs.model){
+                //console.log("autocomplete",model)
+                var aliasTxt =attrs.mdItems.split(/ in /i)[0];
+                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
+                var ngmodel = attrs.model;
+                var local = false;
+                var keyVal = attrs.key || aliasTxt+".id";
+
+                model.scope.itemChange = function(cambio){
+
+                    if(typeof(cambio)=="undefined"){
+                        return false;
+                    }
+                    local = true;
+
+                    var valor = eval("cambio."+keyVal);
+                    scope.$eval(attrs.model+" = "+valor);
+
+                };
+                scope.$watch(ngmodel, function (newVall, olVal) {
+
+                    if(typeof(newVall)=="undefined"){
+                        return false;
+                    }
+
+                    if(newVall==null){
+                        model.scope.selectedItem = null;
+                    }
+                    if(local){
+                        local = false;
+                        return false;
+                    }
+                    var aux = (newVall)? $filter("filterSearch")(src, [newVall],keyVal.replace(aliasTxt+".","")) : [];
+
+                    if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
+                        model.scope.selectedItem = (aux.length>0)?aux[0] : null;
+                    }else if(aux.length ==0){
+                        model.scope.selectedItem = null;
+                    }
+                });
+            }
+
+            /*if(attrs.prelaMsg){
+                element.on("focus","input", function(e) {
+                    if(model.matches.length==0){
+                        setNotif.addNotif('error',attrs.prelaMsg,[{name:"entendido",action:function(){}}],{block:true});
+                    }
+
+                });
+            }*/
+        }
+    }
+});
+
+MyApp.directive('frmDisabled', function($timeout,setNotif,$filter, $sce,$parse) {
+    // var old = {element: "", info: "", scope: null};
+    //var ref = false;
+
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            element.on("focus","input",function(){
+                if(scope.$eval(attrs.frmDisabled)){
+
+                   angular.element(":focus").blur().focusout();
+                   angular.element("body").click()
+                    /*  scope.showGrid(false)*/
+                    setNotif.addNotif("error",attrs.disMsg || "este formulario esta inhabilitado",[{name:"entendido",action:function(){}}],{})
+                }
+            })
+        }
+    }
+});
+
 MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
     var old ={element:"",info:"",scope:null};
     var ref = false;
@@ -711,45 +809,7 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
 
             }*/
 
-            if(element.is("md-autocomplete") &&  attrs.model){
 
-                var aliasTxt =attrs.mdItems.split(/ in /i)[0];
-                var src = scope.$eval(attrs.mdItems.split(/ in /i)[1].split(/ \| /)[0]);
-                var ngmodel = attrs.model;
-                var local = false;
-                var keyVal = attrs.key || aliasTxt+".id";
-
-
-
-                model.scope.itemChange = function(cambio){
-
-                    if(typeof(cambio)=="undefined"){
-                        return false;
-                    }
-                    local = true;
-                    
-                    var valor = eval("cambio."+keyVal);
-                    scope.$eval(attrs.model+" = "+valor);
-
-                };
-                scope.$watch(ngmodel, function (newVall, olVal) {
-
-                    if(typeof(newVall)=="undefined"){
-                        return false;
-                    }
-                    if(local){
-                        local = false;
-                        return false;
-                    }
-                    var aux = (newVall)? $filter("filterSearch")(src, [newVall],keyVal.replace(aliasTxt+".","")) : [];
-
-                    if(aux.length > 0 && !angular.equals(aux[0],model.mdSelectedItem)){
-                            model.scope.selectedItem = (aux.length>0)?aux[0] : null;
-                    }else if(aux.length ==0){
-                        model.scope.selectedItem = null;
-                    }
-                });
-            }
 
             if(attrs.lmbRequired){
                 model.scope.$watch("selectedItem", function (newVall, olVal) {
@@ -777,7 +837,6 @@ MyApp.directive('info', function($timeout,setNotif,$filter, $sce,$parse) {
                             if('lmbRequiredClearOnFail' in  attrs){
                                 $timeout(function () {
                                     model.scope.searchText = undefined;
-                                    console.log("limpiando", model.scope);
                                 }, 100);
                             }
 
@@ -961,7 +1020,8 @@ MyApp.directive('erroListener', function($filter,$q,$timeout,setNotif){
             mdMinLength:"=?mdMinLength",
             minImp:"=?minImpMsg",
             maxImp:"=?maxImpMsg",
-            duplicate:"=?duplicateMsg"
+            duplicate:"=?duplicateMsg",
+            phone:"=?phoneMsg"
 
         },
         link: function(scope, elm, attrs, ctrl) {
@@ -1501,6 +1561,7 @@ MyApp.service('filesService' ,function(Upload){
         },
         setFolder: function(value){
             folder = value;
+            console.log("folder==>",folder)
         },
         getFolder : function (){
             return folder;
@@ -1526,6 +1587,7 @@ MyApp.service('filesService' ,function(Upload){
 
         },
         Upload :function (data){
+            console.log(folder)
             var send= {url:"master/files/upload", data:{ folder:folder, file:data.file}};
 
             console.log("data", data);

@@ -717,8 +717,7 @@ MyApp.directive('formPreview', function() {
                     childs:[]
                 };
                 if(field.value != null){
-                    $scope.crit[''+field.id].value =(field.value.indexOf(">>")!=-1)?field.value.split(">>"):(parseInt(field.value)==field.value)?parseInt(field.value):field.value;
-
+                    $scope.crit[''+field.id].value =(("multi" in field.options) && field.options.multi[0].pivot.value==1)?field.value.split(">>"):(parseInt(field.value)==field.value)?parseInt(field.value):field.value;
                 }
                 $scope.isShow[field.id] = true;
                 $scope.formFilters[field.id] = [];
@@ -853,7 +852,6 @@ MyApp.directive('lmbCollection', function() {
                 }
             }
             $scope.setIten=function(dat){
-                //console.log($scope)
                 $scope.curVal = dat;
                 if($scope.valid.f(dat)){
                     done()
@@ -864,7 +862,6 @@ MyApp.directive('lmbCollection', function() {
 
             var done = function(){
                 var dat = $scope.curVal;
-
                 if($scope.multi){
                     //console.log($scope.model)
                     if(typeof($scope.model) !='object' || $scope.model==null){
@@ -896,6 +893,10 @@ MyApp.directive('lmbCollection', function() {
 
             $scope.exist = function(dat){
                 if($scope.multi){
+                   /* if(typeof($scope.model)!="array"){
+                        $scope.model = new Array($scope.model);
+
+                    }*/
                     if($scope.model){
                         return $scope.model.indexOf(eval("dat."+$scope.key)) !== -1 || $scope.model.indexOf(eval("dat."+$scope.key)+"") !== -1;
                     }
@@ -908,8 +909,9 @@ MyApp.directive('lmbCollection', function() {
 
         },
         link:function(scope,elem,attr,model){
+            //console.log(attr)
             scope.ident = attr;
-            scope.multi = ('multiple' in attr);
+            //scope.multi = ('multiple' in attr);
             scope.key = ('lmbKey' in attr)?attr.lmbKey:'id';
             scope.also = ('lmbAlso' in attr)?attr.lmbAlso:false;
             scope.prntFrm = false;
@@ -932,9 +934,9 @@ MyApp.directive('lmbCollection', function() {
                 }
             });
             attr.$observe('multiple', function (newValue) {
-
+                //console.log("multi",scope.$eval(newValue));
                 if(newValue || ("multiple" in attr)){
-                    scope.multi = true;
+                    scope.multi = scope.$eval(newValue);
                 }else{
                     scope.multi = false;
                 }
@@ -1217,10 +1219,10 @@ MyApp.directive('showNext', function() {
         transclude: true,
         scope:{
             nextFn:"=?onNext",
-            nextValid:"=?valid"
-
+            nextValid:"=?valid",
+            nextError:"=?onError"
         },
-        controller:function($scope,$mdSidenav,nxtService,$timeout,Layers){
+        controller:function($scope,$mdSidenav,nxtService,$timeout,Layers,setNotif){
             $scope.cfg = nxtService.getCfg();
             if(!("onNext" in  $scope)){
                 $scope.onNext = ($scope.$parent)
@@ -1245,9 +1247,15 @@ MyApp.directive('showNext', function() {
                 }
             });
             $scope.show = function(){
-                if((!typeof($scope.nextValid)=="function")?$scope.nextValid():$scope.nextValid){
+
+                if((typeof($scope.nextValid)=="function")?$scope.nextValid():$scope.nextValid){
                     $scope.cfg.show = true;
                     $scope.cfg.fn = $scope.nextFn;
+                }else{
+                    if(("nextError" in  $scope)){
+                        (typeof($scope.nextError)=="function")?$scope.nextError():setNotif.addNotif("error",$scope.nextError,[],{autohidden:2000});
+                        //$scope.nextValid = function(){return true};
+                    }
                 }
             }
         },
@@ -1270,7 +1278,6 @@ MyApp.directive('nextRow', function() {
 
             $scope.cfg = nxtService.getCfg();
             $scope.nxtAction = function(e){
-                console.log(typeof($scope.cfg.fn),$scope.cfg.fn);
                 if(typeof($scope.cfg.fn) === "string"){
                     $scope.LayersAction({open:{name:$scope.cfg.fn}});
                 }else{
@@ -1287,6 +1294,37 @@ MyApp.directive('nextRow', function() {
         '<img src="images/btn_nextArrow.png" ng-click="nxtAction(\$event)"/>'+
         '</md-sidenav>'
     };
+});//GLOBAL
+
+MyApp.service("focusedService",function(){
+    var cfg = {
+        formName : null,
+    };
+
+    return {
+        getCfg : function(){
+            return cfg;
+        }
+    }
+});
+
+MyApp.directive('focused', function(focusedService) {
+
+    return {
+        link: function (scope, object, attr) {
+            //console.log("bind")
+            var x = focusedService.getCfg();
+
+            angular.element(object).on("focus",'input',function(){
+                if(x.formName != attr.name){
+                    angular.element("[name='"+x.formName+"']").removeClass("focused");
+                    angular.element(object).addClass("focused");
+                    x.formName = attr.name;
+                }
+            })
+
+        }
+    }
 });//GLOBAL
 
 
