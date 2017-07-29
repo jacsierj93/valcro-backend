@@ -395,7 +395,7 @@ MyApp.directive('phone', function (setNotif) {
             if(!ctrl){
                 return false;
             }
-            var patt = new RegExp("^(\\(?(00|\\+)[0-9]{1,2}\\)?)\\-?[0-9]{8,10}$");
+            var patt = new RegExp("^((\\((00|\\+)[0-9]{1,2}\\)||(00|\\+)[0-9]{1,2}))\\-?[0-9]{9,10}$");
             ctrl.$validators.phone = function(modelValue, viewValue) {
                 if (ctrl.$isEmpty(modelValue) || ctrl.$pristine || modelValue===true) {
                     //console.log("entrooooo",modelValue)
@@ -780,11 +780,15 @@ MyApp.directive('frmDisabled', function($timeout,setNotif,$filter, $sce,$parse) 
         link: function (scope, element, attrs) {
             element.on("focus","input",function(){
                 if(scope.$eval(attrs.frmDisabled)){
+                    $timeout(function(){
+                        angular.element("body").click()
+                        $timeout(function(){
+                            angular.element(":focus").blur();
+                            setNotif.addNotif("error",attrs.disMsg || "este formulario esta inhabilitado",[{name:"entendido",action:function(){}}],{block:true})
+                        })
 
-                   angular.element(":focus").blur().focusout();
-                   angular.element("body").click()
-                    /*  scope.showGrid(false)*/
-                    setNotif.addNotif("error",attrs.disMsg || "este formulario esta inhabilitado",[{name:"entendido",action:function(){}}],{})
+                    },0);
+
                 }
             })
         }

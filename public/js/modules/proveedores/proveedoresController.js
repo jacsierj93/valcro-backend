@@ -1737,7 +1737,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
     var chipCont = {};
 
     angular.element("#contTelf").on("focus","input",function(e){
-        if(angular.element("#contTelf").find("input").val()==""){
+        if(angular.element("#contTelf").find("input").val()=="" && $scope.ctrl.pais.area_code){
             angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
         }
 
@@ -1780,7 +1780,7 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
         if (angular.isObject(chip)) {
             return chip;
         }
-        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}(\\.[A-Za-z]{1,2})?$");
+        var reg = new RegExp("^[A-Za-z]+[^\\s\\+\\-\\\\\/\\(\\)\\[\\]\\-]*@[A-Za-z]+[A-Za-z0-9]*\\.[A-Za-z]{2,}(\\.[A-Za-z]{2})?$");
 
         if(!reg.test(chip)){
             setNotif.addNotif("error", "el email no tiene un formato adecuado", [
@@ -1816,20 +1816,20 @@ MyApp.controller('contactProv', function($scope,setGetProv,providers,$mdSidenav,
             return chip;
         }
 
-        var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}[\\)\\-\\s]{1}[0-9\\-]{9,10}$");
+        var reg = new RegExp("^\\(?\\+[0-9]{1,3}\\-?[0-9]{0,3}(\\)||\\-)?[0-9\\-]{9,10}$");
         console.log(reg.test(chip))
         if(!reg.test(chip)){
             $timeout(function(){
                 if(angular.element(":focus").parents("#contTelf").length>0){
-                    if(chip!="" && chip != $scope.ctrl.pais.area_code.phone){
-                        setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
-                        ],{autohidden:2000});
+                    setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
+                    ],{autohidden:2000});
+                    if(chip!="" && (chip != $scope.ctrl.pais.area_code.phone && $scope.ctrl.pais.area_code.phone)){
+
                         angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
                     }else{
-                        console.log("espacio",angular.element("#contTelf").find("input"),$scope.ctrl.pais.area_code.phone)
                         angular.element("#contTelf").find("input").val($scope.ctrl.pais.area_code.phone);
-                        setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
-                        ],{autohidden:2000});
+                      /*  setNotif.addNotif("error", "el telefono no posee un formato adecuado, recuerda ingresarlo en formato internacional", [
+                        ],{autohidden:2000});*/
 
                     }
                 }
@@ -3485,6 +3485,7 @@ MyApp.controller('priceListController',function($scope,$mdSidenav,setGetProv,pro
             angular.forEach(list.files,function(v,k){
                 $scope.lp.adjs.push(v.id);
             });
+            console.log($scope.lp.adjs)
             filesService.setFiles(list.files)
             currentOrig = angular.copy($scope.lp);
             setGetProv.addToRllBck($scope.lp,"priceList")

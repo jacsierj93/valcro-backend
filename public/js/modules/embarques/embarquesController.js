@@ -5396,10 +5396,12 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
                 file.state = 'load';
                 file.up = parseInt(100.0 * evt.loaded / evt.total)
             }).success(function (data, status, headers, config) {
+
                 file.state = 'up';
                 angular.forEach(data,function (v, k) {
                     file[k]= v;
                 });
+                console.log("file",file)
                 upload.total.push(file);
                 upload.succeces.push(file);
                 start();
