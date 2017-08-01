@@ -5341,7 +5341,7 @@ MyApp.factory('vlResource', ['$resource',
         });
     }
 ]);
-MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upload,$timeout,$interval,$filter) {
+MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter','$q',function (Upload,$timeout,$interval,$filter,$q) {
     var folder = 'none';
     var key = '';
     var bin = {estado:'wait', data: undefined};
@@ -5414,6 +5414,23 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
         },50*file.index );
     };
 
+    var getIds = function(arr){
+        def = $q.defer();
+
+        Upload.upload({
+            url: 'master/files/gets',
+            data: arr
+                .success(function (data, status, headers, config) {
+                    def.resolve(data);
+
+                })
+                .error(function(){
+                    def.reject();
+                })
+        });
+        return def.promise;
+    }
+
     var clear = function () {
         folder = 'none';
 
@@ -5454,6 +5471,12 @@ MyApp.service('fileSrv',['Upload','$timeout','$interval','$filter',function (Upl
         ,clear : function () {
 
             clear();
+        }
+
+        ,getById :function(ids){
+            getIds(ids).success(function(data){
+                upload.succeces.concat(data);
+            })
         }
 
 

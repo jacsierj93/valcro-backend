@@ -45,4 +45,14 @@ class FilesController extends BaseController
         return $archivo->getFile($file->tipo.$file->archivo);
 
     }
+    public function getFilesIds(Request $req){
+        $files = FileModel::find($req->ids);
+        $archivo = new Files($files[0]->modulo);
+        $list = [];
+        foreach ($files as $file){
+            $list[]=$archivo->getFile($file->tipo.$file->archivo);
+        }
+        return $list;
+
+    }
 }

@@ -5393,7 +5393,7 @@ class OrderController extends BaseController
         $atts = array();
 
         foreach($model->attachments()->get() as $aux){
-            $auxFile= array();
+            $auxFile= array(); //TODO: entender esta MIERDA
             $file= FileModel::findOrFail($aux->archivo_id);
             $att['id'] = $aux->id;
             $att['final_id'] = $aux->final_id;
