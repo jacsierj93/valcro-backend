@@ -87,7 +87,9 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
             if(data.length > 0 && obj){
                 data = $filter("customFind")(data, obj,function(current,compare){
                     if(compare.id ){
-                        if(current.id.toLowerCase().indexOf(compare.id)== -1){
+                        /*compare.id = !isNaN(compare.id)?""+compare.id:compare.id;
+                        console.log(compare.id,compare.id.toString())*/
+                        if(current.id.toString().toLowerCase().indexOf(compare.id.toString())== -1){
                             return false;
                         }
                     }
@@ -124,7 +126,7 @@ MyApp.controller('PedidosCtrll',['$scope','$mdSidenav', '$timeout','$interval','
                         if(!current.id){
                             return false;
                         }
-                        if( current.id.toLowerCase().indexOf(compare.id)== -1){
+                        if( current.id.toString().toLowerCase().indexOf(compare.id)== -1){
                             return false;
                         }
 

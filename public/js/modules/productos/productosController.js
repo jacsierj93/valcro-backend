@@ -473,6 +473,11 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         reqStrg:"",
         tools:""
     };
+    $scope.defaultUnits={
+        id:false,
+        buy:"",
+        sell:""
+    }
     $scope.units  = generic.units();
     $scope.prodMain = productsServices.getProd();
     $scope.prodEdit = productsServices.getToSavedProd();
@@ -483,7 +488,10 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         if(n){
             $scope.prod.id = n;
             $scope.misc.id = n;
+            $scope.defaultUnits.id = n;
 
+            $scope.defaultUnits.buy=parseFloat($scope.prodMain.datos.uni_compra_id);
+            $scope.defaultUnits.sell=parseFloat($scope.prodMain.datos.uni_venta_id);
             $scope.prod.pntBuy = parseFloat($scope.prodMain.datos.point_buy);
             $scope.prod.pntBuyU = parseInt($scope.prodMain.datos.pbuy_unit);
             $scope.prod.pntSald = parseFloat($scope.prodMain.datos.point_credit);
@@ -508,6 +516,7 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
         if(n) {
             $scope.prod.id = n;
             $scope.misc.id = n;
+            $scope.defaultUnits.id = n;
         }
     });
 
@@ -534,6 +543,20 @@ MyApp.controller('extraDataController',['$scope', 'setNotif','productos','$mdSid
                        setNotif.addNotif("ok","datos guardados",[],{autohidden:1500});
                        $scope.$eval(frm).$setPristine();
                        $scope.$eval(frm).$setUntouched();
+                   }
+                   /*$scope.list.common.data.splice(idx,1);*/
+               })
+           }else if(frm=="frmUnits"){
+               productos.put({type:"prodSaveUnits"},$scope.defaultUnits,function (data) {
+                   if(data.action!="equal"){
+                       setNotif.addNotif("ok","datos guardados",[],{autohidden:1500});
+                       $scope.prod.pntBuyU = $scope.defaultUnits.buy;
+                       $scope.prod.pntSaldU = $scope.defaultUnits.buy;
+                       $scope.misc.unitLib = $scope.defaultUnits.sell;
+                       $scope.misc.unitDis = $scope.defaultUnits.sell;
+                       $scope.misc.unitDon = $scope.defaultUnits.sell;
+                       $scope.$eval(frmUnits).$setPristine();
+                       $scope.$eval(frmUnits).$setUntouched();
                    }
                    /*$scope.list.common.data.splice(idx,1);*/
                })

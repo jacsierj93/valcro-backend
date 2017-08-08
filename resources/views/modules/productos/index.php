@@ -617,9 +617,10 @@
                                             <label>Unidad de Compra</label>
                                             <md-autocomplete md-selected-item="ctrl.unitBuy"
                                                              flex
+                                                             md-autofocus
                                                              id="prodStorage"
                                                              info="unidad en la que se compra normalmente este producto"
-                                                             model="units.buy"
+                                                             model="defaultUnits.buy"
                                                              skip-tab
                                                              md-search-text="ctrl.srchbuy"
                                                              md-items="item in units | stringKey : ctrl.srchbuy : 'descripcion'"
@@ -640,7 +641,7 @@
                                                              flex
                                                              id="prodStorage"
                                                              info="unidad en la que se compra normalmente este producto"
-                                                             model="units.sell"
+                                                             model="defaultUnits.sell"
                                                              skip-tab
                                                              md-search-text="ctrl.srchsell"
                                                              md-items="item in units | stringKey : ctrl.srchsell : 'descripcion'"
@@ -671,7 +672,7 @@
                                             <label>Punto de Compra</label>
                                             <input autocomplete="off"
                                                    skip-tab
-                                                   md-autofocus
+
                                                    info="indica el punto del stock en que debe solicitarse nuevamente"
                                                    name="pointBuy"
                                                    type="number"

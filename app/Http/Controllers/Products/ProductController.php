@@ -222,10 +222,8 @@ class ProductController  extends BaseController
             $result['action']="upd";
         }
 
-        $prod->point_buy = $req->pntBuy;
-        $prod->pbuy_unit = $req->pntBuyU;
-        $prod->point_credit = $req->pntSald;
-        $prod->pcred_unit = $req->pntSaldU;
+        $prod->uni_compra_id = $req->buy;
+        $prod->uni_venta_id = $req->sell;
         if($prod->isDirty()){
             $prod->save();
         }else{

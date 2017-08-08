@@ -310,8 +310,8 @@ class OrderController extends BaseController
         $mail->tipo = 'user';
         $mail->modulo = 'email';
         $adjs = [];
-        $destinations = ['to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'subject'=>$mail->asunto,'from'=>$req->from];
-
+        $destinations = ['subject'=>$mail->asunto,'to'=>[],'cc'=>[], 'ccb'=>[],'attsData'=>[],'from'=>$req->from];
+        //dd($destinations);
         if($req->has('to')){
             foreach ($req->to as $aux){
                 $dest = new MailModuleDestinations();
@@ -1259,8 +1259,7 @@ class OrderController extends BaseController
         $result["action"] = "new";
         $model = new Solicitude();
         $uid = null;
-
-        if ($req->has('id')) {
+        if ($req->has('id') && $req->id) {
             $model = $model->findOrFail($req->id);
             $result["action"] = "edit";
         }

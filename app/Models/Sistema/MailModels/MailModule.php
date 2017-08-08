@@ -105,6 +105,7 @@ class MailModule extends Model
             $ofline= ['data'=>storage_path() . '/app/mail/backut/'.$fileModel->archivo, 'nombre'=>'offline.pdf'];
             $sender['atts'][] =$ofline ;
             $model->backut = $fileModel->archivo;
+
             $this->sending($template, $sender);
             $model->send = Carbon::now();
             $model->save();
@@ -155,13 +156,14 @@ class MailModule extends Model
     }
     private function sending ($template, $sender,$opc = []){
         $model = $this;
-        echo "entroooooooo";
+
         Mail::send('emails.render', ['data'=>$template],function ($m) use($sender , $model){
             $m->subject($sender['subject']);
 
-            if(array_key_exists('from' , $sender)){
+            if(array_key_exists('from' , $sender) && $sender['from']['email']!=""){
                 $m->from($sender['from']['email'],$sender['from']['nombre']);
             }
+
             foreach($sender['to'] as $aux)
             {
                 $m->to($aux->email, $aux->nombre);

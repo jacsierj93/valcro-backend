@@ -26,7 +26,7 @@ MyApp.controller('notificaciones', ['$scope', '$mdSidenav','setNotif',"$filter",
         var curr = angular.copy($scope.alerts[target][$scope.selected[target]]);
         $scope.alerts[target].splice($scope.selected[target],1);
 
-        if(curr.param && "block" in curr.param){
+        if(curr.param && ("block" in curr.param)){
 
             $scope.block = false;
             //$scope.block--;
